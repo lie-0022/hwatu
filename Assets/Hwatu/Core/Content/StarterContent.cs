@@ -145,5 +145,33 @@ namespace Hwatu.Core.Content
             },
             EnemyAiKind.Sequence,
             new[] { "glare", "enrage", "oni_smash" });
+
+        // 보스 구미호: 환혹(약화3)/꼬리치기(4×3)/여우불(12), HP 50%↓ 광폭 [구미폭8×3/여우불/꼬리치기]
+        public static EnemyData Gumiho() => new EnemyData(
+            "gumiho", "구미호", 48, 58,
+            new[]
+            {
+                new EnemyMoveData("charm", IntentType.Debuff, 3,
+                    new[] { new EffectData(EffectOp.ApplyStatus, amount: 3, target: TargetType.Enemy, status: StatusType.Weak) }),
+                new EnemyMoveData("tail", IntentType.AttackMulti, 4,
+                    new[]
+                    {
+                        new EffectData(EffectOp.DealDamage, amount: 4, target: TargetType.Enemy),
+                        new EffectData(EffectOp.DealDamage, amount: 4, target: TargetType.Enemy),
+                        new EffectData(EffectOp.DealDamage, amount: 4, target: TargetType.Enemy),
+                    }, hits: 3),
+                new EnemyMoveData("foxfire", IntentType.Attack, 12,
+                    new[] { new EffectData(EffectOp.DealDamage, amount: 12, target: TargetType.Enemy) }),
+                new EnemyMoveData("ninetails", IntentType.AttackMulti, 8,
+                    new[]
+                    {
+                        new EffectData(EffectOp.DealDamage, amount: 8, target: TargetType.Enemy),
+                        new EffectData(EffectOp.DealDamage, amount: 8, target: TargetType.Enemy),
+                        new EffectData(EffectOp.DealDamage, amount: 8, target: TargetType.Enemy),
+                    }, hits: 3),
+            },
+            EnemyAiKind.Phase,
+            new[] { "charm", "tail", "foxfire" },
+            new[] { "ninetails", "foxfire", "tail" });
     }
 }
