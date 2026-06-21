@@ -12,7 +12,9 @@ namespace Hwatu.Core.Content
             switch (type)
             {
                 case NodeType.Boss:
-                    return StarterContent.DokkaebiBoss();
+                    return rng.NextInt(2) == 0
+                        ? StarterContent.DokkaebiBoss()
+                        : StarterContent.Gumiho();
                 case NodeType.Elite:
                     return rng.NextInt(2) == 0
                         ? StarterContent.GwangGwiElite()

@@ -12,9 +12,13 @@ namespace Hwatu.Tests.Run
     public class EnemyContentTests
     {
         [Test]
-        public void Boss_IsFixed()
+        public void Boss_FromBossPool()
         {
-            Assert.AreEqual("달그림자 도깨비", EnemyContent.PickEnemy(NodeType.Boss, new SplitMix64Random(1)).Name);
+            var pool = new HashSet<string> { "달그림자 도깨비", "구미호" };
+            for (ulong s = 1; s <= 20; s++)
+            {
+                Assert.IsTrue(pool.Contains(EnemyContent.PickEnemy(NodeType.Boss, new SplitMix64Random(s)).Name));
+            }
         }
 
         [Test]
