@@ -16,10 +16,11 @@ namespace Hwatu.Core.Content
                 case NodeType.Elite:
                     return StarterContent.GwangGwiElite();
                 default:
-                    int i = rng.NextInt(3);
+                    int i = rng.NextInt(4);
                     return i == 0 ? StarterContent.DokkaebiMinion()
                          : i == 1 ? StarterContent.Crows()
-                         : StarterContent.Scarecrow();
+                         : i == 2 ? StarterContent.Scarecrow()
+                         : StarterContent.WillOWisp();
             }
         }
     }
