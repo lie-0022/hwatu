@@ -44,5 +44,18 @@ namespace Hwatu.Tests.Run
             var run = new RunState(CharacterData.Luminary(), 1);
             Assert.AreEqual(40, run.PotionChance);
         }
+
+        [Test]
+        public void PotionChance_StaysClamped_OverManyRolls()
+        {
+            var pool = PotionContent.All();
+            var rng = new SplitMix64Random(1);
+            int chance = 40;
+            for (int i = 0; i < 20; i++)
+            {
+                RewardSystem.RollPotion(rng, pool, ref chance);
+                Assert.IsTrue(chance >= 10 && chance <= 90, $"roll {i}: chance {chance}");
+            }
+        }
     }
 }
