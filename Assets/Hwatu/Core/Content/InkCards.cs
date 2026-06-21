@@ -86,6 +86,10 @@ namespace Hwatu.Core.Content
                 new EffectData(EffectOp.ApplyStatus, amount: 2, target: TargetType.Enemy, status: StatusType.Poison),
             }, CardRarity.Uncommon);
 
+        // 맹독: 강력한 1회 독(중독6, Exhaust)
+        public static CardData Venom() => new CardData("ink_venom", "맹독", CardType.Skill, 2, TargetType.Enemy, true,
+            new[] { new EffectData(EffectOp.ApplyStatus, amount: 6, target: TargetType.Enemy, status: StatusType.Poison) }, CardRarity.Rare);
+
         /// <summary>묵귀 시작 덱 10장: 그림자칼×5, 그늘×4, 옻칠×1.</summary>
         public static List<CardData> InkStarterDeck()
         {
@@ -96,14 +100,14 @@ namespace Hwatu.Core.Content
             return deck;
         }
 
-        /// <summary>묵귀 보상 풀(13장: Common4/Uncommon6/Rare3).</summary>
+        /// <summary>묵귀 보상 풀(14장: Common4/Uncommon6/Rare4).</summary>
         public static List<CardData> RewardPool()
         {
             return new List<CardData>
             {
                 InkStrike(), Soot(), DarkGuard(), Lacquer(),
                 Seep(), Miasma(), Veil(), Lingering(), ToxicCloud(), Sting(),
-                Plague(), Decay(), BlackSpot(),
+                Plague(), Decay(), BlackSpot(), Venom(),
             };
         }
     }
