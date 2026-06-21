@@ -29,5 +29,17 @@ namespace Hwatu.Tests.Combat
             // Advance 전 → CombatStart phase
             Assert.IsFalse(engine.UsePotion(PotionContent.Block()));
         }
+
+        [Test]
+        public void UsePotion_Heal_RestoresHp_InCombat()
+        {
+            var deck = StarterContent.LuminaryStarterDeck();
+            CombatState state = CombatFactory.CreateCombat(deck, StarterContent.DokkaebiMinion(), 1, 80, 80);
+            state.Player.SetHp(60);
+            var engine = new CombatEngine(state, new EffectDispatcher());
+            engine.Advance(); engine.Advance(); // PlayerAction
+            engine.UsePotion(PotionContent.Heal());
+            Assert.AreEqual(75, state.Player.Hp);   // 60+15
+        }
     }
 }
