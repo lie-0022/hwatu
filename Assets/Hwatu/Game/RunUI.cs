@@ -129,11 +129,11 @@ namespace Hwatu.Game
             }
             else if (p == RunPhase.GameOver)
             {
-                _resultText.text = "패배...";
+                _resultText.text = $"패배...\n<size=45%>{_flow.Run.Character.Name} · 액트 {_flow.Run.Act}</size>";
             }
             else if (p == RunPhase.Victory)
             {
-                _resultText.text = "승리!";
+                _resultText.text = $"승리!\n<size=45%>{_flow.Run.Character.Name} · 액트 {_flow.Run.Act} 클리어</size>";
             }
         }
 
