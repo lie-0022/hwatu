@@ -49,5 +49,22 @@ namespace Hwatu.Tests.Combat
             engine.PlayCard(flashIdx);
             Assert.IsTrue(state.ExhaustPile.Exists(c => c.Data.Id == "lum_flash"), "백광(Exhaust)은 소멸 더미로");
         }
+
+        [Test]
+        public void WillOWisp_Scald_PoisonsPlayer_OverTurns()
+        {
+            var deck = new List<CardData> { StarterContent.Shield() };
+            CombatState state = CombatFactory.CreateCombat(deck, StarterContent.WillOWisp(), 999, 80, 80);
+            var engine = new CombatEngine(state, new EffectDispatcher());
+            int poison = 0;
+            for (int t = 0; t < 14; t++)
+            {
+                CombatPhase ph = engine.Advance();
+                if (ph == CombatPhase.PlayerAction) engine.EndTurn();
+                poison = state.Player.GetStatus(StatusType.Poison);
+                if (poison > 0) break;
+            }
+            Assert.AreEqual(3, poison);   // 도깨비불 scald가 플레이어에 중독 3
+        }
     }
 }
