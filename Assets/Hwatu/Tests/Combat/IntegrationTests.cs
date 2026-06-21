@@ -186,5 +186,18 @@ namespace Hwatu.Tests.Combat
             engine.PlayCard(0);   // 광휘진 → 광 +3
             Assert.AreEqual(3, state.Player.GetStatus(StatusType.Radiance));
         }
+
+        [Test]
+        public void Ink_InkStrike_DealsDamageAndPoison()
+        {
+            var deck = new List<CardData> { InkCards.InkStrike() };
+            CombatState state = CombatFactory.CreateCombat(deck, StarterContent.DokkaebiMinion(), 1, 70, 70);
+            var engine = new CombatEngine(state, new EffectDispatcher());
+            engine.Advance(); engine.Advance(); // PlayerAction
+            int hp = state.Enemies[0].Hp;
+            engine.PlayCard(0);   // 먹칼 → 피해 5 + 중독 2
+            Assert.AreEqual(hp - 5, state.Enemies[0].Hp);
+            Assert.AreEqual(2, state.Enemies[0].GetStatus(StatusType.Poison));
+        }
     }
 }
