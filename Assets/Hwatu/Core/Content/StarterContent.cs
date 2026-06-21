@@ -226,5 +226,20 @@ namespace Hwatu.Core.Content
             },
             EnemyAiKind.Sequence,
             new[] { "fang", "coil", "coil_strike" });
+
+        // 보스 장군: 강공형 — 내려베기(14) / 진군(자기 광+3) / 철벽(방14)
+        public static EnemyData General() => new EnemyData(
+            "general", "장군", 50, 60,
+            new[]
+            {
+                new EnemyMoveData("slash", IntentType.Attack, 14,
+                    new[] { new EffectData(EffectOp.DealDamage, amount: 14, target: TargetType.Enemy) }),
+                new EnemyMoveData("rally", IntentType.Buff, 3,
+                    new[] { new EffectData(EffectOp.GainResource, amount: 3, target: TargetType.Self, resource: ResourceType.Radiance) }),
+                new EnemyMoveData("bastion", IntentType.Block, 14,
+                    new[] { new EffectData(EffectOp.GainBlock, amount: 14, target: TargetType.Self) }),
+            },
+            EnemyAiKind.Sequence,
+            new[] { "rally", "slash", "bastion", "slash" });
     }
 }

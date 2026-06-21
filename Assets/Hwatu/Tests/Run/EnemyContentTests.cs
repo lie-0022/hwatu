@@ -14,7 +14,7 @@ namespace Hwatu.Tests.Run
         [Test]
         public void Boss_FromBossPool()
         {
-            var pool = new HashSet<string> { "달그림자 도깨비", "구미호" };
+            var pool = new HashSet<string> { "달그림자 도깨비", "구미호", "장군" };
             for (ulong s = 1; s <= 20; s++)
             {
                 Assert.IsTrue(pool.Contains(EnemyContent.PickEnemy(NodeType.Boss, new SplitMix64Random(s)).Name));
