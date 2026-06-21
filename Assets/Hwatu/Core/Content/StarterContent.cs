@@ -188,5 +188,22 @@ namespace Hwatu.Core.Content
             },
             EnemyAiKind.Sequence,
             new[] { "ward", "stare", "ram" });
+
+        // 일반 그슨대: 어둠 정령 — 할퀴기(3×2) / 저주(약화2)
+        public static EnemyData Geuseundae() => new EnemyData(
+            "geuseundae", "그슨대", 13, 17,
+            new[]
+            {
+                new EnemyMoveData("claw", IntentType.AttackMulti, 3,
+                    new[]
+                    {
+                        new EffectData(EffectOp.DealDamage, amount: 3, target: TargetType.Enemy),
+                        new EffectData(EffectOp.DealDamage, amount: 3, target: TargetType.Enemy),
+                    }, hits: 2),
+                new EnemyMoveData("curse", IntentType.Debuff, 2,
+                    new[] { new EffectData(EffectOp.ApplyStatus, amount: 2, target: TargetType.Enemy, status: StatusType.Weak) }),
+            },
+            EnemyAiKind.Sequence,
+            new[] { "claw", "curse", "claw" });
     }
 }
