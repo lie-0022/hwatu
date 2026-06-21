@@ -26,6 +26,7 @@ namespace Hwatu.Game
     {
         [SerializeField] private ulong _seed = 20260622UL;
 
+        private const int FinalAct = 3;
         private readonly MapGenerator _mapGen = new MapGenerator();
 
         public RunState Run { get; private set; }
@@ -92,19 +93,32 @@ namespace Hwatu.Game
                 SetPhase(RunPhase.GameOver);
                 return;
             }
-            MapNode node = Run.Map.GetNode(Run.CurrentNodeId);
-            if (node != null && node.Type == NodeType.Boss)
-            {
-                SetPhase(RunPhase.Victory);
-                return;
-            }
+            // 보스든 일반이든 보상(보스는 Rare). 보스 후 액트 진행/승리는 OnRewardDone에서 처리.
             SetPhase(RunPhase.Reward);
         }
 
-        /// <summary>보상 화면을 마치고 맵으로 복귀.</summary>
+        /// <summary>보상 화면을 마치고 — 보스였으면 액트 진행/승리, 아니면 맵 복귀.</summary>
         public void OnRewardDone()
         {
+            MapNode node = Run.Map?.GetNode(Run.CurrentNodeId);
+            if (node != null && node.Type == NodeType.Boss)
+            {
+                if (Run.Act >= FinalAct)
+                {
+                    SetPhase(RunPhase.Victory);
+                    return;
+                }
+                AdvanceAct();
+            }
             SetPhase(RunPhase.Map);
+        }
+
+        // 다음 액트: Act++, 부족분 HP 회복(STS), 새 맵 생성.
+        private void AdvanceAct()
+        {
+            Run.Act++;
+            Run.Heal(Run.MaxHp);   // 부족분 전부(최대치까지)
+            GenerateActMap();
         }
 
         /// <summary>현재 노드가 보스인가(전투 화면이 보스 적을 쓰도록).</summary>
