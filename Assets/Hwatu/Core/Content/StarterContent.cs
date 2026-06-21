@@ -64,5 +64,51 @@ namespace Hwatu.Core.Content
             },
             EnemyAiKind.Sequence,
             new[] { "crush", "rage", "barrier" });
+
+        // 까마귀떼: 다회 약공 — peck(2×3) / flock(방어 4)
+        public static EnemyData Crows() => new EnemyData(
+            "crows", "까마귀떼", 10, 14,
+            new[]
+            {
+                new EnemyMoveData("peck", IntentType.AttackMulti, 2,
+                    new[]
+                    {
+                        new EffectData(EffectOp.DealDamage, amount: 2, target: TargetType.Enemy),
+                        new EffectData(EffectOp.DealDamage, amount: 2, target: TargetType.Enemy),
+                        new EffectData(EffectOp.DealDamage, amount: 2, target: TargetType.Enemy),
+                    }),
+                new EnemyMoveData("flock", IntentType.Block, 4,
+                    new[] { new EffectData(EffectOp.GainBlock, amount: 4, target: TargetType.Self) }),
+            },
+            EnemyAiKind.Sequence,
+            new[] { "peck", "peck", "flock" });
+
+        // 허수아비: 디버프 — weaken(약화 2) / poke(공격 5)
+        public static EnemyData Scarecrow() => new EnemyData(
+            "scarecrow", "허수아비", 14, 18,
+            new[]
+            {
+                new EnemyMoveData("weaken", IntentType.Debuff, 2,
+                    new[] { new EffectData(EffectOp.ApplyStatus, amount: 2, target: TargetType.Enemy, status: StatusType.Weak) }),
+                new EnemyMoveData("poke", IntentType.Attack, 5,
+                    new[] { new EffectData(EffectOp.DealDamage, amount: 5, target: TargetType.Enemy) }),
+            },
+            EnemyAiKind.Sequence,
+            new[] { "weaken", "poke", "poke" });
+
+        // 엘리트 광귀: 강타(11) / 취약화(취약 2) / 방벽(10)
+        public static EnemyData GwangGwiElite() => new EnemyData(
+            "gwanggwi_elite", "광귀", 30, 38,
+            new[]
+            {
+                new EnemyMoveData("smash", IntentType.Attack, 11,
+                    new[] { new EffectData(EffectOp.DealDamage, amount: 11, target: TargetType.Enemy) }),
+                new EnemyMoveData("expose", IntentType.Debuff, 2,
+                    new[] { new EffectData(EffectOp.ApplyStatus, amount: 2, target: TargetType.Enemy, status: StatusType.Vulnerable) }),
+                new EnemyMoveData("wall", IntentType.Block, 10,
+                    new[] { new EffectData(EffectOp.GainBlock, amount: 10, target: TargetType.Self) }),
+            },
+            EnemyAiKind.Sequence,
+            new[] { "smash", "expose", "wall" });
     }
 }
