@@ -137,9 +137,10 @@ namespace Hwatu.Game
         private IEnumerator StartCombatNextFrame()
         {
             yield return null;
-            EnemyData enemy = _flow.CurrentNodeIsBoss()
-                ? StarterContent.DokkaebiBoss()
-                : StarterContent.DokkaebiMinion();
+            MapNode node = _flow.Run.Map.GetNode(_flow.Run.CurrentNodeId);
+            NodeType nodeType = node != null ? node.Type : NodeType.Combat;
+            IRandom enemyRng = new RngStreams(_flow.Run.Seed).ForStream("enemy_" + _flow.Run.CurrentNodeId);
+            EnemyData enemy = EnemyContent.PickEnemy(nodeType, enemyRng);
             ulong combatSeed = _flow.Run.Seed + (ulong)(_flow.Run.CurrentNodeId + 1);
             _combatCtrl.StartCombat(_flow.Run.Deck, enemy, combatSeed, _flow.Run.MaxHp, _flow.Run.Hp);
             _combatView.SetVisible(true);
