@@ -67,13 +67,20 @@ namespace Hwatu.Core.Content
         public static CardData Frenzy() => new CardData("lum_frenzy", "광폭타", CardType.Attack, 3, TargetType.Enemy, false,
             new[] { new EffectData(EffectOp.DealDamage, amount: 20, target: TargetType.Enemy) }, CardRarity.Rare);
 
-        /// <summary>보상 추첨에 쓰는 광객 카드 풀(13장: Common5/Uncommon4/Rare4).</summary>
+        public static CardData Purify() => new CardData("lum_purify", "정화", CardType.Skill, 1, TargetType.Self, false,
+            new[]
+            {
+                new EffectData(EffectOp.GainBlock, amount: 4, target: TargetType.Self),
+                new EffectData(EffectOp.ClearStatus, amount: 0, target: TargetType.Self, status: StatusType.Poison),
+            }, CardRarity.Uncommon);
+
+        /// <summary>보상 추첨에 쓰는 광객 카드 풀(14장: Common5/Uncommon5/Rare4).</summary>
         public static List<CardData> RewardPool()
         {
             return new List<CardData>
             {
                 HeavyStrike(), Guard(), Whet(), Jab(), Check(),
-                Glow(), Pierce(), LightRay(), Stockpile(),
+                Glow(), Pierce(), LightRay(), Stockpile(), Purify(),
                 Burst(), GreatShield(), RadiantSurge(), Frenzy(),
             };
         }
