@@ -12,14 +12,25 @@ namespace Hwatu.Core.Combat
     /// </summary>
     public static class CombatFactory
     {
-        /// <summary>Luminary(HP 80, 시작덱 10장) vs 잡도깨비 1마리 전투를 만든다.</summary>
+        /// <summary>Luminary(HP 80, 시작덱 10장) vs 잡도깨비 1마리 전투(단독 데모용).</summary>
         public static CombatState CreateLuminaryVsDokkaebi(ulong masterSeed)
+        {
+            return CreateCombat(StarterContent.LuminaryStarterDeck(), StarterContent.DokkaebiMinion(),
+                masterSeed, playerMaxHp: 80, playerHp: 80);
+        }
+
+        /// <summary>임의의 덱·적·플레이어 HP로 전투를 조립한다(한 판 루프: RunState가 주입). 시드로 결정론.</summary>
+        public static CombatState CreateCombat(IReadOnlyList<CardData> deck, EnemyData enemyData,
+            ulong masterSeed, int playerMaxHp, int playerHp)
         {
             var streams = new RngStreams(masterSeed);
 
-            var player = new PlayerState(maxHp: 80);
+            var player = new PlayerState(maxHp: playerMaxHp);
+            if (playerHp < playerMaxHp)
+            {
+                player.SetHp(playerHp);
+            }
 
-            var enemyData = StarterContent.DokkaebiMinion();
             int hpRange = enemyData.MaxHpMax - enemyData.MaxHpMin + 1;
             int enemyHp = enemyData.MaxHpMin + streams.ForStream("enemyHp").NextInt(hpRange);
             var enemy = new EnemyState(enemyData, enemyHp, new SequenceAi(enemyData));
@@ -27,7 +38,7 @@ namespace Hwatu.Core.Combat
             var state = new CombatState(player, new List<EnemyState> { enemy }, streams.ForStream("combatShuffle"));
 
             int instanceId = 0;
-            foreach (CardData card in StarterContent.LuminaryStarterDeck())
+            foreach (CardData card in deck)
             {
                 state.DrawPile.Add(new CardInstance(card, instanceId++));
             }
