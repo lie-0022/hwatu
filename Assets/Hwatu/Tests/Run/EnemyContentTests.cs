@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using NUnit.Framework;
+using Hwatu.Core.Combat;
 using Hwatu.Core.Content;
+using Hwatu.Core.Effects;
 using Hwatu.Core.Enemies;
 using Hwatu.Core.Rng;
 using Hwatu.Core.Run;
@@ -26,6 +28,17 @@ namespace Hwatu.Tests.Run
                 EnemyData e = EnemyContent.PickEnemy(NodeType.Combat, new SplitMix64Random(s));
                 Assert.IsTrue(pool.Contains(e.Name), $"seed {s}: unexpected enemy {e.Name}");
             }
+        }
+
+        [Test]
+        public void WillOWisp_Scald_AppliesPoison()
+        {
+            EnemyData wisp = StarterContent.WillOWisp();
+            EnemyMoveData scald = wisp.FindMove("scald");
+            Assert.IsNotNull(scald);
+            Assert.AreEqual(EffectOp.ApplyStatus, scald.Effects[0].Op);
+            Assert.AreEqual(StatusType.Poison, scald.Effects[0].Status);
+            Assert.AreEqual(3, scald.Effects[0].Amount);
         }
 
         [Test]
