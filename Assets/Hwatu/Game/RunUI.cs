@@ -142,7 +142,7 @@ namespace Hwatu.Game
             IRandom enemyRng = new RngStreams(_flow.Run.Seed).ForStream("enemy_" + _flow.Run.CurrentNodeId);
             EnemyData enemy = EnemyContent.PickEnemy(nodeType, enemyRng);
             ulong combatSeed = _flow.Run.Seed + (ulong)(_flow.Run.CurrentNodeId + 1);
-            _combatCtrl.StartCombat(_flow.Run.Deck, enemy, combatSeed, _flow.Run.MaxHp, _flow.Run.Hp);
+            _combatCtrl.StartCombat(_flow.Run.Deck, enemy, combatSeed, _flow.Run.MaxHp, _flow.Run.Hp, _flow.Run.Relics);
             _combatView.SetVisible(true);
             _combatView.Refresh();
         }

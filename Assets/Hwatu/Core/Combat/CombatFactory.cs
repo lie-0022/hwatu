@@ -3,6 +3,7 @@ using Hwatu.Core.Cards;
 using Hwatu.Core.Content;
 using Hwatu.Core.Enemies;
 using Hwatu.Core.Rng;
+using Hwatu.Core.Run;
 
 namespace Hwatu.Core.Combat
 {
@@ -21,7 +22,7 @@ namespace Hwatu.Core.Combat
 
         /// <summary>임의의 덱·적·플레이어 HP로 전투를 조립한다(한 판 루프: RunState가 주입). 시드로 결정론.</summary>
         public static CombatState CreateCombat(IReadOnlyList<CardData> deck, EnemyData enemyData,
-            ulong masterSeed, int playerMaxHp, int playerHp)
+            ulong masterSeed, int playerMaxHp, int playerHp, IReadOnlyList<RelicData> relics = null)
         {
             var streams = new RngStreams(masterSeed);
 
@@ -29,6 +30,13 @@ namespace Hwatu.Core.Combat
             if (playerHp < playerMaxHp)
             {
                 player.SetHp(playerHp);
+            }
+            if (relics != null)
+            {
+                for (int i = 0; i < relics.Count; i++)
+                {
+                    relics[i].ApplyCombatStart(player);
+                }
             }
 
             int hpRange = enemyData.MaxHpMax - enemyData.MaxHpMin + 1;

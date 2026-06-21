@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Hwatu.Core.Cards;
+using Hwatu.Core.Content;
 
 namespace Hwatu.Core.Run
 {
@@ -24,6 +25,9 @@ namespace Hwatu.Core.Run
         /// <summary>카드 보상 레어도 피티 오프셋(시작 -5, 03-card-reward.md).</summary>
         public int RareOffset { get; set; }
 
+        /// <summary>보유 유물(전투 시작 효과 등).</summary>
+        public List<RelicData> Relics { get; }
+
         public RunState(CharacterData character, ulong seed)
         {
             Character = character;
@@ -35,6 +39,7 @@ namespace Hwatu.Core.Run
             Act = 1;
             CurrentNodeId = -1;
             RareOffset = -5;
+            Relics = new List<RelicData> { RelicContent.Lantern() };
         }
 
         /// <summary>덱에 카드를 추가(보상 선택).</summary>
