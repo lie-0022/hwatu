@@ -57,7 +57,12 @@ namespace Hwatu.Core.Effects
         private static void GainBlock(EffectData e, IEffectContext ctx)
         {
             ICombatant who = Resolve(e, ctx);
-            who.SetBlock(who.Block + e.Amount);
+            int amount = e.Amount + who.GetStatus(StatusType.Dexterity);   // 민첩 가산
+            if (amount < 0)
+            {
+                amount = 0;
+            }
+            who.SetBlock(who.Block + amount);
         }
 
         private static void Draw(EffectData e, IEffectContext ctx)
