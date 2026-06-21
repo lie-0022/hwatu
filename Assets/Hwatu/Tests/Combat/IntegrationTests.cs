@@ -128,5 +128,19 @@ namespace Hwatu.Tests.Combat
             Assert.AreEqual("doom", e.CurrentIntent.Id);
             Assert.AreEqual(IntentType.Doom, e.CurrentIntent.Intent);
         }
+
+        [Test]
+        public void General_Rally_GivesSelfRadiance()
+        {
+            var deck = StarterContent.LuminaryStarterDeck();
+            CombatState state = CombatFactory.CreateCombat(deck, StarterContent.General(), 1, 80, 80);
+            var engine = new CombatEngine(state, new EffectDispatcher());
+            engine.Advance(); engine.Advance(); // PlayerAction
+            engine.EndTurn();
+            engine.Advance(); engine.Advance(); // EnemyTurn1(rally) → CheckDeath
+
+            // 장군 AiOrder [rally, ...] — 첫 적턴 rally가 자기 광 +3(이후 공격 강화)
+            Assert.AreEqual(3, state.Enemies[0].GetStatus(StatusType.Radiance));
+        }
     }
 }
