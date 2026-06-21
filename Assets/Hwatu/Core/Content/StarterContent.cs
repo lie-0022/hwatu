@@ -110,5 +110,22 @@ namespace Hwatu.Core.Content
             },
             EnemyAiKind.Sequence,
             new[] { "smash", "expose", "wall" });
+
+        // 도깨비불: 화염 약공(3×2) + 흐림(약화 1)
+        public static EnemyData WillOWisp() => new EnemyData(
+            "willowisp", "도깨비불", 9, 13,
+            new[]
+            {
+                new EnemyMoveData("ember", IntentType.AttackMulti, 3,
+                    new[]
+                    {
+                        new EffectData(EffectOp.DealDamage, amount: 3, target: TargetType.Enemy),
+                        new EffectData(EffectOp.DealDamage, amount: 3, target: TargetType.Enemy),
+                    }, hits: 2),
+                new EnemyMoveData("haze", IntentType.Debuff, 1,
+                    new[] { new EffectData(EffectOp.ApplyStatus, amount: 1, target: TargetType.Enemy, status: StatusType.Weak) }),
+            },
+            EnemyAiKind.Sequence,
+            new[] { "ember", "haze", "ember" });
     }
 }

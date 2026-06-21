@@ -20,7 +20,7 @@ namespace Hwatu.Tests.Run
         [Test]
         public void Combat_FromNormalPool()
         {
-            var pool = new HashSet<string> { "잡도깨비", "까마귀떼", "허수아비" };
+            var pool = new HashSet<string> { "잡도깨비", "까마귀떼", "허수아비", "도깨비불" };
             for (ulong s = 1; s <= 40; s++)
             {
                 EnemyData e = EnemyContent.PickEnemy(NodeType.Combat, new SplitMix64Random(s));
