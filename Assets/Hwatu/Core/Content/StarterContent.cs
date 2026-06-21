@@ -170,7 +170,7 @@ namespace Hwatu.Core.Content
                         new EffectData(EffectOp.DealDamage, amount: 8, target: TargetType.Enemy),
                     }, hits: 3),
                 new EnemyMoveData("doom", IntentType.Doom, 24,
-                    new[] { new EffectData(EffectOp.DealDamage, amount: 24, target: TargetType.Enemy) }),
+                    new[] { new EffectData(EffectOp.DealDamage, amount: 24, target: TargetType.Enemy) }, hits: 1, doomTurns: 1),
             },
             EnemyAiKind.Phase,
             new[] { "charm", "tail", "foxfire" },
