@@ -78,8 +78,20 @@ namespace Hwatu.Game
                     Run.Hp = System.Math.Min(Run.MaxHp, Run.Hp + Run.MaxHp * 30 / 100);
                     SetPhase(RunPhase.Map);
                     break;
+                case NodeType.Treasure:
+                    // 보물: 유물 1개 자동 획득(중복 제외는 후속).
+                    {
+                        IRandom relicRng = new RngStreams(Run.Seed).ForStream("treasure_" + node.Id);
+                        var relic = Hwatu.Core.Run.RewardSystem.RollRelicReward(relicRng, Hwatu.Core.Content.RelicContent.AllRelics());
+                        if (relic != null)
+                        {
+                            Run.AddRelic(relic);
+                        }
+                    }
+                    SetPhase(RunPhase.Map);
+                    break;
                 default:
-                    // 상점/이벤트/보물 — MVP stub(즉시 맵 복귀). 07에서 구현.
+                    // 상점/이벤트 — MVP stub(즉시 맵 복귀). UI 후속.
                     SetPhase(RunPhase.Map);
                     break;
             }
