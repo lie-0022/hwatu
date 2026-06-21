@@ -20,12 +20,13 @@ namespace Hwatu.Core.Content
                         ? StarterContent.GwangGwiElite()
                         : StarterContent.CyclopsOni();
                 default:
-                    int i = rng.NextInt(5);
+                    int i = rng.NextInt(6);
                     return i == 0 ? StarterContent.DokkaebiMinion()
                          : i == 1 ? StarterContent.Crows()
                          : i == 2 ? StarterContent.Scarecrow()
                          : i == 3 ? StarterContent.WillOWisp()
-                         : StarterContent.Jangseung();
+                         : i == 4 ? StarterContent.Jangseung()
+                         : StarterContent.Geuseundae();
             }
         }
     }
