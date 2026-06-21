@@ -28,6 +28,9 @@ namespace Hwatu.Core.Combat
 
         public IRandom ShuffleRng { get; }
 
+        /// <summary>전투 이벤트 로그(턴/카드/적 행동/결과). UI·디버그용.</summary>
+        public List<string> Log { get; } = new List<string>();
+
         public bool AllEnemiesDead()
         {
             for (int i = 0; i < Enemies.Count; i++)
