@@ -54,6 +54,15 @@ namespace Hwatu.Core.Run
             return Deck.Remove(card);
         }
 
+        /// <summary>덱의 index 카드를 업그레이드(휴식 Smith).</summary>
+        public void UpgradeCard(int index)
+        {
+            if (index >= 0 && index < Deck.Count)
+            {
+                Deck[index] = Deck[index].Upgrade();
+            }
+        }
+
         /// <summary>HP 회복(최대 초과 안 함).</summary>
         public void Heal(int amount)
         {

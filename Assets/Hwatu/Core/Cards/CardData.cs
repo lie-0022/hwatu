@@ -31,5 +31,18 @@ namespace Hwatu.Core.Cards
             Effects = effects;
             Rarity = rarity;
         }
+
+        /// <summary>업그레이드 버전(MVP: DealDamage/GainBlock 수치 +3, 이름·Id에 + 표시). 카드별 세부는 후속.</summary>
+        public CardData Upgrade()
+        {
+            var up = new System.Collections.Generic.List<EffectData>(Effects.Count);
+            for (int i = 0; i < Effects.Count; i++)
+            {
+                EffectData e = Effects[i];
+                int amt = (e.Op == EffectOp.DealDamage || e.Op == EffectOp.GainBlock) ? e.Amount + 3 : e.Amount;
+                up.Add(new EffectData(e.Op, amt, e.Target, e.Status, e.Resource));
+            }
+            return new CardData(Id + "+", Name + "+", Type, Cost, Target, Exhaust, up, Rarity);
+        }
     }
 }
