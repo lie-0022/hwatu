@@ -164,5 +164,16 @@ namespace Hwatu.Tests.Combat
             engine.PlayCard(0);   // 견제 → 적 피해 5 + 약화 1
             Assert.AreEqual(1, state.Enemies[0].GetStatus(StatusType.Weak));
         }
+
+        [Test]
+        public void Ink_Veil_AppliesVulnerable()
+        {
+            var deck = new List<CardData> { InkCards.Veil() };
+            CombatState state = CombatFactory.CreateCombat(deck, StarterContent.DokkaebiMinion(), 1, 70, 70);
+            var engine = new CombatEngine(state, new EffectDispatcher());
+            engine.Advance(); engine.Advance(); // PlayerAction
+            engine.PlayCard(0);   // 흑무 → 적 취약 2
+            Assert.AreEqual(2, state.Enemies[0].GetStatus(StatusType.Vulnerable));
+        }
     }
 }
