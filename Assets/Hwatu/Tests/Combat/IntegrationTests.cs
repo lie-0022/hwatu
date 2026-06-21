@@ -212,5 +212,29 @@ namespace Hwatu.Tests.Combat
             Assert.AreEqual(hp - 7, state.Enemies[0].Hp);
             Assert.AreEqual(3, state.Enemies[0].GetStatus(StatusType.Poison));
         }
+
+        [Test]
+        public void Gumiho_Doom_Telegraphs_ThenFires()
+        {
+            var deck = new List<CardData> { StarterContent.Shield() };
+            CombatState state = CombatFactory.CreateCombat(deck, StarterContent.Gumiho(), 1, 999, 999);
+            var engine = new CombatEngine(state, new EffectDispatcher());
+            EnemyState e = state.Enemies[0];
+            engine.Advance(); engine.Advance();
+            e.SetHp(e.MaxHp / 3);   // 광폭 → phase2 [ninetails, doom, tail]
+            e.RefreshIntent();
+
+            var dmgs = new List<int>();
+            for (int t = 0; t < 16; t++)
+            {
+                if (state.Phase == CombatPhase.PlayerAction) engine.EndTurn();
+                int before = state.Player.Hp;
+                engine.Advance();
+                if (state.Phase == CombatPhase.CheckDeath) dmgs.Add(before - state.Player.Hp);
+            }
+            int idx0 = dmgs.IndexOf(0);
+            Assert.GreaterOrEqual(idx0, 0, "doom 예고 턴(피해 0)이 있어야 한다");
+            Assert.AreEqual(24, dmgs[idx0 + 1], "예고 다음 적 턴에 doom 발동 24");
+        }
     }
 }
