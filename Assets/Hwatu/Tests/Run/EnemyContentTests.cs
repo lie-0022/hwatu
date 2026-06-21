@@ -12,11 +12,20 @@ namespace Hwatu.Tests.Run
     public class EnemyContentTests
     {
         [Test]
-        public void Boss_And_Elite_AreFixed()
+        public void Boss_IsFixed()
         {
-            IRandom rng = new SplitMix64Random(1);
-            Assert.AreEqual("달그림자 도깨비", EnemyContent.PickEnemy(NodeType.Boss, rng).Name);
-            Assert.AreEqual("광귀", EnemyContent.PickEnemy(NodeType.Elite, rng).Name);
+            Assert.AreEqual("달그림자 도깨비", EnemyContent.PickEnemy(NodeType.Boss, new SplitMix64Random(1)).Name);
+        }
+
+        [Test]
+        public void Elite_FromElitePool()
+        {
+            var pool = new HashSet<string> { "광귀", "외눈도깨비" };
+            for (ulong s = 1; s <= 20; s++)
+            {
+                EnemyData e = EnemyContent.PickEnemy(NodeType.Elite, new SplitMix64Random(s));
+                Assert.IsTrue(pool.Contains(e.Name), $"seed {s}: {e.Name}");
+            }
         }
 
         [Test]

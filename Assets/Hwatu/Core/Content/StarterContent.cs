@@ -130,5 +130,20 @@ namespace Hwatu.Core.Content
             },
             EnemyAiKind.Sequence,
             new[] { "ember", "scald", "ember" });
+
+        // 엘리트 외눈도깨비: 노려봄(약화2) / 내려찍기(14) / 분노(자기 광+3 → 이후 공격 강화)
+        public static EnemyData CyclopsOni() => new EnemyData(
+            "cyclops_oni", "외눈도깨비", 32, 40,
+            new[]
+            {
+                new EnemyMoveData("glare", IntentType.Debuff, 2,
+                    new[] { new EffectData(EffectOp.ApplyStatus, amount: 2, target: TargetType.Enemy, status: StatusType.Weak) }),
+                new EnemyMoveData("oni_smash", IntentType.Attack, 14,
+                    new[] { new EffectData(EffectOp.DealDamage, amount: 14, target: TargetType.Enemy) }),
+                new EnemyMoveData("enrage", IntentType.Buff, 3,
+                    new[] { new EffectData(EffectOp.GainResource, amount: 3, target: TargetType.Self, resource: ResourceType.Radiance) }),
+            },
+            EnemyAiKind.Sequence,
+            new[] { "glare", "enrage", "oni_smash" });
     }
 }
