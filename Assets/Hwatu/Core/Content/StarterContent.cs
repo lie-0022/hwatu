@@ -50,7 +50,7 @@ namespace Hwatu.Core.Content
             EnemyAiKind.Sequence,
             new[] { "swipe", "swipe", "guard" });
 
-        // 보스: 달그림자 도깨비 — 강타 13 / 광폭 9 / 방벽 12, sequence [crush, rage, barrier]
+        // 보스: 달그림자 도깨비 — 1페이즈 [강타13/광폭9/방벽12], HP 50%↓ 2페이즈 광폭화 [월식18/강타13/광폭9]
         public static EnemyData DokkaebiBoss() => new EnemyData(
             "dokkaebi_boss", "달그림자 도깨비", 45, 55,
             new[]
@@ -61,9 +61,12 @@ namespace Hwatu.Core.Content
                     new[] { new EffectData(EffectOp.DealDamage, amount: 9, target: TargetType.Enemy) }),
                 new EnemyMoveData("barrier", IntentType.Block, 12,
                     new[] { new EffectData(EffectOp.GainBlock, amount: 12, target: TargetType.Self) }),
+                new EnemyMoveData("eclipse", IntentType.Attack, 18,
+                    new[] { new EffectData(EffectOp.DealDamage, amount: 18, target: TargetType.Enemy) }),
             },
-            EnemyAiKind.Sequence,
-            new[] { "crush", "rage", "barrier" });
+            EnemyAiKind.Phase,
+            new[] { "crush", "rage", "barrier" },
+            new[] { "eclipse", "crush", "rage" });
 
         // 까마귀떼: 다회 약공 — peck(2×3) / flock(방어 4)
         public static EnemyData Crows() => new EnemyData(

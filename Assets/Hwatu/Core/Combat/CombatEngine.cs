@@ -195,7 +195,7 @@ namespace Hwatu.Core.Combat
 
                 // 실행은 항상 현재 AI 상태(PeekNext)를 직접 사용한다.
                 // CurrentIntent는 UI 표시 전용 캐시이므로 실행 소스로 겸용하지 않는다(의도 변경 효과 대비).
-                EnemyMoveData move = enemy.Ai.PeekNext();
+                EnemyMoveData move = enemy.Ai.PeekNext(enemy);
                 var ctx = new CombatEffectContext(State, enemy, State.Player);
                 var effects = move.Effects;
                 for (int j = 0; j < effects.Count; j++)

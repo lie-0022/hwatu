@@ -41,7 +41,10 @@ namespace Hwatu.Core.Combat
 
             int hpRange = enemyData.MaxHpMax - enemyData.MaxHpMin + 1;
             int enemyHp = enemyData.MaxHpMin + streams.ForStream("enemyHp").NextInt(hpRange);
-            var enemy = new EnemyState(enemyData, enemyHp, new SequenceAi(enemyData));
+            IEnemyAi ai = enemyData.AiKind == EnemyAiKind.Phase && enemyData.SecondPhaseOrder != null
+                ? new PhaseAi(enemyData, enemyData.AiOrder, enemyData.SecondPhaseOrder)
+                : (IEnemyAi)new SequenceAi(enemyData);
+            var enemy = new EnemyState(enemyData, enemyHp, ai);
 
             var state = new CombatState(player, new List<EnemyState> { enemy }, streams.ForStream("combatShuffle"));
 
