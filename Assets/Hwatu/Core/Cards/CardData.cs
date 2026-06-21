@@ -19,10 +19,11 @@ namespace Hwatu.Core.Cards
         public CardRarity Rarity { get; }
         public bool Retain { get; }   // 턴 종료 시 버리지 않고 손패 유지
         public bool Innate { get; }   // 전투 첫 손패에 보장 투입
+        public bool Ethereal { get; } // 턴 종료 시 미사용이면 소멸(휘발)
 
         public CardData(string id, string name, CardType type, int cost,
             TargetType target, bool exhaust, IReadOnlyList<EffectData> effects,
-            CardRarity rarity = CardRarity.Common, bool retain = false, bool innate = false)
+            CardRarity rarity = CardRarity.Common, bool retain = false, bool innate = false, bool ethereal = false)
         {
             Id = id;
             Name = name;
@@ -34,6 +35,7 @@ namespace Hwatu.Core.Cards
             Rarity = rarity;
             Retain = retain;
             Innate = innate;
+            Ethereal = ethereal;
         }
 
         /// <summary>업그레이드 버전(MVP: DealDamage/GainBlock 수치 +3, 이름·Id에 + 표시). 카드별 세부는 후속.</summary>
@@ -46,7 +48,7 @@ namespace Hwatu.Core.Cards
                 int amt = (e.Op == EffectOp.DealDamage || e.Op == EffectOp.GainBlock) ? e.Amount + 3 : e.Amount;
                 up.Add(new EffectData(e.Op, amt, e.Target, e.Status, e.Resource));
             }
-            return new CardData(Id + "+", Name + "+", Type, Cost, Target, Exhaust, up, Rarity, Retain, Innate);
+            return new CardData(Id + "+", Name + "+", Type, Cost, Target, Exhaust, up, Rarity, Retain, Innate, Ethereal);
         }
     }
 }
