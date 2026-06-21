@@ -165,9 +165,24 @@ namespace Hwatu.Core.Combat
         private void StartCombat()
         {
             State.ShuffleRng.Shuffle(State.DrawPile);
+            MoveInnateToTop();
             for (int i = 0; i < State.Enemies.Count; i++)
             {
                 State.Enemies[i].RefreshIntent();
+            }
+        }
+
+        // Innate 카드를 더미 맨 위(리스트 끝)로 올려 첫 손패에 들어오게 한다.
+        private void MoveInnateToTop()
+        {
+            for (int i = State.DrawPile.Count - 1; i >= 0; i--)
+            {
+                if (State.DrawPile[i].Data.Innate)
+                {
+                    CardInstance c = State.DrawPile[i];
+                    State.DrawPile.RemoveAt(i);
+                    State.DrawPile.Add(c);
+                }
             }
         }
 
