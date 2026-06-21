@@ -1,6 +1,7 @@
 using Hwatu.Core.Cards;
 using Hwatu.Core.Effects;
 using Hwatu.Core.Enemies;
+using Hwatu.Core.Run;
 
 namespace Hwatu.Core.Combat
 {
@@ -157,6 +158,18 @@ namespace Hwatu.Core.Combat
                 return false;
             }
             State.Phase = CombatPhase.PlayerTurnEnd;
+            return true;
+        }
+
+        /// <summary>PlayerAction에서 포션 사용(즉시 Player에 효과). 성공 시 true.</summary>
+        public bool UsePotion(PotionData potion)
+        {
+            if (State.Phase != CombatPhase.PlayerAction || potion == null)
+            {
+                return false;
+            }
+            potion.Apply(State.Player);
+            State.Log.Add($"포션: {potion.Name}");
             return true;
         }
 
