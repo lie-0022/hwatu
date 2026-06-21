@@ -81,13 +81,17 @@ namespace Hwatu.Core.Content
         public static CardData Awaken() => new CardData("lum_awaken", "각성", CardType.Skill, 1, TargetType.Self, true,
             new[] { new EffectData(EffectOp.GainResource, amount: 5, target: TargetType.Self, resource: ResourceType.Radiance) }, CardRarity.Rare);
 
-        /// <summary>보상 추첨에 쓰는 광객 카드 풀(16장: Common5/Uncommon5/Rare6).</summary>
+        // 수호: 방어 6 + 보유(Retain) — 턴 끝에 버리지 않고 다음 턴까지 든다
+        public static CardData Vigil() => new CardData("lum_vigil", "수호", CardType.Skill, 1, TargetType.Self, false,
+            new[] { new EffectData(EffectOp.GainBlock, amount: 6, target: TargetType.Self) }, CardRarity.Uncommon, retain: true);
+
+        /// <summary>보상 추첨에 쓰는 광객 카드 풀(17장: Common5/Uncommon6/Rare6).</summary>
         public static List<CardData> RewardPool()
         {
             return new List<CardData>
             {
                 HeavyStrike(), Guard(), Whet(), Jab(), Check(),
-                Glow(), Pierce(), LightRay(), Stockpile(), Purify(),
+                Glow(), Pierce(), LightRay(), Stockpile(), Purify(), Vigil(),
                 Burst(), GreatShield(), RadiantSurge(), Frenzy(), WhiteFlash(), Awaken(),
             };
         }

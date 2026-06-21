@@ -189,8 +189,15 @@ namespace Hwatu.Core.Combat
 
         private void EndPlayerTurn()
         {
-            State.DiscardPile.AddRange(State.Hand);
-            State.Hand.Clear();
+            // Retain 카드는 손패에 남기고, 나머지만 버린다.
+            for (int i = State.Hand.Count - 1; i >= 0; i--)
+            {
+                if (!State.Hand[i].Data.Retain)
+                {
+                    State.DiscardPile.Add(State.Hand[i]);
+                    State.Hand.RemoveAt(i);
+                }
+            }
         }
 
         private void EnemyTurn()
