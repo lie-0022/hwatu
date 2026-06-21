@@ -48,6 +48,23 @@ namespace Hwatu.Core.Run
             Deck.Add(card);
         }
 
+        /// <summary>유물 획득(보상/상점).</summary>
+        public void AddRelic(RelicData relic)
+        {
+            Relics.Add(relic);
+        }
+
+        /// <summary>골드 지불(부족하면 false, 차감 안 함).</summary>
+        public bool TrySpend(int gold)
+        {
+            if (Gold < gold)
+            {
+                return false;
+            }
+            Gold -= gold;
+            return true;
+        }
+
         /// <summary>덱에서 카드 1장 제거(상점/이벤트). 성공 시 true.</summary>
         public bool RemoveCard(CardData card)
         {

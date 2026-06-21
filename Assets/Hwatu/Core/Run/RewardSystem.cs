@@ -59,6 +59,16 @@ namespace Hwatu.Core.Run
             return rolled == CardRarity.Rare ? -5 : Math.Min(40, rareOffset + 1);
         }
 
+        /// <summary>유물 보상 1개(풀에서 랜덤). 보물/엘리트/보스용.</summary>
+        public static RelicData RollRelicReward(IRandom rng, IReadOnlyList<RelicData> pool)
+        {
+            if (pool == null || pool.Count == 0)
+            {
+                return null;
+            }
+            return pool[rng.NextInt(pool.Count)];
+        }
+
         // 해당 레어도 풀에서 중복 없이 1장(없으면 미사용 카드 아무거나 폴백).
         private static CardData PickCard(IRandom rng, IReadOnlyList<CardData> pool, CardRarity rarity, HashSet<string> used)
         {
