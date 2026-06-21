@@ -1,13 +1,14 @@
 # 15. 상태 효과 (Status Effects)
 
 ## 1. Overview
-status 4종: Radiance(빛/힘) · Weak(약화) · Vulnerable(취약) · Poison(중독).
+status 5종: Radiance(빛/힘) · Weak(약화) · Vulnerable(취약) · Poison(중독) · Dexterity(민첩).
 
 ## 3. Detailed Rules
 - **Radiance**: `deal_damage`에 +Radiance(영구 힘). 빛타격 등 자동 반영.
 - **Weak**: 가해자 공격 ×3/4(정수 floor).
 - **Vulnerable**: 피해자가 받는 피해 ×3/2(정수 floor).
 - **Poison(중독)**: 턴 시작 시 스택만큼 피해(**Block 무시**, 직접 HP) + 그 후 1 감소(`CombatEngine.TickPoison`).
+- **Dexterity(민첩)**: `GainBlock`에 +Dexterity(영구 방어 증가, Radiance의 방어판). 예: 철벽.
 
 ## 5. Edge Cases
 - Poison은 0까지만(음수 HP 없음).
