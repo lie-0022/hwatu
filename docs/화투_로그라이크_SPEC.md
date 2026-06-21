@@ -373,3 +373,45 @@ COMBAT_WIN → 보상(카드 3택1, 골드, [유물])
 - 나무위키 화투/패 — https://namu.wiki/w/%ED%99%94%ED%88%AC/%ED%8C%A8
 - 위키백과 고스톱 — https://ko.wikipedia.org/wiki/%EA%B3%A0%EC%8A%A4%ED%86%B1
 - Godot vs Unity 2026 — https://dev.to/linou518/godot-vs-unity-in-2026-which-engine-should-indie-developers-choose-50g4
+
+---
+
+## 부록 C. 전투 UI 리서치 (Slay the Spire 참고, 2026-06-21)
+
+> 정식 전투 UI 설계 기준. 현재 OnGUI 디버그 UI를 대체할 레이아웃·UX의 근거.
+
+### C.1 표준 레이아웃 (STS1/STS2 공통)
+```
+[상단/중앙]  적들 — 각 적 위에 intent 아이콘(다음 행동) + HP바 + Block 수치 + 상태 아이콘
+[하단]       손패 — 카드 가로/부채꼴 배치. 클릭 또는 드래그-드롭으로 사용·타깃팅
+[좌하단]     에너지 구슬(예 3/3) · 드로우 더미(남은 수) · 플레이어 HP/Block/상태
+[우하단]     버린 더미 · 소멸 더미 · "턴 종료" 버튼
+```
+- 중요 요소는 화면 가장자리에서 띄우고, UI 스케일 조정 지원(가독성).
+
+### C.2 intent (완전정보의 핵심, §2.2)
+- 공격: 빨간 무기 아이콘 + 숫자(예상 피해). 피해량에 따라 단검→낫 5단계로 위협도 시각화.
+- 방어: 방패 / 버프·디버프: 각 아이콘 / 도주: 회오리 화살표 / 카드 오염(STS2): 회색 카드+주황 테두리.
+- **예상 피해는 Block·약화(weak) 등 modifier 반영 후 숫자로** 노출(막을지 판단 가능).
+
+### C.3 카드 표현
+- 코스트(좌상단 숫자), 이름, 아트, 효과 설명, 타입별 테두리 색(Attack/Skill/Power).
+
+### C.4 STS2 신규 UI
+- 크리처 세로 배치(가독성 조정 가능), 효과를 좌(아군)/우(적) 세로 정렬로 구분.
+- 예상 피해 카운터, multi-hit 합계, Heirloom 카드(완료 조건), 4인 협동 UI.
+
+### C.5 화투 매핑
+| STS 요소 | 화투 |
+|---|---|
+| 손패 카드 | 화투 카드(광/열끗/띠/피 비주얼) — 하단 |
+| 에너지 | 그대로(또는 화투 테마 리스킨) |
+| 적 + intent | 몬스터 + 공격/방어 의도 아이콘 |
+| 힘(strength) 스택 | 광(radiance) 상태 스택 |
+| HP/Block/상태 | 동일 |
+
+### C.6 출처
+- Interface In Game (STS2/STS1 UI): https://interfaceingame.com/games/slay-the-spire-2/
+- Mega Crit STS2 Press Kit: https://www.megacrit.com/press-kits/slay-the-spire-2/
+- Untapped.gg intent 가이드: https://sts2.untapped.gg/en/guides/how-to-read-enemy-intent
+- STS Wiki — Intent: https://slaythespire.wiki.gg/wiki/Intent

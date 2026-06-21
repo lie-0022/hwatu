@@ -94,3 +94,7 @@ production/session-logs/
 
 # msys bash crash dumps
 *.stackdump
+
+# Editor screenshots (디버그 캡처)
+/Assets/Screenshots/
+/Assets/Screenshots.meta
