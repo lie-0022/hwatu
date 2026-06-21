@@ -66,5 +66,17 @@ namespace Hwatu.Tests.Combat
             }
             Assert.AreEqual(3, poison);   // 도깨비불 scald가 플레이어에 중독 3
         }
+
+        [Test]
+        public void Ink_Poison_Stacks_FromLacquer()
+        {
+            var deck = new List<CardData> { InkCards.Lacquer(), InkCards.Lacquer() };
+            CombatState state = CombatFactory.CreateCombat(deck, StarterContent.DokkaebiMinion(), 1, 70, 70);
+            var engine = new CombatEngine(state, new EffectDispatcher());
+            engine.Advance(); engine.Advance(); // PlayerAction (옻칠 2장)
+            engine.PlayCard(0);   // 적 중독 4
+            engine.PlayCard(0);   // 적 중독 8 (누적)
+            Assert.AreEqual(8, state.Enemies[0].GetStatus(StatusType.Poison));
+        }
     }
 }
