@@ -169,7 +169,7 @@ namespace Hwatu.Game
             EncounterType enc = NodeEncounterType();
             IRandom rng = new RngStreams(_flow.Run.Seed).ForStream("reward_" + _flow.Run.CurrentNodeId);
             int offset = _flow.Run.RareOffset;
-            List<CardData> reward = RewardSystem.RollCardReward(rng, enc, LuminaryCards.RewardPool(), ref offset, 3);
+            List<CardData> reward = RewardSystem.RollCardReward(rng, enc, CharacterPools.RewardPool(_flow.Run.Character.Id), ref offset, 3);
             _flow.Run.RareOffset = offset;
 
             const float spacing = 280f;
