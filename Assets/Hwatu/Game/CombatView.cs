@@ -22,6 +22,7 @@ namespace Hwatu.Game
     {
         private CombatController _controller;
         private TMP_FontAsset _font;
+        private Canvas _canvas;
 
         private EnemyView _enemyView;
         private TextMeshProUGUI _playerText;
@@ -47,7 +48,7 @@ namespace Hwatu.Game
             Refresh();
         }
 
-        private static TMP_FontAsset LoadKoreanFont()
+        public static TMP_FontAsset LoadKoreanFont()
         {
             Font f = Resources.Load<Font>("Fonts/malgun");
             if (f == null)
@@ -64,6 +65,7 @@ namespace Hwatu.Game
             var canvasGo = new GameObject("CombatCanvas", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
             canvasGo.transform.SetParent(transform, false);
             var canvas = canvasGo.GetComponent<Canvas>();
+            _canvas = canvas;
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
             var scaler = canvasGo.GetComponent<CanvasScaler>();
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
@@ -146,7 +148,16 @@ namespace Hwatu.Game
             _resultPanel.SetActive(false);
         }
 
-        private void Refresh()
+        /// <summary>전투 화면(Canvas) 표시 토글(한 판 루프에서 GameFlow가 제어).</summary>
+        public void SetVisible(bool visible)
+        {
+            if (_canvas != null)
+            {
+                _canvas.enabled = visible;
+            }
+        }
+
+        public void Refresh()
         {
             CombatState s = _controller.State;
             if (s == null)
