@@ -97,6 +97,7 @@ namespace Hwatu.Core.Combat
             }
 
             State.Player.Energy -= card.Data.Cost;
+            State.Log.Add($"플레이어: {card.Data.Name}");
 
             var effects = card.Data.Effects;
             if (targetType == TargetType.AllEnemies)
@@ -173,6 +174,7 @@ namespace Hwatu.Core.Combat
         private void StartPlayerTurn()
         {
             State.Turn++;
+            State.Log.Add($"── {State.Turn}턴 ──");
             State.Player.SetBlock(0);
             TickPoison(State.Player);
             if (State.Player.Hp <= 0)
@@ -211,6 +213,7 @@ namespace Hwatu.Core.Combat
                 // 실행은 항상 현재 AI 상태(PeekNext)를 직접 사용한다.
                 // CurrentIntent는 UI 표시 전용 캐시이므로 실행 소스로 겸용하지 않는다(의도 변경 효과 대비).
                 EnemyMoveData move = enemy.Ai.PeekNext(enemy);
+                State.Log.Add($"{enemy.Data.Name}: {move.Intent} {move.Value}");
                 var ctx = new CombatEffectContext(State, enemy, State.Player);
                 var effects = move.Effects;
                 for (int j = 0; j < effects.Count; j++)
