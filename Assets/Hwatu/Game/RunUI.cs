@@ -33,6 +33,7 @@ namespace Hwatu.Game
         private RectTransform _rewardCardArea;
         private GameObject _resultPanel;
         private TextMeshProUGUI _resultText;
+        private TextMeshProUGUI _mapHud;
 
         private MapView _mapView;
         private GameObject _combatGo;
@@ -76,6 +77,7 @@ namespace Hwatu.Game
             _mapPanel = CreatePanel(root, "MapPanel", new Color(0.06f, 0.07f, 0.10f, 1f));
             _mapView = _mapPanel.AddComponent<MapView>();
             _mapView.Init(_flow, _font, _mapPanel.GetComponent<RectTransform>());
+            _mapHud = CreateText(_mapPanel, "", 30f, new Vector2(0, 320));
 
             // 보상(카드 3택1 + 스킵)
             _rewardPanel = CreatePanel(root, "RewardPanel", new Color(0.09f, 0.09f, 0.06f, 0.97f));
@@ -115,6 +117,7 @@ namespace Hwatu.Game
             if (p == RunPhase.Map)
             {
                 _mapView.Build();
+                _mapHud.text = $"HP {_flow.Run.Hp}/{_flow.Run.MaxHp}    골드 {_flow.Run.Gold}    액트 {_flow.Run.Act}";
             }
             else if (p == RunPhase.Reward)
             {
