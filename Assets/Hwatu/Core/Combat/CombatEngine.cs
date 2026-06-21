@@ -55,7 +55,10 @@ namespace Hwatu.Core.Combat
             return State.Phase;
         }
 
-        /// <summary>PlayerAction에서만 유효. 코스트/타깃 검증 → 효과 순차 실행 → 카드 이동. 성공 시 true.</summary>
+        /// <summary>
+        /// PlayerAction에서만 유효. 코스트/타깃 검증 → 효과 순차 실행 → 카드 이동. 성공 시 true.
+        /// AllEnemies 카드는 살아있는 모든 적에게 효과를 각각 적용한다.
+        /// </summary>
         public bool PlayCard(int handIndex, int enemyTargetIndex = 0)
         {
             if (State.Phase != CombatPhase.PlayerAction)
@@ -73,19 +76,53 @@ namespace Hwatu.Core.Combat
                 return false;
             }
 
-            ICombatant target = ResolveCardTarget(card, enemyTargetIndex);
-            if (target == null && CardNeedsEnemy(card))
+            // 타깃 유효성 검증
+            TargetType targetType = card.Data.Target;
+            if (targetType == TargetType.Enemy)
             {
-                return false;
+                if (enemyTargetIndex < 0 || enemyTargetIndex >= State.Enemies.Count)
+                {
+                    return false;
+                }
+            }
+            else if (targetType == TargetType.AllEnemies)
+            {
+                if (State.Enemies.Count == 0)
+                {
+                    return false;
+                }
             }
 
             State.Player.Energy -= card.Data.Cost;
 
-            var ctx = new CombatEffectContext(State, State.Player, target);
             var effects = card.Data.Effects;
-            for (int i = 0; i < effects.Count; i++)
+            if (targetType == TargetType.AllEnemies)
             {
-                _dispatcher.Execute(effects[i], ctx);
+                for (int ei = 0; ei < State.Enemies.Count; ei++)
+                {
+                    EnemyState enemy = State.Enemies[ei];
+                    if (enemy.IsDead)
+                    {
+                        continue;
+                    }
+                    var ctxAll = new CombatEffectContext(State, State.Player, enemy);
+                    for (int i = 0; i < effects.Count; i++)
+                    {
+                        _dispatcher.Execute(effects[i], ctxAll);
+                    }
+                }
+            }
+            else
+            {
+                // Self/None은 시전자(디스패처가 Self를 Source로 리졸브), Enemy는 지정된 적.
+                ICombatant target = targetType == TargetType.Enemy
+                    ? State.Enemies[enemyTargetIndex]
+                    : State.Player;
+                var ctx = new CombatEffectContext(State, State.Player, target);
+                for (int i = 0; i < effects.Count; i++)
+                {
+                    _dispatcher.Execute(effects[i], ctx);
+                }
             }
 
             State.Hand.RemoveAt(handIndex);
@@ -155,7 +192,10 @@ namespace Hwatu.Core.Combat
                 }
 
                 enemy.SetBlock(0);
-                EnemyMoveData move = enemy.CurrentIntent ?? enemy.Ai.PeekNext();
+
+                // 실행은 항상 현재 AI 상태(PeekNext)를 직접 사용한다.
+                // CurrentIntent는 UI 표시 전용 캐시이므로 실행 소스로 겸용하지 않는다(의도 변경 효과 대비).
+                EnemyMoveData move = enemy.Ai.PeekNext();
                 var ctx = new CombatEffectContext(State, enemy, State.Player);
                 var effects = move.Effects;
                 for (int j = 0; j < effects.Count; j++)
@@ -164,7 +204,7 @@ namespace Hwatu.Core.Combat
                 }
 
                 enemy.Ai.Advance();
-                enemy.RefreshIntent();
+                enemy.RefreshIntent(); // 다음 턴에 보여줄 의도 갱신
             }
         }
 
@@ -185,30 +225,5 @@ namespace Hwatu.Core.Combat
                 State.Phase = CombatPhase.PlayerTurnStart;
             }
         }
-
-        // --- 헬퍼 ---
-
-        private ICombatant ResolveCardTarget(CardInstance card, int enemyTargetIndex)
-        {
-            switch (card.Data.Target)
-            {
-                case TargetType.Self:
-                case TargetType.None:
-                    return State.Player; // 디스패처가 Self를 Source로 리졸브
-                case TargetType.Enemy:
-                    if (enemyTargetIndex < 0 || enemyTargetIndex >= State.Enemies.Count)
-                    {
-                        return null;
-                    }
-                    return State.Enemies[enemyTargetIndex];
-                case TargetType.AllEnemies:
-                    return State.Enemies.Count > 0 ? State.Enemies[0] : null; // 이번 스코프 단일 적
-                default:
-                    return null;
-            }
-        }
-
-        private static bool CardNeedsEnemy(CardInstance card)
-            => card.Data.Target == TargetType.Enemy || card.Data.Target == TargetType.AllEnemies;
     }
 }

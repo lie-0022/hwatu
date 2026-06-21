@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Hwatu.Core.Cards;
 using Hwatu.Core.Combat;
 
@@ -15,22 +14,19 @@ namespace Hwatu.Core.Effects
         public TargetType Target { get; }
         public StatusType Status { get; }
         public ResourceType Resource { get; }
-        public int RepeatCount { get; }
 
         public EffectData(
             string op,
             int amount = 0,
             TargetType target = TargetType.Enemy,
             StatusType status = StatusType.Radiance,
-            ResourceType resource = ResourceType.Radiance,
-            int repeatCount = 1)
+            ResourceType resource = ResourceType.Radiance)
         {
             Op = op;
             Amount = amount;
             Target = target;
             Status = status;
             Resource = resource;
-            RepeatCount = repeatCount;
         }
     }
 }

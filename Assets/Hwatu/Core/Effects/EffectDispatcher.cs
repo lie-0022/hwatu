@@ -23,7 +23,10 @@ namespace Hwatu.Core.Effects
             }
         }
 
-        // 피해 = (기본 + radiance) × weak(×3/4) × vulnerable(×3/2), 정수연산. Block 먼저 차감 후 HP.
+        // 피해 산정(STS 관례 — 각 modifier마다 정수 floor, 순서 고정):
+        //   dmg = (기본 + radiance) → Weak면 ×3/4(floor) → Vulnerable이면 ×3/2(floor) → max(0)
+        //   이후 Block을 먼저 차감하고 잔여만 HP에 적용한다.
+        //   ※ Weak+Vulnerable 동시면 절단이 두 번 일어난다(Slay the Spire와 동일 동작). float·Mathf 금지(결정론 보장).
         private static void DealDamage(EffectData e, IEffectContext ctx)
         {
             int dmg = e.Amount + ctx.Source.GetStatus(StatusType.Radiance);
