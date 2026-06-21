@@ -43,6 +43,18 @@ namespace Hwatu.Core.Run
             Deck.Add(card);
         }
 
+        /// <summary>덱에서 카드 1장 제거(상점/이벤트). 성공 시 true.</summary>
+        public bool RemoveCard(CardData card)
+        {
+            return Deck.Remove(card);
+        }
+
+        /// <summary>HP 회복(최대 초과 안 함).</summary>
+        public void Heal(int amount)
+        {
+            Hp = System.Math.Min(MaxHp, Hp + amount);
+        }
+
         public bool IsDead => Hp <= 0;
     }
 }
