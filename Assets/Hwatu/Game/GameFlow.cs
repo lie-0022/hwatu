@@ -72,8 +72,13 @@ namespace Hwatu.Game
                 case NodeType.Boss:
                     SetPhase(RunPhase.Combat);
                     break;
+                case NodeType.Rest:
+                    // 휴식: 최대 HP의 30% 회복(STS) 후 맵 복귀.
+                    Run.Hp = System.Math.Min(Run.MaxHp, Run.Hp + Run.MaxHp * 30 / 100);
+                    SetPhase(RunPhase.Map);
+                    break;
                 default:
-                    // 휴식/상점/이벤트/보물 — MVP는 stub(즉시 맵 복귀). 07에서 구현.
+                    // 상점/이벤트/보물 — MVP stub(즉시 맵 복귀). 07에서 구현.
                     SetPhase(RunPhase.Map);
                     break;
             }
@@ -107,6 +112,13 @@ namespace Hwatu.Game
         {
             MapNode node = Run.Map?.GetNode(Run.CurrentNodeId);
             return node != null && node.Type == NodeType.Boss;
+        }
+
+        /// <summary>런 종료(결과 화면)에서 메인 메뉴로 복귀.</summary>
+        public void BackToMenu()
+        {
+            Run = null;
+            SetPhase(RunPhase.MainMenu);
         }
 
         private void SetPhase(RunPhase phase)

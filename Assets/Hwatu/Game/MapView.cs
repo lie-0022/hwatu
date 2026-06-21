@@ -52,6 +52,9 @@ namespace Hwatu.Game
 
             float midCol = (map.Width - 1) / 2f;
             IReadOnlyList<MapNode> nodes = map.Nodes;
+
+            // 노드 위치 계산
+            var pos = new Dictionary<int, Vector2>();
             for (int i = 0; i < nodes.Count; i++)
             {
                 MapNode n = nodes[i];
@@ -59,9 +62,34 @@ namespace Hwatu.Game
                 {
                     continue;
                 }
-                float x = (n.Col - midCol) * SpacingX;
-                float y = 50f + n.Row * SpacingY;
-                CreateNodeButton(n, x, y);
+                pos[n.Id] = new Vector2((n.Col - midCol) * SpacingX, 50f + n.Row * SpacingY);
+            }
+
+            // 간선(노드보다 먼저 그려 뒤에 깔림)
+            for (int i = 0; i < nodes.Count; i++)
+            {
+                MapNode n = nodes[i];
+                if (!pos.ContainsKey(n.Id))
+                {
+                    continue;
+                }
+                for (int k = 0; k < n.NextIds.Count; k++)
+                {
+                    if (pos.TryGetValue(n.NextIds[k], out Vector2 to))
+                    {
+                        DrawEdge(pos[n.Id], to);
+                    }
+                }
+            }
+
+            // 노드 버튼
+            for (int i = 0; i < nodes.Count; i++)
+            {
+                MapNode n = nodes[i];
+                if (pos.TryGetValue(n.Id, out Vector2 p))
+                {
+                    CreateNodeButton(n, p.x, p.y);
+                }
             }
             Refresh();
         }
@@ -104,6 +132,22 @@ namespace Hwatu.Game
                 }
             }
             return set;
+        }
+
+        private void DrawEdge(Vector2 from, Vector2 to)
+        {
+            var go = new GameObject("Edge", typeof(RectTransform), typeof(Image));
+            go.transform.SetParent(_content, false);
+            var rt = (RectTransform)go.transform;
+            rt.anchorMin = new Vector2(0.5f, 0f);
+            rt.anchorMax = new Vector2(0.5f, 0f);
+            rt.pivot = new Vector2(0.5f, 0.5f);
+            rt.anchoredPosition = (from + to) * 0.5f;
+            rt.sizeDelta = new Vector2(Vector2.Distance(from, to), 4f);
+            rt.localRotation = Quaternion.Euler(0f, 0f, Mathf.Atan2(to.y - from.y, to.x - from.x) * Mathf.Rad2Deg);
+            var img = go.GetComponent<Image>();
+            img.color = new Color(0.40f, 0.40f, 0.45f, 0.55f);
+            img.raycastTarget = false;
         }
 
         private void CreateNodeButton(MapNode n, float x, float y)

@@ -91,7 +91,8 @@ namespace Hwatu.Game
 
             // 결과
             _resultPanel = CreatePanel(root, "ResultPanel", new Color(0f, 0f, 0f, 0.9f));
-            _resultText = CreateText(_resultPanel, "", 72f, new Vector2(0, 0));
+            _resultText = CreateText(_resultPanel, "", 72f, new Vector2(0, 70));
+            CreateButton(_resultPanel, "메인으로", new Vector2(0, -90), () => _flow.BackToMenu());
 
             // 전투 GO(자체 Canvas, 초기 비활성)
             _combatGo = new GameObject("RunCombat", typeof(CombatController), typeof(CombatView));
