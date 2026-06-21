@@ -97,13 +97,22 @@ namespace Hwatu.Core.Content
         public static CardData Meteor() => new CardData("lum_meteor", "유성", CardType.Attack, 1, TargetType.Enemy, false,
             new[] { new EffectData(EffectOp.DealDamage, amount: 14, target: TargetType.Enemy) }, CardRarity.Rare, retain: false, innate: false, ethereal: true);
 
-        /// <summary>보상 추첨에 쓰는 광객 카드 풀(20장: Common5/Uncommon8/Rare7).</summary>
+        // 연광: 빛살 3연타(3×3) — 다회공격(약점/취약과 시너지)
+        public static CardData Volley() => new CardData("lum_volley", "연광", CardType.Attack, 1, TargetType.Enemy, false,
+            new[]
+            {
+                new EffectData(EffectOp.DealDamage, amount: 3, target: TargetType.Enemy),
+                new EffectData(EffectOp.DealDamage, amount: 3, target: TargetType.Enemy),
+                new EffectData(EffectOp.DealDamage, amount: 3, target: TargetType.Enemy),
+            }, CardRarity.Uncommon);
+
+        /// <summary>보상 추첨에 쓰는 광객 카드 풀(21장: Common5/Uncommon9/Rare7).</summary>
         public static List<CardData> RewardPool()
         {
             return new List<CardData>
             {
                 HeavyStrike(), Guard(), Whet(), Jab(), Check(),
-                Glow(), Pierce(), LightRay(), Stockpile(), Purify(), Vigil(), Dawn(), Bulwark(),
+                Glow(), Pierce(), LightRay(), Stockpile(), Purify(), Vigil(), Dawn(), Bulwark(), Volley(),
                 Burst(), GreatShield(), RadiantSurge(), Frenzy(), WhiteFlash(), Awaken(), Meteor(),
             };
         }
