@@ -30,5 +30,11 @@ namespace Hwatu.Core.Run
         {
             return new CharacterData("luminary", "광객", 80, 99, StarterContent.LuminaryStarterDeck());
         }
+
+        /// <summary>묵귀(Ink Spirit): HP 70, 골드 99, 시작 덱 10장(그림자칼×5/그늘×4/옻칠×1). 독 특화.</summary>
+        public static CharacterData InkSpirit()
+        {
+            return new CharacterData("ink_spirit", "묵귀", 70, 99, InkCards.InkStarterDeck());
+        }
     }
 }
