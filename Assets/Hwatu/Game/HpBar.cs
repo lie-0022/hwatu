@@ -4,10 +4,15 @@ using TMPro;
 
 namespace Hwatu.Game
 {
-    /// <summary>체력 바(배경 + 채움 + 숫자). 채움은 폭 비율로 표현한다(스프라이트 불필요).</summary>
+    /// <summary>체력 바(배경 + 채움 + 숫자). 채움 폭은 SmoothDamp로 부드럽게 변한다(숫자는 즉시).</summary>
     public sealed class HpBar : MonoBehaviour
     {
+        private const float SmoothTime = 0.25f;
+
         private float _width;
+        private float _curWidth;
+        private float _targetWidth;
+        private float _widthVelocity;
         private Image _fill;
         private TextMeshProUGUI _text;
 
@@ -15,6 +20,8 @@ namespace Hwatu.Game
         public void Build(TMP_FontAsset font, Color fillColor, float width, float height)
         {
             _width = width;
+            _curWidth = width;
+            _targetWidth = width;
 
             var rt = (RectTransform)transform;
             rt.sizeDelta = new Vector2(width, height);
@@ -50,12 +57,21 @@ namespace Hwatu.Game
             trt.offsetMax = Vector2.zero;
         }
 
-        /// <summary>현재/최대 체력을 반영한다(폭 비율 + 숫자).</summary>
+        /// <summary>현재/최대 체력을 반영한다(숫자는 즉시, 바는 Update에서 부드럽게).</summary>
         public void Set(int hp, int maxHp)
         {
             float ratio = maxHp > 0 ? Mathf.Clamp01((float)hp / maxHp) : 0f;
-            _fill.rectTransform.sizeDelta = new Vector2(_width * ratio, 0f);
+            _targetWidth = _width * ratio;
             _text.text = $"{hp} / {maxHp}";
+        }
+
+        private void Update()
+        {
+            if (Mathf.Abs(_curWidth - _targetWidth) > 0.3f)
+            {
+                _curWidth = Mathf.SmoothDamp(_curWidth, _targetWidth, ref _widthVelocity, SmoothTime);
+                _fill.rectTransform.sizeDelta = new Vector2(_curWidth, 0f);
+            }
         }
     }
 }

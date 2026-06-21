@@ -1,5 +1,6 @@
 using System;
 using System.Text;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -29,6 +30,7 @@ namespace Hwatu.Game
         private RectTransform _root;
         private int _prevEnemyHp;
         private int _prevPlayerHp;
+        private readonly Dictionary<int, CardView> _cardViews = new Dictionary<int, CardView>();
         private RectTransform _handArea;
         private GameObject _resultPanel;
         private TextMeshProUGUI _resultText;
@@ -217,6 +219,9 @@ namespace Hwatu.Game
             bool ok = _controller.PlayCard(idx, enemyIndex < 0 ? 0 : enemyIndex);
             if (ok)
             {
+                // 사용한 카드는 추적에서 빼고 사용 연출(스스로 소멸)을 재생한 뒤 손패를 갱신
+                _cardViews.Remove(card.Card.InstanceId);
+                card.PlayUseAnimation();
                 Refresh();
             }
             return ok;
@@ -249,40 +254,54 @@ namespace Hwatu.Game
             go.AddComponent<DamagePopup>().Show(_font, amount, color);
         }
 
+        // 손패를 InstanceId로 재사용해 갱신한다(유지 카드는 위치만 트윈, 빠진 카드만 제거, 새 카드만 생성).
         private void RebuildHand(CombatState s)
         {
-            for (int i = _handArea.childCount - 1; i >= 0; i--)
+            var hand = s.Hand;
+            var present = new HashSet<int>();
+            var ordered = new List<CardView>(hand.Count);
+
+            for (int i = 0; i < hand.Count; i++)
             {
-                Transform child = _handArea.GetChild(i);
-                child.SetParent(null, false);   // 즉시 분리 → 아래 LayoutHand의 childCount가 새 카드만 세도록
-                Destroy(child.gameObject);
-            }
-            for (int i = 0; i < s.Hand.Count; i++)
-            {
-                CardInstance c = s.Hand[i];
-                int idx = i;
+                CardInstance c = hand[i];
+                present.Add(c.InstanceId);
                 bool playable = s.Player.Energy >= c.Data.Cost;
 
-                var go = new GameObject("Card", typeof(RectTransform));
-                go.transform.SetParent(_handArea, false);
-                var card = go.AddComponent<CardView>();
-                card.Build(_font);
-                card.SetCombat(this);
+                if (!_cardViews.TryGetValue(c.InstanceId, out CardView card))
+                {
+                    var go = new GameObject("Card", typeof(RectTransform));
+                    go.transform.SetParent(_handArea, false);
+                    card = go.AddComponent<CardView>();
+                    card.Build(_font);
+                    card.SetCombat(this);
+                    _cardViews[c.InstanceId] = card;
+                }
                 card.Bind(c, playable);
-
-                var btn = go.AddComponent<Button>();
-                btn.targetGraphic = go.GetComponent<Image>();
-                btn.interactable = playable;
-                btn.onClick.AddListener(() => { if (_controller.PlayCard(idx)) { Refresh(); } });
+                ordered.Add(card);
             }
 
-            LayoutHand();
+            // 손패에서 빠진 카드 제거
+            var stale = new List<int>();
+            foreach (var kv in _cardViews)
+            {
+                if (!present.Contains(kv.Key))
+                {
+                    stale.Add(kv.Key);
+                }
+            }
+            for (int i = 0; i < stale.Count; i++)
+            {
+                Destroy(_cardViews[stale[i]].gameObject);
+                _cardViews.Remove(stale[i]);
+            }
+
+            LayoutHand(ordered);
         }
 
         // 손패 카드를 부채꼴(아래 손잡이를 중심으로 한 원호)로 배치하고 각 카드의 기준 위치·회전을 지정한다.
-        private void LayoutHand()
+        private void LayoutHand(List<CardView> cards)
         {
-            int n = _handArea.childCount;
+            int n = cards.Count;
             const float anglePerCard = 7f;   // 카드 사이 벌어지는 각도(도)
             const float radius = 1400f;       // 원호 반경(클수록 평평)
             float mid = (n - 1) / 2f;
@@ -293,11 +312,8 @@ namespace Hwatu.Game
                 float rad = angle * Mathf.Deg2Rad;
                 float x = Mathf.Sin(rad) * radius;
                 float y = (Mathf.Cos(rad) - 1f) * radius;   // 중앙 0, 양끝 아래로(위로 볼록한 아치)
-                var card = _handArea.GetChild(i).GetComponent<CardView>();
-                if (card != null)
-                {
-                    card.SetHome(new Vector2(x, y), -angle);
-                }
+                cards[i].transform.SetSiblingIndex(i);
+                cards[i].SetHome(new Vector2(x, y), -angle);
             }
         }
 

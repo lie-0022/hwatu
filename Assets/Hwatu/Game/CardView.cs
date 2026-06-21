@@ -31,10 +31,12 @@ namespace Hwatu.Game
         private Vector2 _homePos;
         private float _homeRot;
         private Vector2 _targetPos;
+        private Vector2 _posVelocity;
         private Vector3 _targetScale = Vector3.one;
         private float _targetRot;
         private bool _hovered;
         private bool _dragging;
+        private bool _used;
         private static bool s_anyDragging;
         private static readonly List<RaycastResult> s_raycastResults = new List<RaycastResult>();
         private bool _targeting;
@@ -44,6 +46,7 @@ namespace Hwatu.Game
         private const float HoverScale = 1.18f;
         private const float HoverLift = 52f;
         private const float TweenSpeed = 12f;
+        private const float SmoothTime = 0.14f;   // 위치 보간 시간(클수록 더 느리고 완만)
         private const float PlayThreshold = 80f;   // 비타깃 카드: 이 높이 이상으로 올려 놓아야 사용(아래는 취소)
 
         /// <summary>이 뷰가 표시 중인 카드 인스턴스.</summary>
@@ -124,11 +127,8 @@ namespace Hwatu.Game
             _homePos = anchoredPosition;
             _homeRot = rotationZ;
 
-            var rt = (RectTransform)transform;
-            rt.anchoredPosition = anchoredPosition;
-            rt.localRotation = Quaternion.Euler(0f, 0f, rotationZ);
-
-            if (!_hovered)
+            // 즉시 이동하지 않고 목표만 갱신 → Update에서 스르륵 보간(손패 재배치 부드럽게)
+            if (!_dragging && !_hovered)
             {
                 _targetPos = anchoredPosition;
                 _targetRot = rotationZ;
@@ -311,9 +311,38 @@ namespace Hwatu.Game
             _targetScale = Vector3.one;
         }
 
+        /// <summary>카드 사용 연출: 위로 날아오르며 페이드아웃한 뒤 소멸한다.</summary>
+        public void PlayUseAnimation()
+        {
+            _used = true;
+            _hovered = false;
+            _dragging = false;
+            if (Group != null)
+            {
+                Group.blocksRaycasts = false;
+            }
+            transform.SetAsLastSibling();
+        }
+
         // 매 프레임 목표(위치·크기·회전)로 부드럽게 보간(스르륵).
         private void Update()
         {
+            if (_used)
+            {
+                var urt = (RectTransform)transform;
+                urt.anchoredPosition += new Vector2(0f, 620f * Time.deltaTime);
+                urt.localScale *= 1f + Time.deltaTime * 1.2f;
+                if (Group != null)
+                {
+                    Group.alpha -= Time.deltaTime * 2.6f;
+                    if (Group.alpha <= 0f)
+                    {
+                        Destroy(gameObject);
+                    }
+                }
+                return;
+            }
+
             if (_dragging && Mouse.current != null && Mouse.current.rightButton.wasPressedThisFrame)
             {
                 CancelDrag();
@@ -333,7 +362,7 @@ namespace Hwatu.Game
             bool followCursor = _dragging && !_targeting;   // 비타깃 드래그만 커서를 직접 따라감
             if (!followCursor)
             {
-                rt.anchoredPosition = Vector2.Lerp(rt.anchoredPosition, _targetPos, t);
+                rt.anchoredPosition = Vector2.SmoothDamp(rt.anchoredPosition, _targetPos, ref _posVelocity, SmoothTime);
             }
             rt.localScale = Vector3.Lerp(rt.localScale, _targetScale, t);
             float z = Mathf.LerpAngle(rt.localEulerAngles.z, _targetRot, t);
