@@ -36,14 +36,28 @@ namespace Hwatu.Core.Content
         public static CardData GreatShield() => new CardData("lum_greatshield", "대방패", CardType.Skill, 2, TargetType.Self, false,
             new[] { new EffectData(EffectOp.GainBlock, amount: 14, target: TargetType.Self) }, CardRarity.Rare);
 
-        /// <summary>보상 추첨에 쓰는 광객 카드 풀(7장).</summary>
+        // ── 다양성 추가 ──
+        public static CardData Jab() => new CardData("lum_jab", "난타", CardType.Attack, 1, TargetType.Enemy, false,
+            new[] { new EffectData(EffectOp.DealDamage, amount: 4, target: TargetType.Enemy) }, CardRarity.Common);
+
+        public static CardData LightRay() => new CardData("lum_ray", "광선", CardType.Attack, 1, TargetType.Enemy, false,
+            new[]
+            {
+                new EffectData(EffectOp.DealDamage, amount: 6, target: TargetType.Enemy),
+                new EffectData(EffectOp.Draw, amount: 1),
+            }, CardRarity.Uncommon);
+
+        public static CardData RadiantSurge() => new CardData("lum_surge", "광휘진", CardType.Skill, 1, TargetType.Self, false,
+            new[] { new EffectData(EffectOp.GainResource, amount: 3, target: TargetType.Self, resource: ResourceType.Radiance) }, CardRarity.Rare);
+
+        /// <summary>보상 추첨에 쓰는 광객 카드 풀(10장: Common4/Uncommon3/Rare3).</summary>
         public static List<CardData> RewardPool()
         {
             return new List<CardData>
             {
-                HeavyStrike(), Guard(), Whet(),
-                Glow(), Pierce(),
-                Burst(), GreatShield(),
+                HeavyStrike(), Guard(), Whet(), Jab(),
+                Glow(), Pierce(), LightRay(),
+                Burst(), GreatShield(), RadiantSurge(),
             };
         }
     }
