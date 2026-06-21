@@ -19,6 +19,7 @@ namespace Hwatu.Core.Effects
                 case EffectOp.Draw: Draw(e, ctx); break;
                 case EffectOp.ApplyStatus: ApplyStatus(e, ctx); break;
                 case EffectOp.GainResource: GainResource(e, ctx); break;
+                case EffectOp.ClearStatus: ClearStatus(e, ctx); break;
                 default: throw new NotSupportedException("Unknown effect op: " + e.Op);
             }
         }
@@ -77,6 +78,17 @@ namespace Hwatu.Core.Effects
             if (e.Resource == ResourceType.Radiance)
             {
                 ctx.Source.AddStatus(StatusType.Radiance, e.Amount);
+            }
+        }
+
+        // 대상의 특정 status를 0으로(정화). e.Status로 어떤 상태인지 지정.
+        private static void ClearStatus(EffectData e, IEffectContext ctx)
+        {
+            ICombatant who = Resolve(e, ctx);
+            int cur = who.GetStatus(e.Status);
+            if (cur != 0)
+            {
+                who.AddStatus(e.Status, -cur);
             }
         }
 
