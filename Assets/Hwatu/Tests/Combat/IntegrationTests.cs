@@ -78,5 +78,21 @@ namespace Hwatu.Tests.Combat
             engine.PlayCard(0);   // 적 중독 8 (누적)
             Assert.AreEqual(8, state.Enemies[0].GetStatus(StatusType.Poison));
         }
+
+        [Test]
+        public void Luminary_Radiance_BoostsLightStrike()
+        {
+            var deck = new List<CardData> { StarterContent.Ignite(), StarterContent.LightStrike() };
+            CombatState state = CombatFactory.CreateCombat(deck, StarterContent.DokkaebiMinion(), 1, 80, 80);
+            var engine = new CombatEngine(state, new EffectDispatcher());
+            engine.Advance(); engine.Advance(); // PlayerAction
+
+            int igniteIdx = state.Hand.FindIndex(c => c.Data.Id == "luminary_ignite");
+            engine.PlayCard(igniteIdx);   // 광(Radiance) +1
+            int hp = state.Enemies[0].Hp;
+            int strikeIdx = state.Hand.FindIndex(c => c.Data.Id == "luminary_light_strike");
+            engine.PlayCard(strikeIdx);   // 빛타격 6 + 광1 = 7
+            Assert.AreEqual(hp - 7, state.Enemies[0].Hp);
+        }
     }
 }
