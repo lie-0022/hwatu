@@ -78,7 +78,10 @@ namespace Hwatu.Game
             {
                 _intentBg.enabled = true;
                 _intentBg.color = IntentColor(e.CurrentIntent.Intent);
-                _intentText.text = $"{IntentKor(e.CurrentIntent.Intent)}  <b><size=135%>{e.CurrentIntent.Value}</size></b>";
+                string num = e.CurrentIntent.Hits > 1
+                    ? $"{e.CurrentIntent.Value}×{e.CurrentIntent.Hits}"
+                    : e.CurrentIntent.Value.ToString();
+                _intentText.text = $"{IntentKor(e.CurrentIntent.Intent)}  <b><size=135%>{num}</size></b>";
             }
             else
             {
