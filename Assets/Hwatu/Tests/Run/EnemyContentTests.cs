@@ -61,5 +61,15 @@ namespace Hwatu.Tests.Run
                 EnemyContent.PickEnemy(NodeType.Combat, new SplitMix64Random(7)).Name,
                 EnemyContent.PickEnemy(NodeType.Combat, new SplitMix64Random(7)).Name);
         }
+
+        [Test]
+        public void Gumiho_Phase2_HasDoomMove()
+        {
+            EnemyData g = StarterContent.Gumiho();
+            EnemyMoveData doom = g.FindMove("doom");
+            Assert.IsNotNull(doom);
+            Assert.AreEqual(IntentType.Doom, doom.Intent);
+            Assert.AreEqual(24, doom.Value);
+        }
     }
 }
