@@ -94,5 +94,21 @@ namespace Hwatu.Tests.Combat
             engine.PlayCard(strikeIdx);   // 빛타격 6 + 광1 = 7
             Assert.AreEqual(hp - 7, state.Enemies[0].Hp);
         }
+
+        [Test]
+        public void InkStarterDeck_DrawsAndShadowBladeHits()
+        {
+            var deck = InkCards.InkStarterDeck();
+            CombatState state = CombatFactory.CreateCombat(deck, StarterContent.DokkaebiMinion(), 1, 70, 70);
+            var engine = new CombatEngine(state, new EffectDispatcher());
+            engine.Advance(); engine.Advance(); // PlayerAction
+
+            Assert.AreEqual(5, state.Hand.Count);   // 묵귀 시작 덱 드로우 5
+            int bladeIdx = state.Hand.FindIndex(c => c.Data.Id == "ink_blade");
+            Assert.GreaterOrEqual(bladeIdx, 0);
+            int hp = state.Enemies[0].Hp;
+            engine.PlayCard(bladeIdx);
+            Assert.AreEqual(hp - 6, state.Enemies[0].Hp);   // 그림자칼 6
+        }
     }
 }
