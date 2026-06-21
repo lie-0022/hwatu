@@ -257,6 +257,24 @@ namespace Hwatu.Core.Combat
                 // 실행은 항상 현재 AI 상태(PeekNext)를 직접 사용한다.
                 // CurrentIntent는 UI 표시 전용 캐시이므로 실행 소스로 겸용하지 않는다(의도 변경 효과 대비).
                 EnemyMoveData move = enemy.Ai.PeekNext(enemy);
+
+                // Doom 카운트다운: DoomTurns>0이면 그만큼 예고 후 발동(예고 턴은 effects 보류 + AI 진행 보류).
+                if (move.Intent == IntentType.Doom && move.DoomTurns > 0)
+                {
+                    if (enemy.DoomTimer < 0)
+                    {
+                        enemy.SetDoomTimer(move.DoomTurns);   // 예고 시작
+                    }
+                    if (enemy.DoomTimer > 0)
+                    {
+                        enemy.SetDoomTimer(enemy.DoomTimer - 1);
+                        State.Log.Add($"{enemy.Data.Name}: 파멸 예고({enemy.DoomTimer + 1})");
+                        enemy.RefreshIntent();
+                        continue;
+                    }
+                    enemy.SetDoomTimer(-1);   // 발동
+                }
+
                 State.Log.Add($"{enemy.Data.Name}: {move.Intent} {move.Value}");
                 var ctx = new CombatEffectContext(State, enemy, State.Player);
                 var effects = move.Effects;
