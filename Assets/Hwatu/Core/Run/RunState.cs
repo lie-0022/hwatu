@@ -17,6 +17,7 @@ namespace Hwatu.Core.Run
         public int Gold { get; set; }
         public ulong Seed { get; }
         public int Act { get; set; }
+        public int Ascension { get; set; }
         public MapGraph Map { get; set; }
 
         /// <summary>현재 맵 위치 노드 id. -1이면 아직 맵에 진입 전(행0 선택 대기).</summary>

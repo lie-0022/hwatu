@@ -22,7 +22,7 @@ namespace Hwatu.Core.Combat
 
         /// <summary>임의의 덱·적·플레이어 HP로 전투를 조립한다(한 판 루프: RunState가 주입). 시드로 결정론.</summary>
         public static CombatState CreateCombat(IReadOnlyList<CardData> deck, EnemyData enemyData,
-            ulong masterSeed, int playerMaxHp, int playerHp, IReadOnlyList<RelicData> relics = null)
+            ulong masterSeed, int playerMaxHp, int playerHp, IReadOnlyList<RelicData> relics = null, int ascension = 0)
         {
             var streams = new RngStreams(masterSeed);
 
@@ -40,7 +40,8 @@ namespace Hwatu.Core.Combat
             }
 
             int hpRange = enemyData.MaxHpMax - enemyData.MaxHpMin + 1;
-            int enemyHp = enemyData.MaxHpMin + streams.ForStream("enemyHp").NextInt(hpRange);
+            int baseHp = enemyData.MaxHpMin + streams.ForStream("enemyHp").NextInt(hpRange);
+            int enemyHp = baseHp * AscensionRules.EnemyHpPercent(ascension) / 100;
             IEnemyAi ai = enemyData.AiKind == EnemyAiKind.Phase && enemyData.SecondPhaseOrder != null
                 ? new PhaseAi(enemyData, enemyData.AiOrder, enemyData.SecondPhaseOrder)
                 : (IEnemyAi)new SequenceAi(enemyData);
