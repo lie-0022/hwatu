@@ -65,6 +65,18 @@ namespace Hwatu.Core.Content
                 new EffectData(EffectOp.ApplyStatus, amount: 5, target: TargetType.Enemy, status: StatusType.Poison),
             }, CardRarity.Rare);
 
+        // 키워드 카드 (Retain/Exhaust/Ethereal 독 빌드)
+        public static CardData Lingering() => new CardData("ink_lingering", "잔독", CardType.Skill, 1, TargetType.Enemy, false,
+            new[] { new EffectData(EffectOp.ApplyStatus, amount: 3, target: TargetType.Enemy, status: StatusType.Poison) },
+            CardRarity.Uncommon, retain: true);
+
+        public static CardData BlackSpot() => new CardData("ink_blackspot", "흑점", CardType.Attack, 2, TargetType.Enemy, true,
+            new[] { new EffectData(EffectOp.DealDamage, amount: 12, target: TargetType.Enemy) }, CardRarity.Rare);
+
+        public static CardData ToxicCloud() => new CardData("ink_toxic", "독무", CardType.Skill, 2, TargetType.Enemy, false,
+            new[] { new EffectData(EffectOp.ApplyStatus, amount: 4, target: TargetType.Enemy, status: StatusType.Poison) },
+            CardRarity.Uncommon, retain: false, innate: false, ethereal: true);
+
         /// <summary>묵귀 시작 덱 10장: 그림자칼×5, 그늘×4, 옻칠×1.</summary>
         public static List<CardData> InkStarterDeck()
         {
@@ -75,14 +87,14 @@ namespace Hwatu.Core.Content
             return deck;
         }
 
-        /// <summary>묵귀 보상 풀(9장: Common4/Uncommon3/Rare2).</summary>
+        /// <summary>묵귀 보상 풀(12장: Common4/Uncommon5/Rare3).</summary>
         public static List<CardData> RewardPool()
         {
             return new List<CardData>
             {
                 InkStrike(), Soot(), DarkGuard(), Lacquer(),
-                Seep(), Miasma(), Veil(),
-                Plague(), Decay(),
+                Seep(), Miasma(), Veil(), Lingering(), ToxicCloud(),
+                Plague(), Decay(), BlackSpot(),
             };
         }
     }
