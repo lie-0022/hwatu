@@ -175,5 +175,16 @@ namespace Hwatu.Tests.Combat
             engine.PlayCard(0);   // 흑무 → 적 취약 2
             Assert.AreEqual(2, state.Enemies[0].GetStatus(StatusType.Vulnerable));
         }
+
+        [Test]
+        public void Luminary_RadiantSurge_GivesRadiance3()
+        {
+            var deck = new List<CardData> { LuminaryCards.RadiantSurge() };
+            CombatState state = CombatFactory.CreateCombat(deck, StarterContent.DokkaebiMinion(), 1, 80, 80);
+            var engine = new CombatEngine(state, new EffectDispatcher());
+            engine.Advance(); engine.Advance(); // PlayerAction
+            engine.PlayCard(0);   // 광휘진 → 광 +3
+            Assert.AreEqual(3, state.Player.GetStatus(StatusType.Radiance));
+        }
     }
 }
