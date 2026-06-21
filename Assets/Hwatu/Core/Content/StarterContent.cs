@@ -114,7 +114,7 @@ namespace Hwatu.Core.Content
             EnemyAiKind.Sequence,
             new[] { "smash", "expose", "wall" });
 
-        // 도깨비불: 화염 약공(3×2) + 흐림(약화 1)
+        // 도깨비불: 화염 약공(3×2) + 화상(중독 3 부여)
         public static EnemyData WillOWisp() => new EnemyData(
             "willowisp", "도깨비불", 9, 13,
             new[]
@@ -125,10 +125,10 @@ namespace Hwatu.Core.Content
                         new EffectData(EffectOp.DealDamage, amount: 3, target: TargetType.Enemy),
                         new EffectData(EffectOp.DealDamage, amount: 3, target: TargetType.Enemy),
                     }, hits: 2),
-                new EnemyMoveData("haze", IntentType.Debuff, 1,
-                    new[] { new EffectData(EffectOp.ApplyStatus, amount: 1, target: TargetType.Enemy, status: StatusType.Weak) }),
+                new EnemyMoveData("scald", IntentType.Debuff, 3,
+                    new[] { new EffectData(EffectOp.ApplyStatus, amount: 3, target: TargetType.Enemy, status: StatusType.Poison) }),
             },
             EnemyAiKind.Sequence,
-            new[] { "ember", "haze", "ember" });
+            new[] { "ember", "scald", "ember" });
     }
 }
