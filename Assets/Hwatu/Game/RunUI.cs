@@ -1,13 +1,16 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem.UI;
 using TMPro;
+using Hwatu.Core.Cards;
 using Hwatu.Core.Combat;
 using Hwatu.Core.Content;
 using Hwatu.Core.Enemies;
+using Hwatu.Core.Rng;
 using Hwatu.Core.Run;
 
 namespace Hwatu.Game
@@ -27,6 +30,7 @@ namespace Hwatu.Game
         private GameObject _charPanel;
         private GameObject _mapPanel;
         private GameObject _rewardPanel;
+        private RectTransform _rewardCardArea;
         private GameObject _resultPanel;
         private TextMeshProUGUI _resultText;
 
@@ -72,10 +76,18 @@ namespace Hwatu.Game
             _mapView = _mapPanel.AddComponent<MapView>();
             _mapView.Init(_flow, _font, _mapPanel.GetComponent<RectTransform>());
 
-            // 보상(MVP stub)
+            // 보상(카드 3택1 + 스킵)
             _rewardPanel = CreatePanel(root, "RewardPanel", new Color(0.09f, 0.09f, 0.06f, 0.97f));
-            CreateText(_rewardPanel, "전투 승리!  (카드 보상은 다음 단계)", 40f, new Vector2(0, 80));
-            CreateButton(_rewardPanel, "계속", new Vector2(0, -50), () => _flow.OnRewardDone());
+            CreateText(_rewardPanel, "카드 보상 — 1장 선택", 46f, new Vector2(0, 300));
+            var areaGo = new GameObject("RewardCards", typeof(RectTransform));
+            areaGo.transform.SetParent(_rewardPanel.transform, false);
+            _rewardCardArea = (RectTransform)areaGo.transform;
+            _rewardCardArea.anchorMin = new Vector2(0.5f, 0.5f);
+            _rewardCardArea.anchorMax = new Vector2(0.5f, 0.5f);
+            _rewardCardArea.pivot = new Vector2(0.5f, 0.5f);
+            _rewardCardArea.anchoredPosition = new Vector2(0, 20);
+            _rewardCardArea.sizeDelta = new Vector2(900, 320);
+            CreateButton(_rewardPanel, "스킵", new Vector2(0, -340), () => _flow.OnRewardDone());
 
             // 결과
             _resultPanel = CreatePanel(root, "ResultPanel", new Color(0f, 0f, 0f, 0.9f));
@@ -102,6 +114,10 @@ namespace Hwatu.Game
             {
                 _mapView.Build();
             }
+            else if (p == RunPhase.Reward)
+            {
+                BuildReward();
+            }
             else if (p == RunPhase.Combat)
             {
                 StartCoroutine(StartCombatNextFrame());
@@ -120,7 +136,9 @@ namespace Hwatu.Game
         private IEnumerator StartCombatNextFrame()
         {
             yield return null;
-            EnemyData enemy = StarterContent.DokkaebiMinion();   // MVP: 모든 전투 잡도깨비(보스 적은 후속)
+            EnemyData enemy = _flow.CurrentNodeIsBoss()
+                ? StarterContent.DokkaebiBoss()
+                : StarterContent.DokkaebiMinion();
             ulong combatSeed = _flow.Run.Seed + (ulong)(_flow.Run.CurrentNodeId + 1);
             _combatCtrl.StartCombat(_flow.Run.Deck, enemy, combatSeed, _flow.Run.MaxHp, _flow.Run.Hp);
             _combatView.SetVisible(true);
@@ -136,6 +154,92 @@ namespace Hwatu.Game
             }
             _combatView.SetVisible(false);
             _flow.OnCombatEnded(won);
+        }
+
+        // 전투 종류에 맞는 카드 보상 3장을 뽑아 버튼으로 표시(선택 → 덱 추가).
+        private void BuildReward()
+        {
+            for (int i = _rewardCardArea.childCount - 1; i >= 0; i--)
+            {
+                Destroy(_rewardCardArea.GetChild(i).gameObject);
+            }
+
+            EncounterType enc = NodeEncounterType();
+            IRandom rng = new RngStreams(_flow.Run.Seed).ForStream("reward_" + _flow.Run.CurrentNodeId);
+            int offset = _flow.Run.RareOffset;
+            List<CardData> reward = RewardSystem.RollCardReward(rng, enc, LuminaryCards.RewardPool(), ref offset, 3);
+            _flow.Run.RareOffset = offset;
+
+            const float spacing = 280f;
+            float startX = -(reward.Count - 1) * spacing / 2f;
+            for (int i = 0; i < reward.Count; i++)
+            {
+                CreateRewardCard(reward[i], new Vector2(startX + i * spacing, 0f));
+            }
+        }
+
+        private void CreateRewardCard(CardData card, Vector2 pos)
+        {
+            var go = new GameObject("Reward_" + card.Id, typeof(RectTransform), typeof(Image), typeof(Button));
+            go.transform.SetParent(_rewardCardArea, false);
+            var rt = (RectTransform)go.transform;
+            rt.anchorMin = new Vector2(0.5f, 0.5f);
+            rt.anchorMax = new Vector2(0.5f, 0.5f);
+            rt.pivot = new Vector2(0.5f, 0.5f);
+            rt.anchoredPosition = pos;
+            rt.sizeDelta = new Vector2(230f, 290f);
+            go.GetComponent<Image>().color = RarityColor(card.Rarity);
+
+            var t = new GameObject("L", typeof(RectTransform), typeof(TextMeshProUGUI));
+            t.transform.SetParent(rt, false);
+            var tmp = t.GetComponent<TextMeshProUGUI>();
+            tmp.font = _font;
+            tmp.fontSize = 24f;
+            tmp.alignment = TextAlignmentOptions.Center;
+            tmp.color = Color.white;
+            tmp.raycastTarget = false;
+            tmp.text = $"[{card.Cost}] {card.Name}\n\n<size=70%>{RarityKor(card.Rarity)}</size>";
+            var lrt = tmp.rectTransform;
+            lrt.anchorMin = Vector2.zero;
+            lrt.anchorMax = Vector2.one;
+            lrt.offsetMin = new Vector2(8, 8);
+            lrt.offsetMax = new Vector2(-8, -8);
+
+            CardData picked = card;
+            go.GetComponent<Button>().onClick.AddListener(() =>
+            {
+                _flow.Run.AddCard(picked);
+                _flow.OnRewardDone();
+            });
+        }
+
+        private EncounterType NodeEncounterType()
+        {
+            MapNode node = _flow.Run.Map.GetNode(_flow.Run.CurrentNodeId);
+            if (node == null) return EncounterType.Normal;
+            if (node.Type == NodeType.Boss) return EncounterType.Boss;
+            if (node.Type == NodeType.Elite) return EncounterType.Elite;
+            return EncounterType.Normal;
+        }
+
+        private static Color RarityColor(CardRarity r)
+        {
+            switch (r)
+            {
+                case CardRarity.Rare: return new Color(0.60f, 0.50f, 0.15f);
+                case CardRarity.Uncommon: return new Color(0.20f, 0.40f, 0.55f);
+                default: return new Color(0.35f, 0.35f, 0.42f);
+            }
+        }
+
+        private static string RarityKor(CardRarity r)
+        {
+            switch (r)
+            {
+                case CardRarity.Rare: return "희귀";
+                case CardRarity.Uncommon: return "고급";
+                default: return "일반";
+            }
         }
 
         // ── UI 헬퍼 ──
