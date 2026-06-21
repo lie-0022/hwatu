@@ -32,9 +32,25 @@ namespace Hwatu.Tests.Run
         }
 
         [Test]
-        public void AllRelics_AreFive()
+        public void Charm_GivesBlock8()
         {
-            Assert.AreEqual(5, RelicContent.AllRelics().Count);
+            var p = new PlayerState(80);
+            RelicContent.Charm().ApplyCombatStart(p);
+            Assert.AreEqual(8, p.Block);
+        }
+
+        [Test]
+        public void SteelScale_GivesDexterity()
+        {
+            var p = new PlayerState(80);
+            RelicContent.SteelScale().ApplyCombatStart(p);
+            Assert.AreEqual(1, p.GetStatus(StatusType.Dexterity));
+        }
+
+        [Test]
+        public void AllRelics_AreEight()
+        {
+            Assert.AreEqual(8, RelicContent.AllRelics().Count);
         }
     }
 }

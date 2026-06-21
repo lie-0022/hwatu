@@ -20,10 +20,23 @@ namespace Hwatu.Core.Content
         public static RelicData Whetstone() => new RelicData("relic_whet", "숫돌", "전투 시작 시 광 +1(임시; 후속에 '첫 공격 +3'으로).",
             p => p.AddStatus(StatusType.Radiance, 1));
 
+        public static RelicData Charm() => new RelicData("relic_charm", "부적", "전투 시작 시 방어 +8.",
+            p => p.SetBlock(p.Block + 8));
+
+        public static RelicData RuneStone() => new RelicData("relic_rune", "룬돌", "전투 시작 시 광 +2.",
+            p => p.AddStatus(StatusType.Radiance, 2));
+
+        public static RelicData SteelScale() => new RelicData("relic_steel", "강철비늘", "전투 시작 시 민첩 +1.",
+            p => p.AddStatus(StatusType.Dexterity, 1));
+
         /// <summary>전체 유물 풀(보물/엘리트/보스 보상 추첨용).</summary>
         public static List<RelicData> AllRelics()
         {
-            return new List<RelicData> { Cushion(), Blanket(), Lantern(), CoinPouch(), Whetstone() };
+            return new List<RelicData>
+            {
+                Cushion(), Blanket(), Lantern(), CoinPouch(), Whetstone(),
+                Charm(), RuneStone(), SteelScale(),
+            };
         }
     }
 }
