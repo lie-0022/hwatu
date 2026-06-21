@@ -69,7 +69,8 @@ namespace Hwatu.Game
             // 캐릭터 선택
             _charPanel = CreatePanel(root, "CharPanel", new Color(0.08f, 0.08f, 0.12f, 1f));
             CreateText(_charPanel, "캐릭터 선택", 56f, new Vector2(0, 170));
-            CreateButton(_charPanel, "광객 (光客)", new Vector2(0, 0), () => _flow.StartNewRun(CharacterData.Luminary()));
+            CreateButton(_charPanel, "광객 (光客) — 빛/공격", new Vector2(0, 40), () => _flow.StartNewRun(CharacterData.Luminary()));
+            CreateButton(_charPanel, "묵귀 (墨鬼) — 독/약화", new Vector2(0, -40), () => _flow.StartNewRun(CharacterData.InkSpirit()));
 
             // 맵
             _mapPanel = CreatePanel(root, "MapPanel", new Color(0.06f, 0.07f, 0.10f, 1f));
