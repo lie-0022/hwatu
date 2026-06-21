@@ -173,5 +173,20 @@ namespace Hwatu.Core.Content
             EnemyAiKind.Phase,
             new[] { "charm", "tail", "foxfire" },
             new[] { "ninetails", "foxfire", "tail" });
+
+        // 일반 장승: 방어형 — 수호(방10) / 노려봄(약화2) / 들이받기(10)
+        public static EnemyData Jangseung() => new EnemyData(
+            "jangseung", "장승", 16, 20,
+            new[]
+            {
+                new EnemyMoveData("ward", IntentType.Block, 10,
+                    new[] { new EffectData(EffectOp.GainBlock, amount: 10, target: TargetType.Self) }),
+                new EnemyMoveData("stare", IntentType.Debuff, 2,
+                    new[] { new EffectData(EffectOp.ApplyStatus, amount: 2, target: TargetType.Enemy, status: StatusType.Weak) }),
+                new EnemyMoveData("ram", IntentType.Attack, 10,
+                    new[] { new EffectData(EffectOp.DealDamage, amount: 10, target: TargetType.Enemy) }),
+            },
+            EnemyAiKind.Sequence,
+            new[] { "ward", "stare", "ram" });
     }
 }
