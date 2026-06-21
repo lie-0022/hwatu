@@ -50,5 +50,23 @@ namespace Hwatu.Tests.Run
             Assert.IsFalse(run.AddPotion(PotionContent.Strength()));   // 4번째는 슬롯 가득
             Assert.AreEqual(3, run.Potions.Count);
         }
+
+        [Test]
+        public void Antidote_RemovesPoison()
+        {
+            var p = new PlayerState(80);
+            p.AddStatus(StatusType.Poison, 5);
+            PotionContent.Antidote().Apply(p);
+            Assert.AreEqual(0, p.GetStatus(StatusType.Poison));
+        }
+
+        [Test]
+        public void Heal_RestoresHp_CappedAtMax()
+        {
+            var p = new PlayerState(80);
+            p.SetHp(70);
+            PotionContent.Heal().Apply(p);
+            Assert.AreEqual(80, p.Hp);   // 70+15=85 → 최대 80
+        }
     }
 }
