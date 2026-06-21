@@ -1,0 +1,41 @@
+using System.Collections.Generic;
+
+namespace Hwatu.Core.Enemies
+{
+    /// <summary>적 정의(불변). HP 범위 롤 + move 목록 + AI 순서.</summary>
+    public sealed class EnemyData
+    {
+        public string Id { get; }
+        public string Name { get; }
+        public int MaxHpMin { get; }
+        public int MaxHpMax { get; }
+        public IReadOnlyList<EnemyMoveData> Moves { get; }
+        public EnemyAiKind AiKind { get; }
+        public IReadOnlyList<string> AiOrder { get; }
+
+        public EnemyData(string id, string name, int maxHpMin, int maxHpMax,
+            IReadOnlyList<EnemyMoveData> moves, EnemyAiKind aiKind, IReadOnlyList<string> aiOrder)
+        {
+            Id = id;
+            Name = name;
+            MaxHpMin = maxHpMin;
+            MaxHpMax = maxHpMax;
+            Moves = moves;
+            AiKind = aiKind;
+            AiOrder = aiOrder;
+        }
+
+        /// <summary>id로 move를 찾는다. 없으면 null.</summary>
+        public EnemyMoveData FindMove(string id)
+        {
+            for (int i = 0; i < Moves.Count; i++)
+            {
+                if (Moves[i].Id == id)
+                {
+                    return Moves[i];
+                }
+            }
+            return null;
+        }
+    }
+}

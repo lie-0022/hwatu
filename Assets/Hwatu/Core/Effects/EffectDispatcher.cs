@@ -1,0 +1,84 @@
+using System;
+using Hwatu.Core.Cards;
+using Hwatu.Core.Combat;
+
+namespace Hwatu.Core.Effects
+{
+    /// <summary>
+    /// 효과 데이터(op)를 받아 전투 상태를 변형한다. 이번 마일스톤은 5종(switch).
+    /// 마일스톤2에서 op→핸들러 등록 테이블로 승격해 데이터-주도를 강화한다.
+    /// </summary>
+    public sealed class EffectDispatcher
+    {
+        public void Execute(EffectData e, IEffectContext ctx)
+        {
+            switch (e.Op)
+            {
+                case EffectOp.DealDamage: DealDamage(e, ctx); break;
+                case EffectOp.GainBlock: GainBlock(e, ctx); break;
+                case EffectOp.Draw: Draw(e, ctx); break;
+                case EffectOp.ApplyStatus: ApplyStatus(e, ctx); break;
+                case EffectOp.GainResource: GainResource(e, ctx); break;
+                default: throw new NotSupportedException("Unknown effect op: " + e.Op);
+            }
+        }
+
+        // 피해 = (기본 + radiance) × weak(×3/4) × vulnerable(×3/2), 정수연산. Block 먼저 차감 후 HP.
+        private static void DealDamage(EffectData e, IEffectContext ctx)
+        {
+            int dmg = e.Amount + ctx.Source.GetStatus(StatusType.Radiance);
+            if (ctx.Source.GetStatus(StatusType.Weak) > 0)
+            {
+                dmg = dmg * 3 / 4;
+            }
+            if (ctx.Target.GetStatus(StatusType.Vulnerable) > 0)
+            {
+                dmg = dmg * 3 / 2;
+            }
+            if (dmg < 0)
+            {
+                dmg = 0;
+            }
+
+            int block = ctx.Target.Block;
+            if (dmg <= block)
+            {
+                ctx.Target.SetBlock(block - dmg);
+                return;
+            }
+            ctx.Target.SetBlock(0);
+            ctx.Target.SetHp(ctx.Target.Hp - (dmg - block));
+        }
+
+        private static void GainBlock(EffectData e, IEffectContext ctx)
+        {
+            ICombatant who = Resolve(e, ctx);
+            who.SetBlock(who.Block + e.Amount);
+        }
+
+        private static void Draw(EffectData e, IEffectContext ctx)
+        {
+            PileSystem.Draw(ctx.Hand, ctx.DrawPile, ctx.DiscardPile, ctx.ShuffleRng, e.Amount);
+        }
+
+        private static void ApplyStatus(EffectData e, IEffectContext ctx)
+        {
+            ICombatant who = Resolve(e, ctx);
+            who.AddStatus(e.Status, e.Amount);
+        }
+
+        private static void GainResource(EffectData e, IEffectContext ctx)
+        {
+            // radiance는 StatusType.Radiance로 통합 라우팅(단일 출처 → Attack 피해가 자동 반영).
+            // 그 외 자원(stakes/go/chaff)은 후순위 캐릭터용으로 이번 스코프 미사용.
+            if (e.Resource == ResourceType.Radiance)
+            {
+                ctx.Source.AddStatus(StatusType.Radiance, e.Amount);
+            }
+        }
+
+        // Self면 Source(시전자), 그 외면 컨텍스트가 정한 Target.
+        private static ICombatant Resolve(EffectData e, IEffectContext ctx)
+            => e.Target == TargetType.Self ? ctx.Source : ctx.Target;
+    }
+}

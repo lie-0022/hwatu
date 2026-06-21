@@ -1,0 +1,53 @@
+using System.Collections.Generic;
+using Hwatu.Core.Cards;
+using Hwatu.Core.Combat;
+using Hwatu.Core.Effects;
+using Hwatu.Core.Enemies;
+
+namespace Hwatu.Core.Content
+{
+    /// <summary>
+    /// 마일스톤1 시작 콘텐츠의 단일 진실원(코드 빌더). 테스트·헤드리스 러너가 ScriptableObject 없이 이걸 쓴다.
+    /// (마일스톤2에서 SO로 외부화하되 이 POCO와 동치를 유지한다.)
+    /// </summary>
+    public static class StarterContent
+    {
+        // 빛타격: Attack, cost 1, 6 피해
+        public static CardData LightStrike() => new CardData(
+            "luminary_light_strike", "빛타격", CardType.Attack, 1, TargetType.Enemy, false,
+            new[] { new EffectData(EffectOp.DealDamage, amount: 6, target: TargetType.Enemy) });
+
+        // 방패: Skill, cost 1, 5 Block
+        public static CardData Shield() => new CardData(
+            "luminary_shield", "방패", CardType.Skill, 1, TargetType.Self, false,
+            new[] { new EffectData(EffectOp.GainBlock, amount: 5, target: TargetType.Self) });
+
+        // 점화: Skill, cost 1, radiance +1
+        public static CardData Ignite() => new CardData(
+            "luminary_ignite", "점화", CardType.Skill, 1, TargetType.Self, false,
+            new[] { new EffectData(EffectOp.GainResource, amount: 1, target: TargetType.Self, resource: ResourceType.Radiance) });
+
+        /// <summary>Luminary 시작 덱 10장: 빛타격×5, 방패×4, 점화×1.</summary>
+        public static List<CardData> LuminaryStarterDeck()
+        {
+            var deck = new List<CardData>();
+            for (int i = 0; i < 5; i++) deck.Add(LightStrike());
+            for (int i = 0; i < 4; i++) deck.Add(Shield());
+            deck.Add(Ignite());
+            return deck;
+        }
+
+        // 잡도깨비: swipe 공격 7 / guard 방어 6, sequence [swipe, swipe, guard]
+        public static EnemyData DokkaebiMinion() => new EnemyData(
+            "dokkaebi_minion", "잡도깨비", 12, 16,
+            new[]
+            {
+                new EnemyMoveData("swipe", IntentType.Attack, 7,
+                    new[] { new EffectData(EffectOp.DealDamage, amount: 7, target: TargetType.Enemy) }),
+                new EnemyMoveData("guard", IntentType.Block, 6,
+                    new[] { new EffectData(EffectOp.GainBlock, amount: 6, target: TargetType.Self) }),
+            },
+            EnemyAiKind.Sequence,
+            new[] { "swipe", "swipe", "guard" });
+    }
+}
