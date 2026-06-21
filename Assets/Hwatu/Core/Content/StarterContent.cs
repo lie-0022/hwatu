@@ -49,5 +49,20 @@ namespace Hwatu.Core.Content
             },
             EnemyAiKind.Sequence,
             new[] { "swipe", "swipe", "guard" });
+
+        // 보스: 달그림자 도깨비 — 강타 13 / 광폭 9 / 방벽 12, sequence [crush, rage, barrier]
+        public static EnemyData DokkaebiBoss() => new EnemyData(
+            "dokkaebi_boss", "달그림자 도깨비", 45, 55,
+            new[]
+            {
+                new EnemyMoveData("crush", IntentType.Attack, 13,
+                    new[] { new EffectData(EffectOp.DealDamage, amount: 13, target: TargetType.Enemy) }),
+                new EnemyMoveData("rage", IntentType.Attack, 9,
+                    new[] { new EffectData(EffectOp.DealDamage, amount: 9, target: TargetType.Enemy) }),
+                new EnemyMoveData("barrier", IntentType.Block, 12,
+                    new[] { new EffectData(EffectOp.GainBlock, amount: 12, target: TargetType.Self) }),
+            },
+            EnemyAiKind.Sequence,
+            new[] { "crush", "rage", "barrier" });
     }
 }
