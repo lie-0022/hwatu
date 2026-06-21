@@ -14,7 +14,9 @@ namespace Hwatu.Core.Content
                 case NodeType.Boss:
                     return StarterContent.DokkaebiBoss();
                 case NodeType.Elite:
-                    return StarterContent.GwangGwiElite();
+                    return rng.NextInt(2) == 0
+                        ? StarterContent.GwangGwiElite()
+                        : StarterContent.CyclopsOni();
                 default:
                     int i = rng.NextInt(4);
                     return i == 0 ? StarterContent.DokkaebiMinion()
