@@ -199,5 +199,18 @@ namespace Hwatu.Tests.Combat
             Assert.AreEqual(hp - 5, state.Enemies[0].Hp);
             Assert.AreEqual(2, state.Enemies[0].GetStatus(StatusType.Poison));
         }
+
+        [Test]
+        public void Ink_Seep_DealsDamageAndPoison()
+        {
+            var deck = new List<CardData> { InkCards.Seep() };
+            CombatState state = CombatFactory.CreateCombat(deck, StarterContent.DokkaebiMinion(), 1, 70, 70);
+            var engine = new CombatEngine(state, new EffectDispatcher());
+            engine.Advance(); engine.Advance(); // PlayerAction
+            int hp = state.Enemies[0].Hp;
+            engine.PlayCard(0);   // 침습 → 피해 7 + 중독 3
+            Assert.AreEqual(hp - 7, state.Enemies[0].Hp);
+            Assert.AreEqual(3, state.Enemies[0].GetStatus(StatusType.Poison));
+        }
     }
 }
