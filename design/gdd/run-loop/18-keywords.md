@@ -6,7 +6,8 @@
 ## 3. Detailed Rules
 - **Exhaust(소멸)**: 사용 시 버림 더미 대신 소멸 더미로(전투 중 재사용 불가). `CardData.Exhaust`. 예: 백광·각성.
 - **Retain(보유)**: 턴 종료 시 버리지 않고 손패 유지(`CombatEngine.EndPlayerTurn`). `CardData.Retain`. 예: 수호.
-- `CardData.Upgrade`는 두 키워드를 그대로 전파.
+- **Innate(선천)**: 전투 첫 손패에 보장(`StartCombat`에서 셔플 후 더미 맨 위로). `CardData.Innate`. 예: 서광.
+- `CardData.Upgrade`는 세 키워드를 그대로 전파.
 
 ## 6. Dependencies
 `CardData.Exhaust/Retain` · `CombatEngine`(PlayCard→ExhaustPile / EndPlayerTurn→Retain 유지).
