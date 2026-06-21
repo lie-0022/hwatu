@@ -33,7 +33,10 @@ namespace Hwatu.Core.Combat
                     break;
                 case CombatPhase.PlayerTurnStart:
                     StartPlayerTurn();
-                    State.Phase = CombatPhase.PlayerAction;
+                    if (State.Phase == CombatPhase.PlayerTurnStart)   // 독사로 Lose가 안 됐으면 입력 대기로
+                    {
+                        State.Phase = CombatPhase.PlayerAction;
+                    }
                     break;
                 case CombatPhase.PlayerAction:
                     break; // 입력 대기 — 멈춤
@@ -171,6 +174,13 @@ namespace Hwatu.Core.Combat
         {
             State.Turn++;
             State.Player.SetBlock(0);
+            TickPoison(State.Player);
+            if (State.Player.Hp <= 0)
+            {
+                State.Result = CombatResult.Lose;
+                State.Phase = CombatPhase.Lose;
+                return;
+            }
             State.Player.Energy = State.Player.BaseEnergy;
             PileSystem.Draw(State.Hand, State.DrawPile, State.DiscardPile, State.ShuffleRng, State.Player.HandSize);
         }
@@ -192,6 +202,11 @@ namespace Hwatu.Core.Combat
                 }
 
                 enemy.SetBlock(0);
+                TickPoison(enemy);
+                if (enemy.IsDead)
+                {
+                    continue;   // 독으로 쓰러지면 행동하지 않음
+                }
 
                 // 실행은 항상 현재 AI 상태(PeekNext)를 직접 사용한다.
                 // CurrentIntent는 UI 표시 전용 캐시이므로 실행 소스로 겸용하지 않는다(의도 변경 효과 대비).
@@ -205,6 +220,17 @@ namespace Hwatu.Core.Combat
 
                 enemy.Ai.Advance();
                 enemy.RefreshIntent(); // 다음 턴에 보여줄 의도 갱신
+            }
+        }
+
+        // Poison(중독): 턴 시작 시 스택만큼 피해(Block 무시), 그 후 1 감소.
+        private static void TickPoison(ICombatant c)
+        {
+            int p = c.GetStatus(StatusType.Poison);
+            if (p > 0)
+            {
+                c.SetHp(System.Math.Max(0, c.Hp - p));
+                c.AddStatus(StatusType.Poison, -1);
             }
         }
 
