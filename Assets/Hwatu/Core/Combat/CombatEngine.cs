@@ -204,14 +204,23 @@ namespace Hwatu.Core.Combat
 
         private void EndPlayerTurn()
         {
-            // Retain 카드는 손패에 남기고, 나머지만 버린다.
+            // Retain은 손패 유지, Ethereal은 소멸, 나머지는 버림.
             for (int i = State.Hand.Count - 1; i >= 0; i--)
             {
-                if (!State.Hand[i].Data.Retain)
+                CardInstance card = State.Hand[i];
+                if (card.Data.Retain)
                 {
-                    State.DiscardPile.Add(State.Hand[i]);
-                    State.Hand.RemoveAt(i);
+                    continue;
                 }
+                if (card.Data.Ethereal)
+                {
+                    State.ExhaustPile.Add(card);
+                }
+                else
+                {
+                    State.DiscardPile.Add(card);
+                }
+                State.Hand.RemoveAt(i);
             }
         }
 

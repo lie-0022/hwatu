@@ -93,14 +93,18 @@ namespace Hwatu.Core.Content
         public static CardData Bulwark() => new CardData("lum_bulwark", "철벽", CardType.Skill, 1, TargetType.Self, false,
             new[] { new EffectData(EffectOp.ApplyStatus, amount: 2, target: TargetType.Self, status: StatusType.Dexterity) }, CardRarity.Uncommon);
 
-        /// <summary>보상 추첨에 쓰는 광객 카드 풀(19장: Common5/Uncommon8/Rare6).</summary>
+        // 유성: 공14 + 휘발(Ethereal) — 안 쓰면 턴 끝에 소멸
+        public static CardData Meteor() => new CardData("lum_meteor", "유성", CardType.Attack, 1, TargetType.Enemy, false,
+            new[] { new EffectData(EffectOp.DealDamage, amount: 14, target: TargetType.Enemy) }, CardRarity.Rare, retain: false, innate: false, ethereal: true);
+
+        /// <summary>보상 추첨에 쓰는 광객 카드 풀(20장: Common5/Uncommon8/Rare7).</summary>
         public static List<CardData> RewardPool()
         {
             return new List<CardData>
             {
                 HeavyStrike(), Guard(), Whet(), Jab(), Check(),
                 Glow(), Pierce(), LightRay(), Stockpile(), Purify(), Vigil(), Dawn(), Bulwark(),
-                Burst(), GreatShield(), RadiantSurge(), Frenzy(), WhiteFlash(), Awaken(),
+                Burst(), GreatShield(), RadiantSurge(), Frenzy(), WhiteFlash(), Awaken(), Meteor(),
             };
         }
     }
