@@ -28,14 +28,14 @@ namespace Hwatu.Game
             AdvanceToInput();
         }
 
-        /// <summary>손패의 카드를 사용(첫 적 대상). 성공 시 true.</summary>
-        public bool PlayCard(int handIndex)
+        /// <summary>손패의 카드를 사용(enemyTargetIndex로 적 지정, 기본 0번 적). 성공 시 true.</summary>
+        public bool PlayCard(int handIndex, int enemyTargetIndex = 0)
         {
             if (_engine == null)
             {
                 return false;
             }
-            bool ok = _engine.PlayCard(handIndex, 0);
+            bool ok = _engine.PlayCard(handIndex, enemyTargetIndex);
             if (ok)
             {
                 AdvanceToInput();

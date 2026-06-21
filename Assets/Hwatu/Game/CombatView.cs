@@ -22,11 +22,16 @@ namespace Hwatu.Game
         private CombatController _controller;
         private TMP_FontAsset _font;
 
-        private TextMeshProUGUI _enemyText;
+        private EnemyView _enemyView;
         private TextMeshProUGUI _playerText;
+        private Outline _playerOutline;
         private RectTransform _handArea;
         private GameObject _resultPanel;
         private TextMeshProUGUI _resultText;
+        private TargetingArrow _arrow;
+
+        /// <summary>타깃 카드 드래그 시 쓰는 조준 화살표.</summary>
+        public TargetingArrow Arrow => _arrow;
 
         private void Start()
         {
@@ -59,16 +64,37 @@ namespace Hwatu.Game
             scaler.referenceResolution = new Vector2(1920, 1080);
             RectTransform root = canvasGo.GetComponent<RectTransform>();
 
-            // 적(상단 중앙)
-            _enemyText = CreateText(root, "EnemyText", new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0, -90), 30, TextAlignmentOptions.Top);
-            _enemyText.rectTransform.sizeDelta = new Vector2(1300, 160);
+            // 적 영역(상단 중앙) — 박스(드롭 타깃 + 조준 테두리)
+            var enemyGo = new GameObject("EnemyView", typeof(RectTransform));
+            enemyGo.transform.SetParent(root, false);
+            var ert = (RectTransform)enemyGo.transform;
+            ert.anchorMin = new Vector2(0.5f, 1f);
+            ert.anchorMax = new Vector2(0.5f, 1f);
+            ert.pivot = new Vector2(0.5f, 1f);
+            ert.anchoredPosition = new Vector2(0f, -70f);
+            _enemyView = enemyGo.AddComponent<EnemyView>();
+            _enemyView.Build(_font, 0);
 
-            // 플레이어(좌하단)
-            _playerText = CreateText(root, "PlayerText", new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(380, 250), 26, TextAlignmentOptions.BottomLeft);
-            _playerText.rectTransform.sizeDelta = new Vector2(720, 150);
+            // 플레이어 영역(좌하단) — 박스 + 테두리(방어 카드 드래그 시 강조)
+            var playerGo = new GameObject("PlayerView", typeof(RectTransform), typeof(Image));
+            playerGo.transform.SetParent(root, false);
+            var prt = (RectTransform)playerGo.transform;
+            prt.anchorMin = Vector2.zero;
+            prt.anchorMax = Vector2.zero;
+            prt.pivot = Vector2.zero;
+            prt.anchoredPosition = new Vector2(24f, 24f);
+            prt.sizeDelta = new Vector2(440f, 150f);
+            playerGo.GetComponent<Image>().color = new Color(0.12f, 0.14f, 0.20f, 0.85f);
+            _playerOutline = playerGo.AddComponent<Outline>();
+            _playerOutline.effectColor = new Color(0.4f, 0.8f, 1f, 1f);
+            _playerOutline.effectDistance = new Vector2(4f, 4f);
+            _playerOutline.enabled = false;
+            _playerText = CreateText(prt, "PlayerText", Vector2.zero, Vector2.one, Vector2.zero, 24, TextAlignmentOptions.Center);
+            _playerText.rectTransform.offsetMin = new Vector2(16f, 12f);
+            _playerText.rectTransform.offsetMax = new Vector2(-16f, -12f);
 
             // 손패(하단 중앙, 가로 배치)
-            var handGo = new GameObject("HandArea", typeof(RectTransform), typeof(HorizontalLayoutGroup));
+            var handGo = new GameObject("HandArea", typeof(RectTransform));
             handGo.transform.SetParent(root, false);
             _handArea = handGo.GetComponent<RectTransform>();
             _handArea.anchorMin = new Vector2(0.5f, 0f);
@@ -76,15 +102,16 @@ namespace Hwatu.Game
             _handArea.pivot = new Vector2(0.5f, 0f);
             _handArea.anchoredPosition = new Vector2(0, 30);
             _handArea.sizeDelta = new Vector2(1500, 190);
-            var hlg = handGo.GetComponent<HorizontalLayoutGroup>();
-            hlg.spacing = 14;
-            hlg.childAlignment = TextAnchor.LowerCenter;
-            hlg.childControlWidth = false;
-            hlg.childControlHeight = false;
 
             // 턴 종료(우하단)
             CreateButton(root, "턴 종료", new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-130, 250), new Vector2(170, 60),
                 () => { _controller.EndTurn(); Refresh(); });
+
+            // 타깃팅 화살표(손패 위, 결과 오버레이 아래)
+            var arrowGo = new GameObject("TargetingArrow", typeof(RectTransform));
+            arrowGo.transform.SetParent(root, false);
+            _arrow = arrowGo.AddComponent<TargetingArrow>();
+            _arrow.Build(root);
 
             // 결과 오버레이
             _resultPanel = new GameObject("ResultPanel", typeof(RectTransform), typeof(Image));
@@ -110,16 +137,10 @@ namespace Hwatu.Game
                 return;
             }
 
-            var sb = new StringBuilder();
-            for (int i = 0; i < s.Enemies.Count; i++)
+            if (s.Enemies.Count > 0)
             {
-                EnemyState e = s.Enemies[i];
-                string intent = e.CurrentIntent != null
-                    ? $"{IntentKor(e.CurrentIntent.Intent)} {e.CurrentIntent.Value}"
-                    : "?";
-                sb.AppendLine($"{e.Data.Name}    HP {e.Hp}/{e.MaxHp}    방어 {e.Block}    다음 행동: {intent}");
+                _enemyView.Bind(s.Enemies[0]);
             }
-            _enemyText.text = sb.ToString();
 
             PlayerState p = s.Player;
             _playerText.text =
@@ -141,20 +162,102 @@ namespace Hwatu.Game
             }
         }
 
+        /// <summary>드래그로 놓은 카드를 사용 시도한다(enemyIndex&lt;0 = 비타깃). 성공 시 손패 갱신.</summary>
+        public bool TryPlayCard(CardView card, int enemyIndex)
+        {
+            CombatState s = _controller.State;
+            if (s == null || card == null)
+            {
+                return false;
+            }
+            int idx = -1;
+            for (int i = 0; i < s.Hand.Count; i++)
+            {
+                if (s.Hand[i] == card.Card)
+                {
+                    idx = i;
+                    break;
+                }
+            }
+            if (idx < 0)
+            {
+                return false;
+            }
+            bool ok = _controller.PlayCard(idx, enemyIndex < 0 ? 0 : enemyIndex);
+            if (ok)
+            {
+                Refresh();
+            }
+            return ok;
+        }
+
+        /// <summary>적 박스 조준 테두리(단일 적: 인자가 그 적이면 켜고, null이면 끈다).</summary>
+        public void SetEnemyHighlight(EnemyView enemy)
+        {
+            if (_enemyView != null)
+            {
+                _enemyView.SetHighlight(enemy == _enemyView);
+            }
+        }
+
+        /// <summary>플레이어 영역 테두리 on/off(방어 카드 드래그 시).</summary>
+        public void SetPlayerHighlight(bool on)
+        {
+            if (_playerOutline != null)
+            {
+                _playerOutline.enabled = on;
+            }
+        }
+
         private void RebuildHand(CombatState s)
         {
             for (int i = _handArea.childCount - 1; i >= 0; i--)
             {
-                Destroy(_handArea.GetChild(i).gameObject);
+                Transform child = _handArea.GetChild(i);
+                child.SetParent(null, false);   // 즉시 분리 → 아래 LayoutHand의 childCount가 새 카드만 세도록
+                Destroy(child.gameObject);
             }
             for (int i = 0; i < s.Hand.Count; i++)
             {
                 CardInstance c = s.Hand[i];
                 int idx = i;
-                string label = $"[{c.Data.Cost}]\n{c.Data.Name}\n\n{Describe(c)}";
-                Button btn = CreateCardButton(_handArea, label);
-                btn.interactable = s.Player.Energy >= c.Data.Cost;
+                bool playable = s.Player.Energy >= c.Data.Cost;
+
+                var go = new GameObject("Card", typeof(RectTransform));
+                go.transform.SetParent(_handArea, false);
+                var card = go.AddComponent<CardView>();
+                card.Build(_font);
+                card.SetCombat(this);
+                card.Bind(c, playable);
+
+                var btn = go.AddComponent<Button>();
+                btn.targetGraphic = go.GetComponent<Image>();
+                btn.interactable = playable;
                 btn.onClick.AddListener(() => { if (_controller.PlayCard(idx)) { Refresh(); } });
+            }
+
+            LayoutHand();
+        }
+
+        // 손패 카드를 부채꼴(아래 손잡이를 중심으로 한 원호)로 배치하고 각 카드의 기준 위치·회전을 지정한다.
+        private void LayoutHand()
+        {
+            int n = _handArea.childCount;
+            const float anglePerCard = 7f;   // 카드 사이 벌어지는 각도(도)
+            const float radius = 1400f;       // 원호 반경(클수록 평평)
+            float mid = (n - 1) / 2f;
+            for (int i = 0; i < n; i++)
+            {
+                float offset = i - mid;
+                float angle = offset * anglePerCard;
+                float rad = angle * Mathf.Deg2Rad;
+                float x = Mathf.Sin(rad) * radius;
+                float y = (Mathf.Cos(rad) - 1f) * radius;   // 중앙 0, 양끝 아래로(위로 볼록한 아치)
+                var card = _handArea.GetChild(i).GetComponent<CardView>();
+                if (card != null)
+                {
+                    card.SetHome(new Vector2(x, y), -angle);
+                }
             }
         }
 
@@ -181,7 +284,7 @@ namespace Hwatu.Game
             t.fontSize = size;
             t.alignment = align;
             t.color = Color.white;
-            t.enableWordWrapping = false;
+            t.textWrappingMode = TextWrappingModes.NoWrap;
             var rt = t.rectTransform;
             rt.anchorMin = aMin;
             rt.anchorMax = aMax;
@@ -210,49 +313,5 @@ namespace Hwatu.Game
             return go.GetComponent<Button>();
         }
 
-        private Button CreateCardButton(RectTransform parent, string label)
-        {
-            var go = new GameObject("Card", typeof(RectTransform), typeof(Image), typeof(Button), typeof(LayoutElement));
-            go.transform.SetParent(parent, false);
-            var le = go.GetComponent<LayoutElement>();
-            le.preferredWidth = 160;
-            le.preferredHeight = 180;
-            go.GetComponent<Image>().color = new Color(0.30f, 0.34f, 0.42f);
-
-            var txt = CreateText(go.GetComponent<RectTransform>(), "Label", Vector2.zero, Vector2.one, Vector2.zero, 20, TextAlignmentOptions.Center);
-            txt.rectTransform.sizeDelta = Vector2.zero;
-            txt.enableWordWrapping = true;
-            txt.text = label;
-            return go.GetComponent<Button>();
-        }
-
-        private static string IntentKor(IntentType intent)
-        {
-            switch (intent)
-            {
-                case IntentType.Attack: return "공격";
-                case IntentType.AttackMulti: return "연속공격";
-                case IntentType.Block: return "방어";
-                case IntentType.Buff: return "강화";
-                case IntentType.Debuff: return "약화";
-                default: return intent.ToString();
-            }
-        }
-
-        private static string Describe(CardInstance c)
-        {
-            if (c.Data.Effects.Count == 0)
-            {
-                return "-";
-            }
-            EffectData e = c.Data.Effects[0];
-            switch (e.Op)
-            {
-                case EffectOp.DealDamage: return $"{e.Amount} 피해";
-                case EffectOp.GainBlock: return $"{e.Amount} 방어";
-                case EffectOp.GainResource: return $"광 +{e.Amount}";
-                default: return e.Op;
-            }
-        }
     }
 }
