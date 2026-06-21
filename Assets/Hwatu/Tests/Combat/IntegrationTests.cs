@@ -110,5 +110,23 @@ namespace Hwatu.Tests.Combat
             engine.PlayCard(bladeIdx);
             Assert.AreEqual(hp - 6, state.Enemies[0].Hp);   // 그림자칼 6
         }
+
+        [Test]
+        public void Gumiho_Enraged_AdvancesToDoom()
+        {
+            var deck = InkCards.InkStarterDeck();
+            CombatState state = CombatFactory.CreateCombat(deck, StarterContent.Gumiho(), 1, 70, 70);
+            var engine = new CombatEngine(state, new EffectDispatcher());
+            engine.Advance(); engine.Advance();
+
+            EnemyState e = state.Enemies[0];
+            e.SetHp(e.MaxHp / 3);   // enrage → phase2 [ninetails, doom, tail]
+            e.RefreshIntent();
+            Assert.AreEqual("ninetails", e.CurrentIntent.Id);
+            e.Ai.Advance();
+            e.RefreshIntent();
+            Assert.AreEqual("doom", e.CurrentIntent.Id);
+            Assert.AreEqual(IntentType.Doom, e.CurrentIntent.Intent);
+        }
     }
 }
