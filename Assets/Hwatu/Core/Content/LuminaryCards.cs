@@ -74,14 +74,21 @@ namespace Hwatu.Core.Content
                 new EffectData(EffectOp.ClearStatus, amount: 0, target: TargetType.Self, status: StatusType.Poison),
             }, CardRarity.Uncommon);
 
-        /// <summary>보상 추첨에 쓰는 광객 카드 풀(14장: Common5/Uncommon5/Rare4).</summary>
+        // 소멸(Exhaust) 카드: 1회용 강력 — 쓰면 소멸 더미로
+        public static CardData WhiteFlash() => new CardData("lum_flash", "백광", CardType.Attack, 2, TargetType.Enemy, true,
+            new[] { new EffectData(EffectOp.DealDamage, amount: 25, target: TargetType.Enemy) }, CardRarity.Rare);
+
+        public static CardData Awaken() => new CardData("lum_awaken", "각성", CardType.Skill, 1, TargetType.Self, true,
+            new[] { new EffectData(EffectOp.GainResource, amount: 5, target: TargetType.Self, resource: ResourceType.Radiance) }, CardRarity.Rare);
+
+        /// <summary>보상 추첨에 쓰는 광객 카드 풀(16장: Common5/Uncommon5/Rare6).</summary>
         public static List<CardData> RewardPool()
         {
             return new List<CardData>
             {
                 HeavyStrike(), Guard(), Whet(), Jab(), Check(),
                 Glow(), Pierce(), LightRay(), Stockpile(), Purify(),
-                Burst(), GreatShield(), RadiantSurge(), Frenzy(),
+                Burst(), GreatShield(), RadiantSurge(), Frenzy(), WhiteFlash(), Awaken(),
             };
         }
     }
