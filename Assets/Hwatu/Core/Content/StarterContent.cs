@@ -207,5 +207,24 @@ namespace Hwatu.Core.Content
             },
             EnemyAiKind.Sequence,
             new[] { "claw", "curse", "claw" });
+
+        // 엘리트 구렁이: 독 특화 — 휘감기(12) / 독니(6+중독4) / 또아리(방10)
+        public static EnemyData Serpent() => new EnemyData(
+            "serpent", "구렁이", 33, 41,
+            new[]
+            {
+                new EnemyMoveData("coil_strike", IntentType.Attack, 12,
+                    new[] { new EffectData(EffectOp.DealDamage, amount: 12, target: TargetType.Enemy) }),
+                new EnemyMoveData("fang", IntentType.Attack, 6,
+                    new[]
+                    {
+                        new EffectData(EffectOp.DealDamage, amount: 6, target: TargetType.Enemy),
+                        new EffectData(EffectOp.ApplyStatus, amount: 4, target: TargetType.Enemy, status: StatusType.Poison),
+                    }),
+                new EnemyMoveData("coil", IntentType.Block, 10,
+                    new[] { new EffectData(EffectOp.GainBlock, amount: 10, target: TargetType.Self) }),
+            },
+            EnemyAiKind.Sequence,
+            new[] { "fang", "coil", "coil_strike" });
     }
 }

@@ -24,7 +24,7 @@ namespace Hwatu.Tests.Run
         [Test]
         public void Elite_FromElitePool()
         {
-            var pool = new HashSet<string> { "광귀", "외눈도깨비" };
+            var pool = new HashSet<string> { "광귀", "외눈도깨비", "구렁이" };
             for (ulong s = 1; s <= 20; s++)
             {
                 EnemyData e = EnemyContent.PickEnemy(NodeType.Elite, new SplitMix64Random(s));

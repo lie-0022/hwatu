@@ -16,9 +16,10 @@ namespace Hwatu.Core.Content
                         ? StarterContent.DokkaebiBoss()
                         : StarterContent.Gumiho();
                 case NodeType.Elite:
-                    return rng.NextInt(2) == 0
-                        ? StarterContent.GwangGwiElite()
-                        : StarterContent.CyclopsOni();
+                    int el = rng.NextInt(3);
+                    return el == 0 ? StarterContent.GwangGwiElite()
+                         : el == 1 ? StarterContent.CyclopsOni()
+                         : StarterContent.Serpent();
                 default:
                     int i = rng.NextInt(6);
                     return i == 0 ? StarterContent.DokkaebiMinion()
