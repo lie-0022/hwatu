@@ -25,6 +25,10 @@ namespace Hwatu.Game
         private EnemyView _enemyView;
         private TextMeshProUGUI _playerText;
         private Outline _playerOutline;
+        private HpBar _playerHpBar;
+        private RectTransform _root;
+        private int _prevEnemyHp;
+        private int _prevPlayerHp;
         private RectTransform _handArea;
         private GameObject _resultPanel;
         private TextMeshProUGUI _resultText;
@@ -63,6 +67,7 @@ namespace Hwatu.Game
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
             scaler.referenceResolution = new Vector2(1920, 1080);
             RectTransform root = canvasGo.GetComponent<RectTransform>();
+            _root = root;
 
             // 적 영역(상단 중앙) — 박스(드롭 타깃 + 조준 테두리)
             var enemyGo = new GameObject("EnemyView", typeof(RectTransform));
@@ -89,9 +94,19 @@ namespace Hwatu.Game
             _playerOutline.effectColor = new Color(0.4f, 0.8f, 1f, 1f);
             _playerOutline.effectDistance = new Vector2(4f, 4f);
             _playerOutline.enabled = false;
-            _playerText = CreateText(prt, "PlayerText", Vector2.zero, Vector2.one, Vector2.zero, 24, TextAlignmentOptions.Center);
+            var pbarGo = new GameObject("PlayerHpBar", typeof(RectTransform));
+            pbarGo.transform.SetParent(prt, false);
+            var pbrt = (RectTransform)pbarGo.transform;
+            pbrt.anchorMin = new Vector2(0.5f, 1f);
+            pbrt.anchorMax = new Vector2(0.5f, 1f);
+            pbrt.pivot = new Vector2(0.5f, 1f);
+            pbrt.anchoredPosition = new Vector2(0f, -12f);
+            _playerHpBar = pbarGo.AddComponent<HpBar>();
+            _playerHpBar.Build(_font, new Color(0.3f, 0.75f, 0.35f, 1f), 400f, 28f);
+
+            _playerText = CreateText(prt, "PlayerText", Vector2.zero, Vector2.one, Vector2.zero, 22, TextAlignmentOptions.Center);
             _playerText.rectTransform.offsetMin = new Vector2(16f, 12f);
-            _playerText.rectTransform.offsetMax = new Vector2(-16f, -12f);
+            _playerText.rectTransform.offsetMax = new Vector2(-16f, -52f);
 
             // 손패(하단 중앙, 가로 배치)
             var handGo = new GameObject("HandArea", typeof(RectTransform));
@@ -137,16 +152,32 @@ namespace Hwatu.Game
                 return;
             }
 
+            // HP 감소량만큼 피해 팝업(엔진 수정 없이 UI에서 감지)
+            int curEnemyHp = s.Enemies.Count > 0 ? s.Enemies[0].Hp : 0;
+            int curPlayerHp = s.Player.Hp;
+            int enemyDamage = _prevEnemyHp - curEnemyHp;
+            int playerDamage = _prevPlayerHp - curPlayerHp;
+            if (enemyDamage > 0 && _enemyView != null)
+            {
+                ShowDamagePopup(_enemyView.transform.position, enemyDamage, new Color(1f, 0.95f, 0.45f));
+            }
+            if (playerDamage > 0 && _playerOutline != null)
+            {
+                ShowDamagePopup(_playerOutline.transform.position + new Vector3(0f, 80f, 0f), playerDamage, new Color(1f, 0.45f, 0.4f));
+            }
+            _prevEnemyHp = curEnemyHp;
+            _prevPlayerHp = curPlayerHp;
+
             if (s.Enemies.Count > 0)
             {
                 _enemyView.Bind(s.Enemies[0]);
             }
 
             PlayerState p = s.Player;
+            _playerHpBar.Set(p.Hp, p.MaxHp);
             _playerText.text =
-                $"나    HP {p.Hp}/{p.MaxHp}    방어 {p.Block}\n" +
                 $"에너지 {p.Energy}/{p.BaseEnergy}    광 {p.GetStatus(StatusType.Radiance)}\n" +
-                $"턴 {s.Turn}    덱 {s.DrawPile.Count}    버린 더미 {s.DiscardPile.Count}";
+                $"방어 {p.Block}    턴 {s.Turn}    덱 {s.DrawPile.Count}    버린 {s.DiscardPile.Count}";
 
             RebuildHand(s);
 
@@ -207,6 +238,15 @@ namespace Hwatu.Game
             {
                 _playerOutline.enabled = on;
             }
+        }
+
+        // 피해 숫자 팝업을 대상 위치에 띄운다.
+        private void ShowDamagePopup(Vector3 worldPos, int amount, Color color)
+        {
+            var go = new GameObject("DamagePopup", typeof(RectTransform));
+            go.transform.SetParent(_root, false);
+            go.transform.position = worldPos;
+            go.AddComponent<DamagePopup>().Show(_font, amount, color);
         }
 
         private void RebuildHand(CombatState s)
