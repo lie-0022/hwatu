@@ -169,10 +169,12 @@ namespace Hwatu.Core.Content
                         new EffectData(EffectOp.DealDamage, amount: 8, target: TargetType.Enemy),
                         new EffectData(EffectOp.DealDamage, amount: 8, target: TargetType.Enemy),
                     }, hits: 3),
+                new EnemyMoveData("doom", IntentType.Doom, 24,
+                    new[] { new EffectData(EffectOp.DealDamage, amount: 24, target: TargetType.Enemy) }),
             },
             EnemyAiKind.Phase,
             new[] { "charm", "tail", "foxfire" },
-            new[] { "ninetails", "foxfire", "tail" });
+            new[] { "ninetails", "doom", "tail" });
 
         // 일반 장승: 방어형 — 수호(방10) / 노려봄(약화2) / 들이받기(10)
         public static EnemyData Jangseung() => new EnemyData(
