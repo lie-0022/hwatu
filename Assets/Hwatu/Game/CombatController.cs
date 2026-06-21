@@ -5,6 +5,7 @@ using Hwatu.Core.Cards;
 using Hwatu.Core.Combat;
 using Hwatu.Core.Effects;
 using Hwatu.Core.Enemies;
+using Hwatu.Core.Run;
 
 namespace Hwatu.Game
 {
@@ -41,9 +42,9 @@ namespace Hwatu.Game
         }
 
         /// <summary>외부(GameFlow)에서 런 덱·적·플레이어 HP를 주입해 전투 시작.</summary>
-        public void StartCombat(IReadOnlyList<CardData> deck, EnemyData enemyData, ulong seed, int maxHp, int hp)
+        public void StartCombat(IReadOnlyList<CardData> deck, EnemyData enemyData, ulong seed, int maxHp, int hp, IReadOnlyList<RelicData> relics = null)
         {
-            BeginWith(CombatFactory.CreateCombat(deck, enemyData, seed, maxHp, hp));
+            BeginWith(CombatFactory.CreateCombat(deck, enemyData, seed, maxHp, hp, relics));
         }
 
         private void BeginWith(CombatState state)
