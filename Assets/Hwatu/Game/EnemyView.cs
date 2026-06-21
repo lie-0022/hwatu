@@ -126,6 +126,7 @@ namespace Hwatu.Game
                 case IntentType.Block:       return new Color(0.20f, 0.40f, 0.70f, 0.95f);  // 방어: 파랑
                 case IntentType.Buff:        return new Color(0.25f, 0.55f, 0.30f, 0.95f);  // 강화: 초록
                 case IntentType.Debuff:      return new Color(0.50f, 0.30f, 0.62f, 0.95f);  // 약화: 보라
+                case IntentType.Doom:        return new Color(0.12f, 0.02f, 0.16f, 0.98f);  // 파멸: 흑보라
                 default:                     return new Color(0.35f, 0.35f, 0.35f, 0.95f);  // 기타: 회색
             }
         }
