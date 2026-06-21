@@ -90,8 +90,20 @@ namespace Hwatu.Game
                     }
                     SetPhase(RunPhase.Map);
                     break;
+                case NodeType.Event:
+                    // 이벤트: 시드로 1개 골라 첫 선택지 자동 적용(선택 UI는 후속).
+                    {
+                        IRandom evRng = new RngStreams(Run.Seed).ForStream("event_" + node.Id);
+                        var ev = Hwatu.Core.Content.EventContent.Pick(evRng);
+                        if (ev.Choices.Count > 0)
+                        {
+                            ev.Choices[0].Apply(Run);
+                        }
+                    }
+                    SetPhase(RunPhase.Map);
+                    break;
                 default:
-                    // 상점/이벤트 — MVP stub(즉시 맵 복귀). UI 후속.
+                    // 상점 — MVP stub(즉시 맵 복귀). UI 후속.
                     SetPhase(RunPhase.Map);
                     break;
             }
