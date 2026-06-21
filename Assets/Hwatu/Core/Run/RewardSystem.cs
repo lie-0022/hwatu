@@ -69,6 +69,22 @@ namespace Hwatu.Core.Run
             return pool[rng.NextInt(pool.Count)];
         }
 
+        /// <summary>포션 보상 피티: chance%로 등장(나오면 −10%, 없으면 +10%; 10~90 클램프). 등장 시 풀에서 1개, 아니면 null.</summary>
+        public static PotionData RollPotion(IRandom rng, IReadOnlyList<PotionData> pool, ref int chancePercent)
+        {
+            if (pool == null || pool.Count == 0)
+            {
+                return null;
+            }
+            if (rng.NextInt(100) < chancePercent)
+            {
+                chancePercent = System.Math.Max(10, chancePercent - 10);
+                return pool[rng.NextInt(pool.Count)];
+            }
+            chancePercent = System.Math.Min(90, chancePercent + 10);
+            return null;
+        }
+
         // 해당 레어도 풀에서 중복 없이 1장(없으면 미사용 카드 아무거나 폴백).
         private static CardData PickCard(IRandom rng, IReadOnlyList<CardData> pool, CardRarity rarity, HashSet<string> used)
         {
