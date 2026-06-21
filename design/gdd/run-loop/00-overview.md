@@ -85,6 +85,18 @@ RewardOption  { CardData Card; ... }  // 3택1
 - 노드: 전투=피(피 몹) / 엘리트=광 도깨비 / 보물=열끗·단 / 상점=초장 / 이벤트=흔들기 / 휴식=쉼 / 보스=각 월(月) 대장.
 - 카드 풀: 광객의 빛 계열(빛타격·방패·점화) + 보상으로 확장.
 
+## 11. 구현 현황 (2026-06-22 자율 확장, feature/run-loop)
+설계(MVP)를 넘어 콘텐츠·메커닉을 자율 확장. EditMode **94/94 통과**.
+- **루프**: 메인→캐릭터→맵→전투→보상3택1→맵→액트전환(보스→보상→다음 액트, FinalAct=3 승리). 보물 노드 유물 자동 획득.
+- **전투**: 턴 상태머신, 효과 op 6종(deal_damage/gain_block/draw/apply_status/gain_resource/clear_status), 키워드 4(Exhaust/Retain/Innate/Ethereal).
+- **status 5**: Radiance(빛=힘)·Weak·Vulnerable·Poison(턴틱)·Dexterity(방어+).
+- **적**: 일반5(잡도깨비·까마귀떼·허수아비·도깨비불·장승)·엘리트2(광귀·외눈도깨비)·보스2(달그림자·구미호, PhaseAi HP50% 광폭).
+- **카드**: 광객 풀 20장(빛/공격/방어/Exhaust/Innate/Ethereal), 묵귀 풀 12장(독/약화). 캐릭터별 풀 선택(CharacterPools).
+- **캐릭터 2**: 광객(HP80, radiance)·묵귀(HP70, poison). 시작 덱·보상 풀 차등.
+- **경제/메타**: 골드 TrySpend·유물 8종(전투 시작 효과)·카드 업그레이드·이벤트 2·어센션(난이도 HP스케일)·전투 로그.
+- **기능 문서**: `08~18`(유물·액트·휴식·상점·밸런스·보스페이즈·이벤트·status·어센션·캐릭터·키워드).
+- **남은 Play 게이트**(자율 미검증): 캐릭터 선택 UI·휴식 Smith UI·상점/이벤트 UI·키워드/유물 카드 표시·체감 밸런싱.
+
 ## 출처
 - 맵: [sts_map_oracle (원본 복제)](https://github.com/Ru5ty0ne/sts_map_oracle) · [Map Generation wiki.gg](https://slaythespire.wiki.gg/wiki/Map_Generation)
 - 보상: [Card Rarity — Spire Codex](https://spire-codex.com/mechanics/card-rarity) · [Card Rewards — Fandom](https://slay-the-spire.fandom.com/wiki/Card_Rewards)
