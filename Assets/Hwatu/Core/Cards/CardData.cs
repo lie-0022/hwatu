@@ -16,9 +16,11 @@ namespace Hwatu.Core.Cards
         public TargetType Target { get; }
         public bool Exhaust { get; }
         public IReadOnlyList<EffectData> Effects { get; }
+        public CardRarity Rarity { get; }
 
         public CardData(string id, string name, CardType type, int cost,
-            TargetType target, bool exhaust, IReadOnlyList<EffectData> effects)
+            TargetType target, bool exhaust, IReadOnlyList<EffectData> effects,
+            CardRarity rarity = CardRarity.Common)
         {
             Id = id;
             Name = name;
@@ -27,6 +29,7 @@ namespace Hwatu.Core.Cards
             Target = target;
             Exhaust = exhaust;
             Effects = effects;
+            Rarity = rarity;
         }
     }
 }
