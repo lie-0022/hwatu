@@ -153,5 +153,16 @@ namespace Hwatu.Tests.Combat
             engine.PlayCard(0);
             Assert.AreEqual(8, state.Player.Block);   // 암막 방어 8
         }
+
+        [Test]
+        public void Luminary_Check_AppliesWeakToEnemy()
+        {
+            var deck = new List<CardData> { LuminaryCards.Check() };
+            CombatState state = CombatFactory.CreateCombat(deck, StarterContent.DokkaebiMinion(), 1, 80, 80);
+            var engine = new CombatEngine(state, new EffectDispatcher());
+            engine.Advance(); engine.Advance(); // PlayerAction
+            engine.PlayCard(0);   // 견제 → 적 피해 5 + 약화 1
+            Assert.AreEqual(1, state.Enemies[0].GetStatus(StatusType.Weak));
+        }
     }
 }
