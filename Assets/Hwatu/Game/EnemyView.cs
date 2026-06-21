@@ -81,7 +81,9 @@ namespace Hwatu.Game
                 string num = e.CurrentIntent.Hits > 1
                     ? $"{e.CurrentIntent.Value}×{e.CurrentIntent.Hits}"
                     : e.CurrentIntent.Value.ToString();
-                _intentText.text = $"{IntentKor(e.CurrentIntent.Intent)}  <b><size=135%>{num}</size></b>";
+                string doomTag = (e.CurrentIntent.Intent == IntentType.Doom && e.DoomTimer > 0)
+                    ? $"  <size=80%>({e.DoomTimer})</size>" : "";
+                _intentText.text = $"{IntentKor(e.CurrentIntent.Intent)}  <b><size=135%>{num}</size></b>{doomTag}";
             }
             else
             {
