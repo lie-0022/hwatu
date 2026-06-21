@@ -37,5 +37,12 @@ namespace Hwatu.Tests.Run
             Assert.AreEqual(a?.Id, b?.Id);
             Assert.AreEqual(c1, c2);
         }
+
+        [Test]
+        public void RunState_PotionChance_StartsAt40()
+        {
+            var run = new RunState(CharacterData.Luminary(), 1);
+            Assert.AreEqual(40, run.PotionChance);
+        }
     }
 }

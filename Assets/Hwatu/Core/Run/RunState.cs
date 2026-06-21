@@ -33,6 +33,9 @@ namespace Hwatu.Core.Run
         public List<PotionData> Potions { get; }
         public const int MaxPotions = 3;
 
+        /// <summary>포션 보상 피티 확률(%). 시작 40, RewardSystem.RollPotion이 갱신.</summary>
+        public int PotionChance { get; set; }
+
         public RunState(CharacterData character, ulong seed)
         {
             Character = character;
@@ -46,6 +49,7 @@ namespace Hwatu.Core.Run
             RareOffset = -5;
             Relics = new List<RelicData> { RelicContent.Lantern() };
             Potions = new List<PotionData>();
+            PotionChance = 40;
         }
 
         /// <summary>덱에 카드를 추가(보상 선택).</summary>
