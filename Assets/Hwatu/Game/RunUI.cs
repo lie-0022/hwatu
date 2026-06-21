@@ -174,6 +174,15 @@ namespace Hwatu.Game
             IRandom rng = new RngStreams(_flow.Run.Seed).ForStream("reward_" + _flow.Run.CurrentNodeId);
             int offset = _flow.Run.RareOffset;
             List<CardData> reward = RewardSystem.RollCardReward(rng, enc, CharacterPools.RewardPool(_flow.Run.Character.Id), ref offset, 3);
+
+            // 포션 보상 피티(전투 후). 획득 시 슬롯 보유(슬롯 UI는 후속).
+            int potionChance = _flow.Run.PotionChance;
+            var potion = RewardSystem.RollPotion(rng, PotionContent.All(), ref potionChance);
+            _flow.Run.PotionChance = potionChance;
+            if (potion != null)
+            {
+                _flow.Run.AddPotion(potion);
+            }
             _flow.Run.RareOffset = offset;
 
             const float spacing = 280f;
