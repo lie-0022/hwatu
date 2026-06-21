@@ -2,6 +2,7 @@ using NUnit.Framework;
 using Hwatu.Core.Combat;
 using Hwatu.Core.Content;
 using Hwatu.Core.Rng;
+using Hwatu.Core.Run;
 
 namespace Hwatu.Tests.Run
 {
@@ -37,6 +38,17 @@ namespace Hwatu.Tests.Run
             Assert.AreEqual(
                 PotionContent.Pick(new SplitMix64Random(3)).Id,
                 PotionContent.Pick(new SplitMix64Random(3)).Id);
+        }
+
+        [Test]
+        public void AddPotion_RespectsSlotLimit()
+        {
+            var run = new RunState(CharacterData.Luminary(), 1);
+            Assert.IsTrue(run.AddPotion(PotionContent.Strength()));
+            Assert.IsTrue(run.AddPotion(PotionContent.Block()));
+            Assert.IsTrue(run.AddPotion(PotionContent.Swift()));
+            Assert.IsFalse(run.AddPotion(PotionContent.Strength()));   // 4번째는 슬롯 가득
+            Assert.AreEqual(3, run.Potions.Count);
         }
     }
 }

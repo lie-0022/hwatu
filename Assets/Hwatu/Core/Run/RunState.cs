@@ -29,6 +29,10 @@ namespace Hwatu.Core.Run
         /// <summary>보유 유물(전투 시작 효과 등).</summary>
         public List<RelicData> Relics { get; }
 
+        /// <summary>보유 포션(최대 <see cref="MaxPotions"/> 슬롯).</summary>
+        public List<PotionData> Potions { get; }
+        public const int MaxPotions = 3;
+
         public RunState(CharacterData character, ulong seed)
         {
             Character = character;
@@ -41,6 +45,7 @@ namespace Hwatu.Core.Run
             CurrentNodeId = -1;
             RareOffset = -5;
             Relics = new List<RelicData> { RelicContent.Lantern() };
+            Potions = new List<PotionData>();
         }
 
         /// <summary>덱에 카드를 추가(보상 선택).</summary>
@@ -53,6 +58,17 @@ namespace Hwatu.Core.Run
         public void AddRelic(RelicData relic)
         {
             Relics.Add(relic);
+        }
+
+        /// <summary>포션 획득(슬롯 여유 시 true; 가득 차면 false, 추가 안 함).</summary>
+        public bool AddPotion(PotionData potion)
+        {
+            if (Potions.Count >= MaxPotions)
+            {
+                return false;
+            }
+            Potions.Add(potion);
+            return true;
         }
 
         /// <summary>골드 지불(부족하면 false, 차감 안 함).</summary>
