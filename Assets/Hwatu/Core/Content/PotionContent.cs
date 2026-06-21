@@ -1,0 +1,32 @@
+using System.Collections.Generic;
+using Hwatu.Core.Combat;
+using Hwatu.Core.Rng;
+using Hwatu.Core.Run;
+
+namespace Hwatu.Core.Content
+{
+    /// <summary>포션 정의 + 시드 선택. 전투 중 PlayerState에 즉시 효과(보유 슬롯/사용 UI는 후속).</summary>
+    public static class PotionContent
+    {
+        public static PotionData Strength() => new PotionData("pot_str", "힘약", "광 +2.",
+            p => p.AddStatus(StatusType.Radiance, 2));
+
+        public static PotionData Block() => new PotionData("pot_block", "방패약", "방어 +12.",
+            p => p.SetBlock(p.Block + 12));
+
+        public static PotionData Swift() => new PotionData("pot_swift", "민첩약", "민첩 +2.",
+            p => p.AddStatus(StatusType.Dexterity, 2));
+
+        public static List<PotionData> All()
+        {
+            return new List<PotionData> { Strength(), Block(), Swift() };
+        }
+
+        /// <summary>시드로 포션 1개 선택.</summary>
+        public static PotionData Pick(IRandom rng)
+        {
+            List<PotionData> all = All();
+            return all[rng.NextInt(all.Count)];
+        }
+    }
+}
