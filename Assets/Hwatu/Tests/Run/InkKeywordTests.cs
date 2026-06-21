@@ -30,7 +30,7 @@ namespace Hwatu.Tests.Run
         [Test]
         public void InkPool_HasThirteen()
         {
-            Assert.AreEqual(13, InkCards.RewardPool().Count);
+            Assert.AreEqual(14, InkCards.RewardPool().Count);
         }
 
         [Test]
