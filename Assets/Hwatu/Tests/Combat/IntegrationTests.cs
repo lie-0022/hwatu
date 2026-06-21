@@ -142,5 +142,16 @@ namespace Hwatu.Tests.Combat
             // 장군 AiOrder [rally, ...] — 첫 적턴 rally가 자기 광 +3(이후 공격 강화)
             Assert.AreEqual(3, state.Enemies[0].GetStatus(StatusType.Radiance));
         }
+
+        [Test]
+        public void Ink_DarkGuard_GivesBlock()
+        {
+            var deck = new List<CardData> { InkCards.DarkGuard() };
+            CombatState state = CombatFactory.CreateCombat(deck, StarterContent.DokkaebiMinion(), 1, 70, 70);
+            var engine = new CombatEngine(state, new EffectDispatcher());
+            engine.Advance(); engine.Advance(); // PlayerAction
+            engine.PlayCard(0);
+            Assert.AreEqual(8, state.Player.Block);   // 암막 방어 8
+        }
     }
 }
