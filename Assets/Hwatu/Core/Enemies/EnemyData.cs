@@ -12,9 +12,11 @@ namespace Hwatu.Core.Enemies
         public IReadOnlyList<EnemyMoveData> Moves { get; }
         public EnemyAiKind AiKind { get; }
         public IReadOnlyList<string> AiOrder { get; }
+        public IReadOnlyList<string> SecondPhaseOrder { get; }   // Phase AI 2페이즈 순서(없으면 null)
 
         public EnemyData(string id, string name, int maxHpMin, int maxHpMax,
-            IReadOnlyList<EnemyMoveData> moves, EnemyAiKind aiKind, IReadOnlyList<string> aiOrder)
+            IReadOnlyList<EnemyMoveData> moves, EnemyAiKind aiKind, IReadOnlyList<string> aiOrder,
+            IReadOnlyList<string> secondPhaseOrder = null)
         {
             Id = id;
             Name = name;
@@ -23,6 +25,7 @@ namespace Hwatu.Core.Enemies
             Moves = moves;
             AiKind = aiKind;
             AiOrder = aiOrder;
+            SecondPhaseOrder = secondPhaseOrder;
         }
 
         /// <summary>id로 move를 찾는다. 없으면 null.</summary>

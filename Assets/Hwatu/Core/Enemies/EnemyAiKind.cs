@@ -5,6 +5,7 @@ namespace Hwatu.Core.Enemies
     {
         Sequence,
         WeightedRandom,
-        Conditional
+        Conditional,
+        Phase
     }
 }
