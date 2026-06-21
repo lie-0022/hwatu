@@ -77,6 +77,15 @@ namespace Hwatu.Core.Content
             new[] { new EffectData(EffectOp.ApplyStatus, amount: 4, target: TargetType.Enemy, status: StatusType.Poison) },
             CardRarity.Uncommon, retain: false, innate: false, ethereal: true);
 
+        // 독침: 2연타 + 중독2 (다회독)
+        public static CardData Sting() => new CardData("ink_sting", "독침", CardType.Attack, 1, TargetType.Enemy, false,
+            new[]
+            {
+                new EffectData(EffectOp.DealDamage, amount: 2, target: TargetType.Enemy),
+                new EffectData(EffectOp.DealDamage, amount: 2, target: TargetType.Enemy),
+                new EffectData(EffectOp.ApplyStatus, amount: 2, target: TargetType.Enemy, status: StatusType.Poison),
+            }, CardRarity.Uncommon);
+
         /// <summary>묵귀 시작 덱 10장: 그림자칼×5, 그늘×4, 옻칠×1.</summary>
         public static List<CardData> InkStarterDeck()
         {
@@ -87,13 +96,13 @@ namespace Hwatu.Core.Content
             return deck;
         }
 
-        /// <summary>묵귀 보상 풀(12장: Common4/Uncommon5/Rare3).</summary>
+        /// <summary>묵귀 보상 풀(13장: Common4/Uncommon6/Rare3).</summary>
         public static List<CardData> RewardPool()
         {
             return new List<CardData>
             {
                 InkStrike(), Soot(), DarkGuard(), Lacquer(),
-                Seep(), Miasma(), Veil(), Lingering(), ToxicCloud(),
+                Seep(), Miasma(), Veil(), Lingering(), ToxicCloud(), Sting(),
                 Plague(), Decay(), BlackSpot(),
             };
         }

@@ -28,9 +28,15 @@ namespace Hwatu.Tests.Run
         }
 
         [Test]
-        public void InkPool_HasTwelve()
+        public void InkPool_HasThirteen()
         {
-            Assert.AreEqual(12, InkCards.RewardPool().Count);
+            Assert.AreEqual(13, InkCards.RewardPool().Count);
+        }
+
+        [Test]
+        public void Sting_IsMultiHitPoison()
+        {
+            Assert.AreEqual(3, InkCards.Sting().Effects.Count);
         }
     }
 }
