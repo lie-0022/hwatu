@@ -50,14 +50,31 @@ namespace Hwatu.Core.Content
         public static CardData RadiantSurge() => new CardData("lum_surge", "광휘진", CardType.Skill, 1, TargetType.Self, false,
             new[] { new EffectData(EffectOp.GainResource, amount: 3, target: TargetType.Self, resource: ResourceType.Radiance) }, CardRarity.Rare);
 
-        /// <summary>보상 추첨에 쓰는 광객 카드 풀(10장: Common4/Uncommon3/Rare3).</summary>
+        public static CardData Check() => new CardData("lum_check", "견제", CardType.Attack, 1, TargetType.Enemy, false,
+            new[]
+            {
+                new EffectData(EffectOp.DealDamage, amount: 5, target: TargetType.Enemy),
+                new EffectData(EffectOp.ApplyStatus, amount: 1, target: TargetType.Enemy, status: StatusType.Weak),
+            }, CardRarity.Common);
+
+        public static CardData Stockpile() => new CardData("lum_stock", "비축", CardType.Skill, 1, TargetType.Self, false,
+            new[]
+            {
+                new EffectData(EffectOp.GainBlock, amount: 5, target: TargetType.Self),
+                new EffectData(EffectOp.GainResource, amount: 1, target: TargetType.Self, resource: ResourceType.Radiance),
+            }, CardRarity.Uncommon);
+
+        public static CardData Frenzy() => new CardData("lum_frenzy", "광폭타", CardType.Attack, 3, TargetType.Enemy, false,
+            new[] { new EffectData(EffectOp.DealDamage, amount: 20, target: TargetType.Enemy) }, CardRarity.Rare);
+
+        /// <summary>보상 추첨에 쓰는 광객 카드 풀(13장: Common5/Uncommon4/Rare4).</summary>
         public static List<CardData> RewardPool()
         {
             return new List<CardData>
             {
-                HeavyStrike(), Guard(), Whet(), Jab(),
-                Glow(), Pierce(), LightRay(),
-                Burst(), GreatShield(), RadiantSurge(),
+                HeavyStrike(), Guard(), Whet(), Jab(), Check(),
+                Glow(), Pierce(), LightRay(), Stockpile(),
+                Burst(), GreatShield(), RadiantSurge(), Frenzy(),
             };
         }
     }
