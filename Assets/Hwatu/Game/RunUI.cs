@@ -163,7 +163,8 @@ namespace Hwatu.Game
             CreateText(_shopPanel, "상점", 50f, new Vector2(0, 180));
             _shopText = CreateText(_shopPanel, "", 32f, new Vector2(0, 50));
             CreateButton(_shopPanel, "구매", new Vector2(0, -50), () => _flow.OnBuyCard());
-            CreateButton(_shopPanel, "나가기", new Vector2(0, -130), () => _flow.OnShopLeave());
+            CreateButton(_shopPanel, "카드 제거 (첫 카드, 75골드)", new Vector2(0, -130), () => { _flow.ShopRemoveFirstCard(); BuildShop(); });
+            CreateButton(_shopPanel, "나가기", new Vector2(0, -210), () => _flow.OnShopLeave());
 
             // 전투 GO(자체 Canvas, 초기 비활성)
             _combatGo = new GameObject("RunCombat", typeof(CombatController), typeof(CombatView));
