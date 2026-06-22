@@ -254,11 +254,11 @@ namespace Hwatu.Game
             }
             else if (p == RunPhase.GameOver)
             {
-                _resultText.text = $"패배...\n<size=45%>{_flow.Run.Character.Name} · 액트 {_flow.Run.Act}</size>";
+                _resultText.text = $"패배...\n<size=45%>{_flow.Run.Character.Name} · 액트 {_flow.Run.Act} · 골드 {_flow.Run.Gold} · 유물 {_flow.Run.Relics.Count} · 덱 {_flow.Run.Deck.Count}장</size>";
             }
             else if (p == RunPhase.Victory)
             {
-                _resultText.text = $"승리!\n<size=45%>{_flow.Run.Character.Name} · 액트 {_flow.Run.Act} 클리어</size>";
+                _resultText.text = $"승리!\n<size=45%>{_flow.Run.Character.Name} · 액트 {_flow.Run.Act} 클리어 · 유물 {_flow.Run.Relics.Count} · 덱 {_flow.Run.Deck.Count}장</size>";
             }
         }
 
