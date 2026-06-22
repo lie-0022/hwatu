@@ -6,6 +6,7 @@ using UnityEngine.InputSystem;
 using TMPro;
 using Hwatu.Core.Cards;
 using Hwatu.Core.Effects;
+using Hwatu.Core.Combat;
 
 namespace Hwatu.Game
 {
@@ -403,19 +404,45 @@ namespace Hwatu.Game
 
         private static string Describe(CardData d)
         {
-            if (d.Effects.Count == 0)
+            var parts = new System.Collections.Generic.List<string>();
+            foreach (EffectData e in d.Effects)
             {
-                return "-";
+                switch (e.Op)
+                {
+                    case EffectOp.DealDamage:   parts.Add($"{e.Amount} 피해"); break;
+                    case EffectOp.GainBlock:    parts.Add($"{e.Amount} 방어"); break;
+                    case EffectOp.GainResource: parts.Add($"광 +{e.Amount}"); break;
+                    case EffectOp.Draw:         parts.Add($"{e.Amount}장 뽑기"); break;
+                    case EffectOp.ApplyStatus:  parts.Add($"{StatusKor(e.Status)} {e.Amount}"); break;
+                    case EffectOp.ClearStatus:  parts.Add($"{StatusKor(e.Status)} 제거"); break;
+                    default:                    parts.Add(e.Op.ToString()); break;
+                }
             }
-            EffectData e = d.Effects[0];
-            switch (e.Op)
+            var kw = new System.Collections.Generic.List<string>();
+            if (d.Innate) { kw.Add("선제"); }
+            if (d.Retain) { kw.Add("유지"); }
+            if (d.Exhaust) { kw.Add("소멸"); }
+            if (d.Ethereal) { kw.Add("휘발"); }
+
+            string body = parts.Count > 0 ? string.Join(", ", parts) : "-";
+            if (kw.Count > 0)
             {
-                case EffectOp.DealDamage:   return $"{e.Amount} 피해";
-                case EffectOp.GainBlock:    return $"{e.Amount} 방어";
-                case EffectOp.GainResource: return $"광 +{e.Amount}";
-                case EffectOp.Draw:         return $"{e.Amount}장 뽑기";
-                case EffectOp.ApplyStatus:  return $"{e.Status} {e.Amount}";
-                default:                    return e.Op;
+                body += $"\n<size=78%><color=#C9B98C>[{string.Join("·", kw)}]</color></size>";
+            }
+            return body;
+        }
+
+        /// <summary>StatusType을 카드 설명용 한글로.</summary>
+        private static string StatusKor(StatusType s)
+        {
+            switch (s)
+            {
+                case StatusType.Poison:     return "중독";
+                case StatusType.Weak:       return "약화";
+                case StatusType.Vulnerable: return "취약";
+                case StatusType.Radiance:   return "광";
+                case StatusType.Dexterity:  return "민첩";
+                default:                    return s.ToString();
             }
         }
 
