@@ -502,6 +502,7 @@ namespace Hwatu.Game
                 _flow.Run.AddPotion(potion);
             }
             _flow.Run.RareOffset = offset;
+            _flow.Run.Gold += 10 + rng.NextInt(11);   // 전투 골드 보상(STS식 10~20). 맵 HUD에 반영
 
             const float spacing = 280f;
             float startX = -(reward.Count - 1) * spacing / 2f;
