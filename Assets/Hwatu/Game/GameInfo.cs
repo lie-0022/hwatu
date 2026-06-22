@@ -119,5 +119,21 @@ namespace Hwatu.Game
                 default:                  return r.ToString();
             }
         }
+
+        /// <summary>맵 노드 타입 설명(hover — "다음에 뭘 할 수 있나").</summary>
+        public static string NodeDesc(NodeType t)
+        {
+            switch (t)
+            {
+                case NodeType.Combat:   return "<b>전투</b>\n일반 적과 싸웁니다. 승리 시 카드 보상.";
+                case NodeType.Elite:    return "<b>정예</b>\n강한 적. 승리 시 유물 + 카드 보상.";
+                case NodeType.Rest:     return "<b>휴식</b>\nHP 회복 또는 카드 강화 중 택1.";
+                case NodeType.Shop:     return "<b>상점</b>\n골드로 카드를 구매합니다.";
+                case NodeType.Treasure: return "<b>보물</b>\n유물을 획득합니다.";
+                case NodeType.Event:    return "<b>이벤트</b>\n무작위 상황 — 선택지가 주어집니다.";
+                case NodeType.Boss:     return "<b>보스</b>\n액트 최종 적. 처치 시 다음 액트로.";
+                default:                return t.ToString();
+            }
+        }
     }
 }

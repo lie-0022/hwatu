@@ -161,6 +161,7 @@ namespace Hwatu.Game
             rt.anchoredPosition = new Vector2(x, y);
             rt.sizeDelta = new Vector2(56f, 46f);
             go.GetComponent<Image>().color = NodeColor(n.Type);
+            go.AddComponent<TooltipTrigger>().Set(GameInfo.NodeDesc(n.Type));
 
             var label = new GameObject("L", typeof(RectTransform), typeof(TextMeshProUGUI));
             label.transform.SetParent(rt, false);
