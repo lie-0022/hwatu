@@ -37,9 +37,18 @@ namespace Hwatu.Core.Content
                 new EventChoice("그냥 지나간다", "화로가 식어간다.", run => { }),
             });
 
+        public static EventData Curse() => new EventData(
+            "curse", "그믐의 속삭임", "어둠이 힘을 빌려주겠다 속삭인다. 대가가 따른다.",
+            new[]
+            {
+                new EventChoice("힘을 받는다 (골드 +80, 최대 HP -6)", "살점을 내주고 힘을 얻는다.",
+                    run => { run.Gold += 80; run.MaxHp -= 6; if (run.Hp > run.MaxHp) { run.Hp = run.MaxHp; } }),
+                new EventChoice("거절한다", "속삭임이 잦아든다.", run => { }),
+            });
+
         public static List<EventData> All()
         {
-            return new List<EventData> { Spring(), Bargain(), Forge() };
+            return new List<EventData> { Spring(), Bargain(), Forge(), Curse() };
         }
 
         /// <summary>시드로 이벤트 1개 선택.</summary>
