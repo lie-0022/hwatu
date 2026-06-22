@@ -38,5 +38,13 @@ namespace Hwatu.Tests.Run
             EventContent.Forge().Choices[0].Apply(run);
             Assert.IsTrue(run.Deck[0].Name.Contains("✦"));
         }
+
+        [Test]
+        public void Radiant_AddsRadianceEffect()
+        {
+            var c = StarterContent.LightStrike().WithEnchant("radiant");
+            Assert.AreEqual(2, c.Effects.Count);   // 원래 효과 + 광 +1
+            Assert.IsTrue(c.Name.Contains("☀"));
+        }
     }
 }
