@@ -340,6 +340,9 @@ namespace Hwatu.Game
                 chip.GetComponent<Image>().color = StatusColor(st);
                 chip.GetComponent<TooltipTrigger>().Set(GameInfo.StatusDesc(st, amt));
                 var lbl = CreateText(crt, "L", Vector2.zero, Vector2.one, Vector2.zero, 20f, TextAlignmentOptions.Center);
+                lbl.enableAutoSizing = true;   // 큰 수치(취약 12 등)도 칩 안에 맞춤
+                lbl.fontSizeMin = 12f;
+                lbl.fontSizeMax = 20f;
                 lbl.text = $"{GameInfo.StatusName(st)} {amt}";
                 lbl.raycastTarget = false;
                 idx++;
