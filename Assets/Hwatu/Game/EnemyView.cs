@@ -64,10 +64,13 @@ namespace Hwatu.Game
             irt.anchorMax = new Vector2(0.5f, 0.18f);
             irt.pivot = new Vector2(0.5f, 0.5f);
             irt.anchoredPosition = Vector2.zero;
-            irt.sizeDelta = new Vector2(220f, 48f);
+            irt.sizeDelta = new Vector2(264f, 48f);
             _intentBg = intentGo.GetComponent<Image>();
             _intentBg.raycastTarget = false;
-            _intentText = CreateText(irt, "IntentText", 24f, new Vector2(0.5f, 0.5f), new Vector2(212f, 44f));
+            _intentText = CreateText(irt, "IntentText", 24f, new Vector2(0.5f, 0.5f), new Vector2(256f, 44f));
+            _intentText.enableAutoSizing = true;   // 긴 인텐트(연속 히트·Doom 타이머)는 자동 축소해 박스 안에 맞춘다
+            _intentText.fontSizeMin = 13f;
+            _intentText.fontSizeMax = 24f;
 
             // 적 status 칩 영역(박스 아래, hover 설명 — STS2식)
             var estatGo = new GameObject("EnemyStatus", typeof(RectTransform));
