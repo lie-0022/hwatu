@@ -5,7 +5,7 @@
 
 ## 3. Detailed Rules
 - `PotionData`(전투 중 `Action<PlayerState>` 효과). `PotionContent.Pick(rng)` 시드 선택.
-- 6종: 힘약(광 +2)·방패약(방어 +12)·민첩약(민첩 +2)·해독약(중독 제거)·회복약(HP +15)·강심약(광 +3·방어 +6 복합).
+- 7종: 힘약(광 +2)·방패약(방어 +12)·민첩약(민첩 +2)·해독약(중독 제거)·회복약(HP +15)·강심약(광 +3·방어 +6 복합)·선약(HP +30).
 
 ## 6. Dependencies
 `PotionData`/`PotionContent` · `PlayerState`(AddStatus/SetBlock) · `RunState.Potions`(슬롯3) · 전투 포션 버튼 UI(RunUI PotionBar, sortingOrder 50) 구현.
