@@ -20,6 +20,8 @@ namespace Hwatu.Game
         private HpBar _hpBar;
         private Image _intentBg;
         private TextMeshProUGUI _intentText;
+        private RectTransform _enemyStatusArea;
+        private static readonly StatusType[] s_statusOrder = { StatusType.Weak, StatusType.Vulnerable, StatusType.Poison, StatusType.Radiance, StatusType.Dexterity };
 
         /// <summary>적 배열에서의 인덱스(PlayCard 타깃 지정용).</summary>
         public int Index { get; private set; }
@@ -66,6 +68,16 @@ namespace Hwatu.Game
             _intentBg = intentGo.GetComponent<Image>();
             _intentBg.raycastTarget = false;
             _intentText = CreateText(irt, "IntentText", 24f, new Vector2(0.5f, 0.5f), new Vector2(212f, 44f));
+
+            // 적 status 칩 영역(박스 아래, hover 설명 — STS2식)
+            var estatGo = new GameObject("EnemyStatus", typeof(RectTransform));
+            estatGo.transform.SetParent(transform, false);
+            _enemyStatusArea = (RectTransform)estatGo.transform;
+            _enemyStatusArea.anchorMin = new Vector2(0f, 0f);
+            _enemyStatusArea.anchorMax = new Vector2(0f, 0f);
+            _enemyStatusArea.pivot = new Vector2(0f, 1f);
+            _enemyStatusArea.anchoredPosition = new Vector2(30f, -6f);
+            _enemyStatusArea.sizeDelta = new Vector2(400f, 36f);
         }
 
         /// <summary>적 상태를 박스에 반영한다.</summary>
@@ -89,6 +101,47 @@ namespace Hwatu.Game
             {
                 _intentBg.enabled = false;
                 _intentText.text = "?";
+            }
+            RebuildEnemyStatus(e);
+        }
+
+        /// <summary>적 status를 박스 아래 칩으로 다시 그린다(active만, hover 설명).</summary>
+        private void RebuildEnemyStatus(EnemyState e)
+        {
+            var kill = new System.Collections.Generic.List<GameObject>();
+            foreach (Transform c in _enemyStatusArea) { kill.Add(c.gameObject); }
+            foreach (var g in kill) { Destroy(g); }
+            int idx = 0;
+            foreach (StatusType st in s_statusOrder)
+            {
+                int amt = e.GetStatus(st);
+                if (amt <= 0) { continue; }
+                var chip = new GameObject($"St_{st}", typeof(RectTransform), typeof(Image), typeof(TooltipTrigger));
+                chip.transform.SetParent(_enemyStatusArea, false);
+                var crt = (RectTransform)chip.transform;
+                crt.anchorMin = new Vector2(0f, 1f);
+                crt.anchorMax = new Vector2(0f, 1f);
+                crt.pivot = new Vector2(0f, 1f);
+                crt.anchoredPosition = new Vector2(idx * 96f, 0f);
+                crt.sizeDelta = new Vector2(90f, 34f);
+                chip.GetComponent<Image>().color = EnemyStatusColor(st);
+                chip.GetComponent<TooltipTrigger>().Set(GameInfo.StatusDesc(st, amt));
+                var lbl = CreateText((RectTransform)chip.transform, "L", 19f, new Vector2(0.5f, 0.5f), new Vector2(86f, 32f));
+                lbl.text = $"{GameInfo.StatusName(st)} {amt}";
+                idx++;
+            }
+        }
+
+        private static Color EnemyStatusColor(StatusType s)
+        {
+            switch (s)
+            {
+                case StatusType.Radiance:   return new Color(0.85f, 0.65f, 0.2f, 0.95f);
+                case StatusType.Dexterity:  return new Color(0.2f, 0.5f, 0.7f, 0.95f);
+                case StatusType.Weak:       return new Color(0.5f, 0.35f, 0.6f, 0.95f);
+                case StatusType.Vulnerable: return new Color(0.7f, 0.35f, 0.3f, 0.95f);
+                case StatusType.Poison:     return new Color(0.35f, 0.6f, 0.3f, 0.95f);
+                default:                    return new Color(0.4f, 0.4f, 0.4f, 0.95f);
             }
         }
 
