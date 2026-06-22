@@ -77,6 +77,8 @@ namespace Hwatu.Game
             {
                 sb.Append('\n').Append(kw);
             }
+            if (d.Name.Contains("✦")) { sb.Append("\n<color=#C9B98C>✦ 예리 — 영구 강화됨</color>"); }
+            if (d.Name.Contains("✷")) { sb.Append("\n<color=#C97070>✷ 취약 — 강력하나 1회 쓰면 소멸</color>"); }
             return sb.ToString().TrimEnd();
         }
 
