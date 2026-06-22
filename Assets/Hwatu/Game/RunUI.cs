@@ -48,6 +48,8 @@ namespace Hwatu.Game
         private GameObject _potionBarGo;
         private GameObject _deckPanel;
         private TextMeshProUGUI _deckText;
+        private GameObject _upgradePanel;
+        private GameObject _upgradeCardArea;
 
         private void Start()
         {
@@ -128,7 +130,16 @@ namespace Hwatu.Game
             _restPanel = CreatePanel(root, "RestPanel", new Color(0.05f, 0.09f, 0.07f, 0.97f));
             CreateText(_restPanel, "휴식처", 50f, new Vector2(0, 160));
             CreateButton(_restPanel, "회복 (HP 30%)", new Vector2(0, 20), () => _flow.OnRest(0));
-            CreateButton(_restPanel, "강화 (첫 카드 +)", new Vector2(0, -60), () => _flow.OnRest(1));
+            CreateButton(_restPanel, "강화 (카드 선택)", new Vector2(0, -60), () => OpenUpgradeView());
+
+            // 강화 카드 선택 모달(휴식 위 오버레이)
+            _upgradePanel = CreatePanel(root, "UpgradePanel", new Color(0.06f, 0.05f, 0.09f, 0.98f));
+            CreateText(_upgradePanel, "강화할 카드 선택", 50f, new Vector2(0, 460));
+            var upArea = new GameObject("UpgradeCardArea", typeof(RectTransform));
+            upArea.transform.SetParent(_upgradePanel.transform, false);
+            _upgradeCardArea = upArea;
+            CreateButton(_upgradePanel, "취소", new Vector2(0, -470), () => CloseUpgradeView());
+            _upgradePanel.SetActive(false);
 
             // 상점(매물 카드 1 + 구매/나가기)
             _shopPanel = CreatePanel(root, "ShopPanel", new Color(0.10f, 0.08f, 0.04f, 0.97f));
@@ -167,6 +178,7 @@ namespace Hwatu.Game
             _resultPanel.SetActive(p == RunPhase.GameOver || p == RunPhase.Victory);
             _eventPanel.SetActive(p == RunPhase.Event);
             _restPanel.SetActive(p == RunPhase.Rest);
+            _upgradePanel.SetActive(false);
             _shopPanel.SetActive(p == RunPhase.Shop);
             _combatGo.SetActive(p == RunPhase.Combat);
             _potionBarGo.SetActive(p == RunPhase.Combat);
@@ -273,6 +285,48 @@ namespace Hwatu.Game
         private void CloseDeckView()
         {
             _deckPanel.SetActive(false);
+        }
+
+        /// <summary>강화할 카드를 덱에서 고르는 모달을 연다(카드별 버튼 6열 그리드).</summary>
+        private void OpenUpgradeView()
+        {
+            if (_flow.Run == null)
+            {
+                return;
+            }
+            var existing = new List<GameObject>();
+            foreach (Transform child in _upgradeCardArea.transform)
+            {
+                existing.Add(child.gameObject);
+            }
+            foreach (GameObject go in existing)
+            {
+                Destroy(go);
+            }
+            var deck = _flow.Run.Deck;
+            for (int i = 0; i < deck.Count; i++)
+            {
+                int idx = i;
+                int col = i % 6;
+                int row = i / 6;
+                var pos = new Vector2(-750f + col * 300f, 330f - row * 80f);
+                CreateButton(_upgradeCardArea, deck[i].Name, pos, () => UpgradeAndClose(idx));
+            }
+            _upgradePanel.SetActive(true);
+            _upgradePanel.transform.SetAsLastSibling();
+        }
+
+        /// <summary>선택 카드를 강화하고 모달을 닫는다(휴식 종료 → 맵).</summary>
+        private void UpgradeAndClose(int index)
+        {
+            _upgradePanel.SetActive(false);
+            _flow.RestUpgradeCard(index);
+        }
+
+        /// <summary>강화 모달을 닫는다(강화 없이 휴식 화면 유지).</summary>
+        private void CloseUpgradeView()
+        {
+            _upgradePanel.SetActive(false);
         }
 
         /// <summary>전투 중 포션 슬롯 버튼을 현재 보유 포션으로 다시 그린다(좌측 세로).</summary>
