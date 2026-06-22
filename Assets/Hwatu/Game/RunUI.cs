@@ -52,6 +52,7 @@ namespace Hwatu.Game
         private GameObject _upgradePanel;
         private GameObject _upgradeCardArea;
         private bool _isEnchant;
+        private TextMeshProUGUI _upgradeTitle;
         private GameObject _relicBarGo;
         private GameObject _neowPanel;
 
@@ -151,7 +152,7 @@ namespace Hwatu.Game
 
             // 강화 카드 선택 모달(휴식 위 오버레이)
             _upgradePanel = CreatePanel(root, "UpgradePanel", new Color(0.06f, 0.05f, 0.09f, 0.98f));
-            CreateText(_upgradePanel, "강화할 카드 선택", 50f, new Vector2(0, 460));
+            _upgradeTitle = CreateText(_upgradePanel, "강화할 카드 선택", 50f, new Vector2(0, 460));
             var upArea = new GameObject("UpgradeCardArea", typeof(RectTransform));
             upArea.transform.SetParent(_upgradePanel.transform, false);
             _upgradeCardArea = upArea;
@@ -338,6 +339,7 @@ namespace Hwatu.Game
         private void OpenUpgradeView(bool enchant)
         {
             _isEnchant = enchant;
+            _upgradeTitle.text = enchant ? "벼릴 카드 선택 (예리)" : "강화할 카드 선택";
             if (_flow.Run == null)
             {
                 return;
