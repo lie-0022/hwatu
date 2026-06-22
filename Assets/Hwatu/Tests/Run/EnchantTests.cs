@@ -20,7 +20,7 @@ namespace Hwatu.Tests.Run
         {
             var c = StarterContent.LightStrike().WithEnchant("brittle");
             Assert.IsTrue(c.Exhaust);
-            Assert.AreEqual(6, c.Effects[0].Amount);   // brittle은 수치 불변
+            Assert.AreEqual(10, c.Effects[0].Amount);   // brittle 공격 +4(강력) + 소멸
         }
 
         [Test]
