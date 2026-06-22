@@ -74,9 +74,18 @@ namespace Hwatu.Tests.Run
         }
 
         [Test]
-        public void AllRelics_AreEleven()
+        public void Herb_HealsOnCombatStart()
         {
-            Assert.AreEqual(11, RelicContent.AllRelics().Count);
+            var p = new PlayerState(80);
+            p.SetHp(50);
+            RelicContent.Herb().ApplyCombatStart(p);
+            Assert.AreEqual(54, p.Hp);
+        }
+
+        [Test]
+        public void AllRelics_AreTwelve()
+        {
+            Assert.AreEqual(12, RelicContent.AllRelics().Count);
         }
     }
 }
