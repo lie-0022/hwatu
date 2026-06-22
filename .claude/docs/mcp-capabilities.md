@@ -140,8 +140,5 @@
 
 - **2026-05-08**: 신규 작성. UnityMCP CoplayDev 도입 후 AI 능력 확장 반영.
   Editor handoff 문서는 *MCP로 안 되는 작업* 한정으로 의미 축소.
-- **2026-06-21**: 화투 부트스트랩 시 Unity **공식** MCP(`com.unity.ai.assistant`, `unity-mcp` relay) 도입을 시도했으나,
-  **Unity Personal 플랜은 활성 AI 구독/AI Seat이 없으면 "direct connections 0"으로 외부 클라이언트 연결이 차단**됨
-  (무료 트라이얼 14일 한정, 이후 유료). 무료 지속이 불가해 **CoplayDev UnityMCP(`com.coplaydev.unity-mcp` v9.7.3,
-  HTTP `127.0.0.1:8080/mcp`)로 재채택**. → 본 문서의 CoplayDev 툴명(`manage_gameobject`/`execute_code`/`read_console` 등)
-  전제는 그대로 유효. 공식 MCP는 도구 철학이 다름(세밀한 `manage_*` 대신 `Unity_RunCommand`(임의 C# 실행) 중심). 유료 전환 시 재평가.
+- **2026-06-21**: 화투 Editor 자동화 MCP로 **CoplayDev UnityMCP**(`com.coplaydev.unity-mcp` v9.7.3, HTTP `127.0.0.1:8080/mcp`) 채택. 본 문서의 CoplayDev 툴명(`manage_gameobject`/`execute_code`/`read_console` 등) 전제는 그대로 유효.
+- **2026-06-23**: Editor 자동화는 **CoplayDev UnityMCP만** 사용한다. Unity Bridge는 `Window > MCP For Unity > Connect`의 `Start Server`로 켜고, `Advanced > Auto-Start Server on Editor Load` 체크로 Unity 시작 시 자동 기동.
