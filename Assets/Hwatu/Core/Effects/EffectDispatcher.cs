@@ -30,19 +30,7 @@ namespace Hwatu.Core.Effects
         //   ※ Weak+Vulnerable 동시면 절단이 두 번 일어난다(Slay the Spire와 동일 동작). float·Mathf 금지(결정론 보장).
         private static void DealDamage(EffectData e, IEffectContext ctx)
         {
-            int dmg = e.Amount + ctx.Source.GetStatus(StatusType.Radiance);
-            if (ctx.Source.GetStatus(StatusType.Weak) > 0)
-            {
-                dmg = dmg * 3 / 4;
-            }
-            if (ctx.Target.GetStatus(StatusType.Vulnerable) > 0)
-            {
-                dmg = dmg * 3 / 2;
-            }
-            if (dmg < 0)
-            {
-                dmg = 0;
-            }
+            int dmg = DamageMath.RawDamage(ctx.Source, ctx.Target, e.Amount);
 
             int block = ctx.Target.Block;
             if (dmg <= block)
