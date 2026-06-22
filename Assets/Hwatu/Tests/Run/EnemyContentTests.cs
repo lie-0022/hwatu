@@ -44,6 +44,15 @@ namespace Hwatu.Tests.Run
         }
 
         [Test]
+        public void Combat_Act2_HasScaledHp()
+        {
+            EnemyData a1 = EnemyContent.PickEnemy(NodeType.Combat, new SplitMix64Random(3), 1);
+            EnemyData a2 = EnemyContent.PickEnemy(NodeType.Combat, new SplitMix64Random(3), 2);
+            Assert.AreEqual(a1.Name, a2.Name, "같은 시드 같은 적");
+            Assert.Greater(a2.MaxHpMax, a1.MaxHpMax, "act2는 HP 스케일 적용");
+        }
+
+        [Test]
         public void WillOWisp_Scald_AppliesPoison()
         {
             EnemyData wisp = StarterContent.WillOWisp();

@@ -7,7 +7,16 @@ namespace Hwatu.Core.Content
     /// <summary>노드 타입에 맞는 적을 시드 RNG로 고른다(일반 풀 / 엘리트 / 보스).</summary>
     public static class EnemyContent
     {
-        public static EnemyData PickEnemy(NodeType type, IRandom rng)
+        public static EnemyData PickEnemy(NodeType type, IRandom rng) => PickEnemy(type, rng, 1);
+
+        /// <summary>act 기반 난이도 스케일(act≥2면 HP 배율 1+0.25*(act-1)).</summary>
+        public static EnemyData PickEnemy(NodeType type, IRandom rng, int act)
+        {
+            EnemyData picked = PickBase(type, rng);
+            return act >= 2 ? picked.WithHpScale(1.0 + 0.25 * (act - 1)) : picked;
+        }
+
+        private static EnemyData PickBase(NodeType type, IRandom rng)
         {
             switch (type)
             {

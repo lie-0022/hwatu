@@ -28,6 +28,15 @@ namespace Hwatu.Core.Enemies
             SecondPhaseOrder = secondPhaseOrder;
         }
 
+        /// <summary>HP 범위에 배율을 적용한 복제본(2막+ 난이도 스케일). 다른 필드는 공유.</summary>
+        public EnemyData WithHpScale(double mult)
+        {
+            return new EnemyData(Id, Name,
+                (int)System.Math.Round(MaxHpMin * mult),
+                (int)System.Math.Round(MaxHpMax * mult),
+                Moves, AiKind, AiOrder, SecondPhaseOrder);
+        }
+
         /// <summary>id로 move를 찾는다. 없으면 null.</summary>
         public EnemyMoveData FindMove(string id)
         {
