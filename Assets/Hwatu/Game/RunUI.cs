@@ -34,6 +34,9 @@ namespace Hwatu.Game
         private GameObject _resultPanel;
         private TextMeshProUGUI _resultText;
         private TextMeshProUGUI _mapHud;
+        private GameObject _eventPanel;
+        private TextMeshProUGUI _eventText;
+        private RectTransform _eventChoiceArea;
 
         private MapView _mapView;
         private GameObject _combatGo;
@@ -97,6 +100,14 @@ namespace Hwatu.Game
             _resultText = CreateText(_resultPanel, "", 72f, new Vector2(0, 70));
             CreateButton(_resultPanel, "메인으로", new Vector2(0, -90), () => _flow.BackToMenu());
 
+            // 이벤트(제목/설명 + 선택지 버튼)
+            _eventPanel = CreatePanel(root, "EventPanel", new Color(0.07f, 0.05f, 0.10f, 0.97f));
+            _eventText = CreateText(_eventPanel, "", 34f, new Vector2(0, 200));
+            var evAreaGo = new GameObject("EventChoices", typeof(RectTransform));
+            evAreaGo.transform.SetParent(_eventPanel.transform, false);
+            _eventChoiceArea = (RectTransform)evAreaGo.transform;
+            _eventChoiceArea.anchoredPosition = new Vector2(0, -40);
+
             // 전투 GO(자체 Canvas, 초기 비활성)
             _combatGo = new GameObject("RunCombat", typeof(CombatController), typeof(CombatView));
             _combatCtrl = _combatGo.GetComponent<CombatController>();
@@ -112,12 +123,17 @@ namespace Hwatu.Game
             _mapPanel.SetActive(p == RunPhase.Map);
             _rewardPanel.SetActive(p == RunPhase.Reward);
             _resultPanel.SetActive(p == RunPhase.GameOver || p == RunPhase.Victory);
+            _eventPanel.SetActive(p == RunPhase.Event);
             _combatGo.SetActive(p == RunPhase.Combat);
 
             if (p == RunPhase.Map)
             {
                 _mapView.Build();
                 _mapHud.text = $"HP {_flow.Run.Hp}/{_flow.Run.MaxHp}    골드 {_flow.Run.Gold}    액트 {_flow.Run.Act}";
+            }
+            else if (p == RunPhase.Event)
+            {
+                BuildEvent();
             }
             else if (p == RunPhase.Reward)
             {
@@ -134,6 +150,26 @@ namespace Hwatu.Game
             else if (p == RunPhase.Victory)
             {
                 _resultText.text = $"승리!\n<size=45%>{_flow.Run.Character.Name} · 액트 {_flow.Run.Act} 클리어</size>";
+            }
+        }
+
+        /// <summary>이벤트 화면을 현재 이벤트로 채운다(제목/설명 + 선택지 버튼).</summary>
+        private void BuildEvent()
+        {
+            EventData ev = _flow.CurrentEvent;
+            if (ev == null)
+            {
+                return;
+            }
+            _eventText.text = $"<b>{ev.Title}</b>\n<size=65%>{ev.Description}</size>";
+            for (int i = _eventChoiceArea.childCount - 1; i >= 0; i--)
+            {
+                Destroy(_eventChoiceArea.GetChild(i).gameObject);
+            }
+            for (int i = 0; i < ev.Choices.Count; i++)
+            {
+                int idx = i;
+                CreateButton(_eventChoiceArea.gameObject, ev.Choices[i].Label, new Vector2(0, -i * 70), () => _flow.OnEventChoice(idx));
             }
         }
 
