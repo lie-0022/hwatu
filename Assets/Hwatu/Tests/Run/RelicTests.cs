@@ -65,9 +65,18 @@ namespace Hwatu.Tests.Run
         }
 
         [Test]
-        public void AllRelics_AreTen()
+        public void InkStone_GivesRadianceAndDexterity()
         {
-            Assert.AreEqual(10, RelicContent.AllRelics().Count);
+            var p = new PlayerState(80);
+            RelicContent.InkStone().ApplyCombatStart(p);
+            Assert.AreEqual(1, p.GetStatus(StatusType.Radiance));
+            Assert.AreEqual(1, p.GetStatus(StatusType.Dexterity));
+        }
+
+        [Test]
+        public void AllRelics_AreEleven()
+        {
+            Assert.AreEqual(11, RelicContent.AllRelics().Count);
         }
     }
 }
