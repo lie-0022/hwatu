@@ -70,11 +70,12 @@ namespace Hwatu.Game
             {
                 case 0: Run.MaxHp += 8; Run.Hp += 8; break;
                 case 1: Run.Gold += 100; break;
-                default:
+                case 2:
                     IRandom rng = new RngStreams(Run.Seed).ForStream("neow_relic");
                     RelicData relic = RewardSystem.RollRelicReward(rng, RelicContent.AllRelics());
                     if (relic != null) { Run.AddRelic(relic); }
                     break;
+                default: Run.UpgradeCard(0); break;   // 첫 카드 강화
             }
             SetPhase(RunPhase.Map);
         }
