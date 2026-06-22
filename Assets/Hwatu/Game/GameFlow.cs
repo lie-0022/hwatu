@@ -146,6 +146,16 @@ namespace Hwatu.Game
             SetPhase(RunPhase.Map);
         }
 
+        /// <summary>상점에서 골드 75로 덱 첫 카드를 제거(STS식 덱 압축). 상점은 유지.</summary>
+        public bool ShopRemoveFirstCard()
+        {
+            if (Run.Deck.Count > 0 && Run.TrySpend(75))
+            {
+                return Run.RemoveCard(Run.Deck[0]);
+            }
+            return false;
+        }
+
         public void GenerateActMap()
         {
             IRandom rng = new RngStreams(Run.Seed).ForStream("map_act" + Run.Act);
