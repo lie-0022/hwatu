@@ -50,6 +50,7 @@ namespace Hwatu.Game
         private TextMeshProUGUI _deckText;
         private GameObject _upgradePanel;
         private GameObject _upgradeCardArea;
+        private bool _isEnchant;
         private GameObject _relicBarGo;
         private GameObject _neowPanel;
 
@@ -143,7 +144,8 @@ namespace Hwatu.Game
             _restPanel = CreatePanel(root, "RestPanel", new Color(0.05f, 0.09f, 0.07f, 0.97f));
             CreateText(_restPanel, "휴식처", 50f, new Vector2(0, 160));
             CreateButton(_restPanel, "회복 (HP 30%)", new Vector2(0, 20), () => _flow.OnRest(0));
-            CreateButton(_restPanel, "강화 (카드 선택)", new Vector2(0, -60), () => OpenUpgradeView());
+            CreateButton(_restPanel, "강화 (카드 선택)", new Vector2(0, -60), () => OpenUpgradeView(false));
+            CreateButton(_restPanel, "벼리기 (예리 인챈트)", new Vector2(0, -140), () => OpenUpgradeView(true));
 
             // 강화 카드 선택 모달(휴식 위 오버레이)
             _upgradePanel = CreatePanel(root, "UpgradePanel", new Color(0.06f, 0.05f, 0.09f, 0.98f));
@@ -329,8 +331,9 @@ namespace Hwatu.Game
         }
 
         /// <summary>강화할 카드를 덱에서 고르는 모달을 연다(카드별 버튼 6열 그리드).</summary>
-        private void OpenUpgradeView()
+        private void OpenUpgradeView(bool enchant)
         {
+            _isEnchant = enchant;
             if (_flow.Run == null)
             {
                 return;
@@ -362,7 +365,8 @@ namespace Hwatu.Game
         private void UpgradeAndClose(int index)
         {
             _upgradePanel.SetActive(false);
-            _flow.RestUpgradeCard(index);
+            if (_isEnchant) { _flow.RestEnchantCard(index); }
+            else { _flow.RestUpgradeCard(index); }
         }
 
         /// <summary>강화 모달을 닫는다(강화 없이 휴식 화면 유지).</summary>
