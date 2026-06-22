@@ -15,7 +15,8 @@ namespace Hwatu.Game
         Reward,
         BossReward,
         GameOver,
-        Victory
+        Victory,
+        Event
     }
 
     /// <summary>
@@ -31,6 +32,7 @@ namespace Hwatu.Game
 
         public RunState Run { get; private set; }
         public RunPhase Phase { get; private set; }
+        public EventData CurrentEvent { get; private set; }   // 이벤트 노드 진입 시 채워짐(RunUI가 읽음)
 
         /// <summary>페이즈 전환 시 발생(현재 페이즈 전달).</summary>
         public event Action<RunPhase> OnPhaseChanged;
@@ -51,6 +53,16 @@ namespace Hwatu.Game
         {
             Run = new RunState(character, _seed);
             GenerateActMap();
+            SetPhase(RunPhase.Map);
+        }
+
+        /// <summary>이벤트 선택지 index를 적용하고 맵으로 복귀.</summary>
+        public void OnEventChoice(int index)
+        {
+            if (CurrentEvent != null && index >= 0 && index < CurrentEvent.Choices.Count)
+            {
+                CurrentEvent.Choices[index].Apply(Run);
+            }
             SetPhase(RunPhase.Map);
         }
 
@@ -91,16 +103,12 @@ namespace Hwatu.Game
                     SetPhase(RunPhase.Map);
                     break;
                 case NodeType.Event:
-                    // 이벤트: 시드로 1개 골라 첫 선택지 자동 적용(선택 UI는 후속).
+                    // 이벤트: 시드로 1개 골라 선택 화면으로(선택지 적용은 OnEventChoice).
                     {
                         IRandom evRng = new RngStreams(Run.Seed).ForStream("event_" + node.Id);
-                        var ev = Hwatu.Core.Content.EventContent.Pick(evRng);
-                        if (ev.Choices.Count > 0)
-                        {
-                            ev.Choices[0].Apply(Run);
-                        }
+                        CurrentEvent = Hwatu.Core.Content.EventContent.Pick(evRng);
                     }
-                    SetPhase(RunPhase.Map);
+                    SetPhase(RunPhase.Event);
                     break;
                 default:
                     // 상점 — MVP stub(즉시 맵 복귀). UI 후속.
