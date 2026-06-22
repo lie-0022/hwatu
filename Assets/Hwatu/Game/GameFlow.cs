@@ -138,6 +138,13 @@ namespace Hwatu.Game
             SetPhase(RunPhase.Map);
         }
 
+        /// <summary>휴식에서 선택한 덱 카드를 예리 인챈트하고 맵으로(STS2식).</summary>
+        public void RestEnchantCard(int index)
+        {
+            Run.EnchantCard(index, "sharp");
+            SetPhase(RunPhase.Map);
+        }
+
         public void GenerateActMap()
         {
             IRandom rng = new RngStreams(Run.Seed).ForStream("map_act" + Run.Act);
