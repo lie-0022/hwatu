@@ -240,16 +240,9 @@ namespace Hwatu.Game
 
             RebuildHand(s);
 
-            if (_controller.Result != CombatResult.InProgress)
-            {
-                _resultPanel.SetActive(true);
-                _resultPanel.transform.SetAsLastSibling();
-                _resultText.text = _controller.Result == CombatResult.Win ? "승리!" : "패배...";
-            }
-            else
-            {
-                _resultPanel.SetActive(false);
-            }
+            // 런 모드에선 승패 후 RunUI가 보상/게임오버 화면을 띄운다 → CombatView 결과 패널("다시 시작")은
+            // 쓰지 않는다(보상 직전 0.7초 동안 잠깐 깜빡이던 문제 제거).
+            _resultPanel.SetActive(false);
         }
 
         /// <summary>드래그로 놓은 카드를 사용 시도한다(enemyIndex&lt;0 = 비타깃). 성공 시 손패 갱신.</summary>
