@@ -6,8 +6,9 @@ namespace Hwatu.Core.Combat
     public enum StatusType
     {
         Radiance,   // 광: 누적 스택 → 모든 Attack 피해에 +radiance
-        Weak,       // 약화: 가하는 피해 ×3/4 (이번 스코프는 자리만)
-        Vulnerable, // 취약: 받는 피해 ×3/2
-        Poison      // 독 (이번 스코프는 자리만)
+        Weak,       // 약화: 공격자가 가하는 피해 ×3/4 (EffectDispatcher.DealDamage에서 적용)
+        Vulnerable, // 취약: 대상이 받는 피해 ×3/2 (적용됨)
+        Poison,     // 독: 턴 시작 시 스택만큼 피해(Block 무시) + 1 감소 (CombatEngine.TickPoison)
+        Dexterity   // 민첩: GainBlock에 +Dexterity (Radiance의 방어판)
     }
 }

@@ -22,6 +22,7 @@ namespace Hwatu.Game
     {
         private CombatController _controller;
         private TMP_FontAsset _font;
+        private Canvas _canvas;
 
         private EnemyView _enemyView;
         private TextMeshProUGUI _playerText;
@@ -32,6 +33,11 @@ namespace Hwatu.Game
         private int _prevPlayerHp;
         private readonly Dictionary<int, CardView> _cardViews = new Dictionary<int, CardView>();
         private RectTransform _handArea;
+        private RectTransform _playerStatusArea;
+        private static readonly StatusType[] s_statusOrder = { StatusType.Radiance, StatusType.Dexterity, StatusType.Weak, StatusType.Vulnerable, StatusType.Poison };
+        private GameObject _pilePanel;
+        private TextMeshProUGUI _pileText;
+        private RectTransform _pileGridArea;
         private GameObject _resultPanel;
         private TextMeshProUGUI _resultText;
         private TargetingArrow _arrow;
@@ -47,7 +53,7 @@ namespace Hwatu.Game
             Refresh();
         }
 
-        private static TMP_FontAsset LoadKoreanFont()
+        public static TMP_FontAsset LoadKoreanFont()
         {
             Font f = Resources.Load<Font>("Fonts/malgun");
             if (f == null)
@@ -64,6 +70,7 @@ namespace Hwatu.Game
             var canvasGo = new GameObject("CombatCanvas", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
             canvasGo.transform.SetParent(transform, false);
             var canvas = canvasGo.GetComponent<Canvas>();
+            _canvas = canvas;
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
             var scaler = canvasGo.GetComponent<CanvasScaler>();
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
@@ -110,6 +117,16 @@ namespace Hwatu.Game
             _playerText.rectTransform.offsetMin = new Vector2(16f, 12f);
             _playerText.rectTransform.offsetMax = new Vector2(-16f, -52f);
 
+            // 플레이어 status 칩 영역(PlayerView 위, hover 설명 — STS2식)
+            var pstatGo = new GameObject("PlayerStatus", typeof(RectTransform));
+            pstatGo.transform.SetParent(root, false);
+            _playerStatusArea = (RectTransform)pstatGo.transform;
+            _playerStatusArea.anchorMin = Vector2.zero;
+            _playerStatusArea.anchorMax = Vector2.zero;
+            _playerStatusArea.pivot = Vector2.zero;
+            _playerStatusArea.anchoredPosition = new Vector2(24f, 184f);
+            _playerStatusArea.sizeDelta = new Vector2(440f, 44f);
+
             // 손패(하단 중앙, 가로 배치)
             var handGo = new GameObject("HandArea", typeof(RectTransform));
             handGo.transform.SetParent(root, false);
@@ -144,9 +161,48 @@ namespace Hwatu.Game
             CreateButton(rp, "다시 시작", new Vector2(0.5f, 0.42f), new Vector2(0.5f, 0.42f), Vector2.zero, new Vector2(220, 66),
                 () => { _controller.NewCombat(); Refresh(); });
             _resultPanel.SetActive(false);
+
+            // 더미 보기 버튼(우하단 세로) — STS2식 draw/discard/exhaust
+            CreateButton(root, "뽑을 카드", new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-130f, 486f), new Vector2(170f, 52f),
+                () => ShowPile(_controller.State.DrawPile, "뽑을 카드 (남은 덱)"));
+            CreateButton(root, "버린 카드", new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-130f, 428f), new Vector2(170f, 52f),
+                () => ShowPile(_controller.State.DiscardPile, "버린 카드"));
+            CreateButton(root, "소멸 카드", new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-130f, 370f), new Vector2(170f, 52f),
+                () => ShowPile(_controller.State.ExhaustPile, "소멸한 카드"));
+
+            // 더미 내용 모달
+            _pilePanel = new GameObject("PilePanel", typeof(RectTransform), typeof(Image));
+            _pilePanel.transform.SetParent(root, false);
+            var pp = _pilePanel.GetComponent<RectTransform>();
+            pp.anchorMin = Vector2.zero;
+            pp.anchorMax = Vector2.one;
+            pp.offsetMin = Vector2.zero;
+            pp.offsetMax = Vector2.zero;
+            _pilePanel.GetComponent<Image>().color = new Color(0.02f, 0.02f, 0.04f, 0.9f);
+            _pileText = CreateText(pp, "PileText", new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -64f), 34f, TextAlignmentOptions.Center);
+            _pileText.rectTransform.sizeDelta = new Vector2(900f, 56f);
+            var pileGridGo = new GameObject("PileGrid", typeof(RectTransform));
+            pileGridGo.transform.SetParent(pp, false);
+            _pileGridArea = (RectTransform)pileGridGo.transform;
+            _pileGridArea.anchorMin = _pileGridArea.anchorMax = new Vector2(0.5f, 0.5f);
+            _pileGridArea.pivot = new Vector2(0.5f, 0.5f);
+            _pileGridArea.anchoredPosition = new Vector2(0f, -10f);
+            _pileGridArea.sizeDelta = new Vector2(1180f, 780f);
+            CreateButton(pp, "닫기", new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 130f), new Vector2(220f, 62f),
+                () => _pilePanel.SetActive(false));
+            _pilePanel.SetActive(false);
         }
 
-        private void Refresh()
+        /// <summary>전투 화면(Canvas) 표시 토글(한 판 루프에서 GameFlow가 제어).</summary>
+        public void SetVisible(bool visible)
+        {
+            if (_canvas != null)
+            {
+                _canvas.enabled = visible;
+            }
+        }
+
+        public void Refresh()
         {
             CombatState s = _controller.State;
             if (s == null)
@@ -172,27 +228,21 @@ namespace Hwatu.Game
 
             if (s.Enemies.Count > 0)
             {
-                _enemyView.Bind(s.Enemies[0]);
+                _enemyView.Bind(s.Enemies[0], s.Player);
             }
 
             PlayerState p = s.Player;
             _playerHpBar.Set(p.Hp, p.MaxHp);
             _playerText.text =
-                $"에너지 {p.Energy}/{p.BaseEnergy}    광 {p.GetStatus(StatusType.Radiance)}\n" +
-                $"방어 {p.Block}    턴 {s.Turn}    덱 {s.DrawPile.Count}    버린 {s.DiscardPile.Count}";
+                $"에너지 {p.Energy}/{p.BaseEnergy}    방어 {p.Block}\n" +
+                $"턴 {s.Turn}   덱 {s.DrawPile.Count}  버린 {s.DiscardPile.Count}  소멸 {s.ExhaustPile.Count}";
+            RebuildStatus(p);
 
             RebuildHand(s);
 
-            if (_controller.Result != CombatResult.InProgress)
-            {
-                _resultPanel.SetActive(true);
-                _resultPanel.transform.SetAsLastSibling();
-                _resultText.text = _controller.Result == CombatResult.Win ? "승리!" : "패배...";
-            }
-            else
-            {
-                _resultPanel.SetActive(false);
-            }
+            // 런 모드에선 승패 후 RunUI가 보상/게임오버 화면을 띄운다 → CombatView 결과 패널("다시 시작")은
+            // 쓰지 않는다(보상 직전 0.7초 동안 잠깐 깜빡이던 문제 제거).
+            _resultPanel.SetActive(false);
         }
 
         /// <summary>드래그로 놓은 카드를 사용 시도한다(enemyIndex&lt;0 = 비타깃). 성공 시 손패 갱신.</summary>
@@ -254,7 +304,105 @@ namespace Hwatu.Game
             go.AddComponent<DamagePopup>().Show(_font, amount, color);
         }
 
+        /// <summary>새 전투 시작 시 호출: 이전 전투의 데미지 팝업 잔존을 제거하고 HP 기준점을 초기화한다.</summary>
+        public void ResetForNewCombat()
+        {
+            var kill = new System.Collections.Generic.List<GameObject>();
+            foreach (Transform c in _root)
+            {
+                if (c.name == "DamagePopup") { kill.Add(c.gameObject); }
+            }
+            foreach (GameObject g in kill) { Destroy(g); }
+            CombatState s = _controller.State;
+            _prevEnemyHp = (s != null && s.Enemies.Count > 0) ? s.Enemies[0].Hp : 0;
+            _prevPlayerHp = s != null ? s.Player.Hp : 0;
+        }
+
         // 손패를 InstanceId로 재사용해 갱신한다(유지 카드는 위치만 트윈, 빠진 카드만 제거, 새 카드만 생성).
+        /// <summary>플레이어 status를 칩으로 다시 그린다(active만, hover 설명 — STS2식).</summary>
+        private void RebuildStatus(PlayerState p)
+        {
+            var kill = new System.Collections.Generic.List<GameObject>();
+            foreach (Transform c in _playerStatusArea) { kill.Add(c.gameObject); }
+            foreach (var g in kill) { Destroy(g); }
+            int idx = 0;
+            foreach (StatusType st in s_statusOrder)
+            {
+                int amt = p.GetStatus(st);
+                if (amt <= 0) { continue; }
+                var chip = new GameObject($"St_{st}", typeof(RectTransform), typeof(Image), typeof(TooltipTrigger));
+                chip.transform.SetParent(_playerStatusArea, false);
+                var crt = (RectTransform)chip.transform;
+                crt.anchorMin = new Vector2(0f, 0.5f);
+                crt.anchorMax = new Vector2(0f, 0.5f);
+                crt.pivot = new Vector2(0f, 0.5f);
+                crt.anchoredPosition = new Vector2(idx * 96f, 0f);
+                crt.sizeDelta = new Vector2(90f, 40f);
+                chip.GetComponent<Image>().color = StatusColor(st);
+                chip.GetComponent<TooltipTrigger>().Set(GameInfo.StatusDesc(st, amt));
+                var lbl = CreateText(crt, "L", Vector2.zero, Vector2.one, Vector2.zero, 20f, TextAlignmentOptions.Center);
+                lbl.enableAutoSizing = true;   // 큰 수치(취약 12 등)도 칩 안에 맞춤
+                lbl.fontSizeMin = 12f;
+                lbl.fontSizeMax = 20f;
+                lbl.text = $"{GameInfo.StatusName(st)} {amt}";
+                lbl.raycastTarget = false;
+                idx++;
+            }
+        }
+
+        private static Color StatusColor(StatusType s)
+        {
+            switch (s)
+            {
+                case StatusType.Radiance:   return new Color(0.85f, 0.65f, 0.2f, 0.95f);
+                case StatusType.Dexterity:  return new Color(0.2f, 0.5f, 0.7f, 0.95f);
+                case StatusType.Weak:       return new Color(0.5f, 0.35f, 0.6f, 0.95f);
+                case StatusType.Vulnerable: return new Color(0.7f, 0.35f, 0.3f, 0.95f);
+                case StatusType.Poison:     return new Color(0.35f, 0.6f, 0.3f, 0.95f);
+                default:                    return new Color(0.4f, 0.4f, 0.4f, 0.95f);
+            }
+        }
+
+        /// <summary>더미(뽑을/버린/소멸) 내용을 카드명 ×수량으로 모달에 표시 — STS2식.</summary>
+        private void ShowPile(System.Collections.Generic.List<CardInstance> pile, string title)
+        {
+            _pileText.text = pile.Count == 0 ? $"<b>{title}</b>  (비어 있음)" : $"<b>{title}</b>  ({pile.Count}장)";
+            PopulatePileGrid(pile);
+            _pilePanel.SetActive(true);
+            _pilePanel.transform.SetAsLastSibling();
+        }
+
+        /// <summary>더미 모달을 카드(CardView) 그리드로 채운다 — 한 줄 5장, 정적 배치(트윈 끔).</summary>
+        private void PopulatePileGrid(System.Collections.Generic.List<CardInstance> pile)
+        {
+            var kill = new System.Collections.Generic.List<GameObject>();
+            foreach (Transform c in _pileGridArea) { kill.Add(c.gameObject); }
+            foreach (GameObject g in kill) { Destroy(g); }
+
+            int cols = 5;
+            float scale = pile.Count > 15 ? 0.54f : 0.64f;
+            float cw = (200f * scale) + 30f;
+            float ch = (280f * scale) + 22f;
+            float x0 = -(cols - 1) / 2f * cw;
+            float y0 = (_pileGridArea.sizeDelta.y / 2f) - (ch / 2f) - 6f;
+            for (int i = 0; i < pile.Count; i++)
+            {
+                int col = i % cols;
+                int row = i / cols;
+                var go = new GameObject("PileCard", typeof(RectTransform));
+                go.transform.SetParent(_pileGridArea, false);
+                var cv = go.AddComponent<CardView>();
+                cv.Build(_font);
+                cv.Bind(pile[i], true);
+                cv.enabled = false;   // 손패 트윈 비활성 — 모달은 정적 배치
+                var rt = (RectTransform)go.transform;
+                rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
+                rt.pivot = new Vector2(0.5f, 0.5f);
+                rt.localScale = new Vector3(scale, scale, 1f);
+                rt.anchoredPosition = new Vector2(x0 + col * cw, y0 - row * ch);
+            }
+        }
+
         private void RebuildHand(CombatState s)
         {
             var hand = s.Hand;
@@ -365,6 +513,9 @@ namespace Hwatu.Game
 
             var txt = CreateText(rt, "Label", Vector2.zero, Vector2.one, Vector2.zero, 22, TextAlignmentOptions.Center);
             txt.rectTransform.sizeDelta = Vector2.zero;
+            txt.enableAutoSizing = true;   // 긴 버튼 라벨도 버튼 안에 맞춤
+            txt.fontSizeMin = 13f;
+            txt.fontSizeMax = 22f;
             txt.text = label;
             return go.GetComponent<Button>();
         }

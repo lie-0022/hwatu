@@ -20,6 +20,9 @@ namespace Hwatu.Game
         private HpBar _hpBar;
         private Image _intentBg;
         private TextMeshProUGUI _intentText;
+        private TextMeshProUGUI _blockText;
+        private RectTransform _enemyStatusArea;
+        private static readonly StatusType[] s_statusOrder = { StatusType.Weak, StatusType.Vulnerable, StatusType.Poison, StatusType.Radiance, StatusType.Dexterity };
 
         /// <summary>적 배열에서의 인덱스(PlayCard 타깃 지정용).</summary>
         public int Index { get; private set; }
@@ -62,28 +65,104 @@ namespace Hwatu.Game
             irt.anchorMax = new Vector2(0.5f, 0.18f);
             irt.pivot = new Vector2(0.5f, 0.5f);
             irt.anchoredPosition = Vector2.zero;
-            irt.sizeDelta = new Vector2(220f, 48f);
+            irt.sizeDelta = new Vector2(264f, 48f);
             _intentBg = intentGo.GetComponent<Image>();
             _intentBg.raycastTarget = false;
-            _intentText = CreateText(irt, "IntentText", 24f, new Vector2(0.5f, 0.5f), new Vector2(212f, 44f));
+            _intentText = CreateText(irt, "IntentText", 24f, new Vector2(0.5f, 0.5f), new Vector2(256f, 44f));
+            _intentText.enableAutoSizing = true;   // 긴 인텐트(연속 히트·Doom 타이머)는 자동 축소해 박스 안에 맞춘다
+            _intentText.fontSizeMin = 13f;
+            _intentText.fontSizeMax = 24f;
+
+            // 적 status 칩 영역(박스 아래, hover 설명 — STS2식)
+            var estatGo = new GameObject("EnemyStatus", typeof(RectTransform));
+            estatGo.transform.SetParent(transform, false);
+            _enemyStatusArea = (RectTransform)estatGo.transform;
+            _enemyStatusArea.anchorMin = new Vector2(0f, 0f);
+            _enemyStatusArea.anchorMax = new Vector2(0f, 0f);
+            _enemyStatusArea.pivot = new Vector2(0f, 1f);
+            _enemyStatusArea.anchoredPosition = new Vector2(30f, -6f);
+            _enemyStatusArea.sizeDelta = new Vector2(400f, 36f);
+
+            // 방어도(Block) — HP바 위 좌측. 0이면 숨김(STS2식 방패 표기)
+            _blockText = CreateText(transform, "Block", 22f, new Vector2(0.5f, 0.66f), new Vector2(160f, 30f));
+            _blockText.rectTransform.anchoredPosition = new Vector2(-110f, 0f);
+            _blockText.color = new Color(0.55f, 0.78f, 1f);
+            _blockText.fontStyle = FontStyles.Bold;
+            _blockText.alignment = TextAlignmentOptions.Left;
         }
 
         /// <summary>적 상태를 박스에 반영한다.</summary>
-        public void Bind(EnemyState e)
+        public void Bind(EnemyState e, PlayerState player)
         {
             _nameText.text = e.Data.Name;
             _hpBar.Set(e.Hp, e.MaxHp);
+            _blockText.text = e.Block > 0 ? $"방어 {e.Block}" : "";
 
             if (e.CurrentIntent != null)
             {
                 _intentBg.enabled = true;
                 _intentBg.color = IntentColor(e.CurrentIntent.Intent);
-                _intentText.text = $"{IntentKor(e.CurrentIntent.Intent)}  <b><size=135%>{e.CurrentIntent.Value}</size></b>";
+                // 공격류는 약화·취약·광을 반영한 "실제로 들어올" 데미지로 표시(EffectDispatcher와 같은 DamageMath 공유)
+                IntentType it = e.CurrentIntent.Intent;
+                bool isAttack = it == IntentType.Attack || it == IntentType.AttackMulti || it == IntentType.Doom;
+                int shown = (isAttack && player != null)
+                    ? DamageMath.RawDamage(e, player, e.CurrentIntent.Value)
+                    : e.CurrentIntent.Value;
+                string num = e.CurrentIntent.Hits > 1
+                    ? $"{shown}×{e.CurrentIntent.Hits}"
+                    : shown.ToString();
+                string doomTag = (e.CurrentIntent.Intent == IntentType.Doom && e.DoomTimer > 0)
+                    ? $"  <size=80%>({e.DoomTimer})</size>" : "";
+                _intentText.text = $"{IntentKor(e.CurrentIntent.Intent)}  <b><size=135%>{num}</size></b>{doomTag}";
             }
             else
             {
                 _intentBg.enabled = false;
                 _intentText.text = "?";
+            }
+            RebuildEnemyStatus(e);
+        }
+
+        /// <summary>적 status를 박스 아래 칩으로 다시 그린다(active만, hover 설명).</summary>
+        private void RebuildEnemyStatus(EnemyState e)
+        {
+            var kill = new System.Collections.Generic.List<GameObject>();
+            foreach (Transform c in _enemyStatusArea) { kill.Add(c.gameObject); }
+            foreach (var g in kill) { Destroy(g); }
+            int idx = 0;
+            foreach (StatusType st in s_statusOrder)
+            {
+                int amt = e.GetStatus(st);
+                if (amt <= 0) { continue; }
+                var chip = new GameObject($"St_{st}", typeof(RectTransform), typeof(Image), typeof(TooltipTrigger));
+                chip.transform.SetParent(_enemyStatusArea, false);
+                var crt = (RectTransform)chip.transform;
+                crt.anchorMin = new Vector2(0f, 1f);
+                crt.anchorMax = new Vector2(0f, 1f);
+                crt.pivot = new Vector2(0f, 1f);
+                crt.anchoredPosition = new Vector2(idx * 96f, 0f);
+                crt.sizeDelta = new Vector2(90f, 34f);
+                chip.GetComponent<Image>().color = EnemyStatusColor(st);
+                chip.GetComponent<TooltipTrigger>().Set(GameInfo.StatusDesc(st, amt));
+                var lbl = CreateText((RectTransform)chip.transform, "L", 19f, new Vector2(0.5f, 0.5f), new Vector2(86f, 32f));
+                lbl.enableAutoSizing = true;   // 큰 수치(취약 12 등)도 칩 안에 맞춤
+                lbl.fontSizeMin = 12f;
+                lbl.fontSizeMax = 19f;
+                lbl.text = $"{GameInfo.StatusName(st)} {amt}";
+                idx++;
+            }
+        }
+
+        private static Color EnemyStatusColor(StatusType s)
+        {
+            switch (s)
+            {
+                case StatusType.Radiance:   return new Color(0.85f, 0.65f, 0.2f, 0.95f);
+                case StatusType.Dexterity:  return new Color(0.2f, 0.5f, 0.7f, 0.95f);
+                case StatusType.Weak:       return new Color(0.5f, 0.35f, 0.6f, 0.95f);
+                case StatusType.Vulnerable: return new Color(0.7f, 0.35f, 0.3f, 0.95f);
+                case StatusType.Poison:     return new Color(0.35f, 0.6f, 0.3f, 0.95f);
+                default:                    return new Color(0.4f, 0.4f, 0.4f, 0.95f);
             }
         }
 
@@ -123,6 +202,7 @@ namespace Hwatu.Game
                 case IntentType.Block:       return new Color(0.20f, 0.40f, 0.70f, 0.95f);  // 방어: 파랑
                 case IntentType.Buff:        return new Color(0.25f, 0.55f, 0.30f, 0.95f);  // 강화: 초록
                 case IntentType.Debuff:      return new Color(0.50f, 0.30f, 0.62f, 0.95f);  // 약화: 보라
+                case IntentType.Doom:        return new Color(0.12f, 0.02f, 0.16f, 0.98f);  // 파멸: 흑보라
                 default:                     return new Color(0.35f, 0.35f, 0.35f, 0.95f);  // 기타: 회색
             }
         }

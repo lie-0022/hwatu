@@ -19,6 +19,7 @@ namespace Hwatu.Core.Effects
                 case EffectOp.Draw: Draw(e, ctx); break;
                 case EffectOp.ApplyStatus: ApplyStatus(e, ctx); break;
                 case EffectOp.GainResource: GainResource(e, ctx); break;
+                case EffectOp.ClearStatus: ClearStatus(e, ctx); break;
                 default: throw new NotSupportedException("Unknown effect op: " + e.Op);
             }
         }
@@ -29,19 +30,7 @@ namespace Hwatu.Core.Effects
         //   ※ Weak+Vulnerable 동시면 절단이 두 번 일어난다(Slay the Spire와 동일 동작). float·Mathf 금지(결정론 보장).
         private static void DealDamage(EffectData e, IEffectContext ctx)
         {
-            int dmg = e.Amount + ctx.Source.GetStatus(StatusType.Radiance);
-            if (ctx.Source.GetStatus(StatusType.Weak) > 0)
-            {
-                dmg = dmg * 3 / 4;
-            }
-            if (ctx.Target.GetStatus(StatusType.Vulnerable) > 0)
-            {
-                dmg = dmg * 3 / 2;
-            }
-            if (dmg < 0)
-            {
-                dmg = 0;
-            }
+            int dmg = DamageMath.RawDamage(ctx.Source, ctx.Target, e.Amount);
 
             int block = ctx.Target.Block;
             if (dmg <= block)
@@ -56,7 +45,12 @@ namespace Hwatu.Core.Effects
         private static void GainBlock(EffectData e, IEffectContext ctx)
         {
             ICombatant who = Resolve(e, ctx);
-            who.SetBlock(who.Block + e.Amount);
+            int amount = e.Amount + who.GetStatus(StatusType.Dexterity);   // 민첩 가산
+            if (amount < 0)
+            {
+                amount = 0;
+            }
+            who.SetBlock(who.Block + amount);
         }
 
         private static void Draw(EffectData e, IEffectContext ctx)
@@ -77,6 +71,17 @@ namespace Hwatu.Core.Effects
             if (e.Resource == ResourceType.Radiance)
             {
                 ctx.Source.AddStatus(StatusType.Radiance, e.Amount);
+            }
+        }
+
+        // 대상의 특정 status를 0으로(정화). e.Status로 어떤 상태인지 지정.
+        private static void ClearStatus(EffectData e, IEffectContext ctx)
+        {
+            ICombatant who = Resolve(e, ctx);
+            int cur = who.GetStatus(e.Status);
+            if (cur != 0)
+            {
+                who.AddStatus(e.Status, -cur);
             }
         }
 

@@ -12,18 +12,18 @@ namespace Hwatu.Tests.Combat
         {
             var ai = new SequenceAi(StarterContent.DokkaebiMinion());
 
-            Assert.AreEqual("swipe", ai.PeekNext().Id); ai.Advance();
-            Assert.AreEqual("swipe", ai.PeekNext().Id); ai.Advance();
-            Assert.AreEqual("guard", ai.PeekNext().Id); ai.Advance();
-            Assert.AreEqual("swipe", ai.PeekNext().Id); // 순환
+            Assert.AreEqual("swipe", ai.PeekNext(null).Id); ai.Advance();
+            Assert.AreEqual("swipe", ai.PeekNext(null).Id); ai.Advance();
+            Assert.AreEqual("guard", ai.PeekNext(null).Id); ai.Advance();
+            Assert.AreEqual("swipe", ai.PeekNext(null).Id); // 순환
         }
 
         [Test]
         public void PeekNext_DoesNotAdvance()
         {
             var ai = new SequenceAi(StarterContent.DokkaebiMinion());
-            Assert.AreEqual("swipe", ai.PeekNext().Id);
-            Assert.AreEqual("swipe", ai.PeekNext().Id); // peek은 진행시키지 않음
+            Assert.AreEqual("swipe", ai.PeekNext(null).Id);
+            Assert.AreEqual("swipe", ai.PeekNext(null).Id); // peek은 진행시키지 않음
         }
 
         [Test]

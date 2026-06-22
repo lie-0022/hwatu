@@ -26,6 +26,10 @@ namespace Hwatu.Core.Combat
         public EnemyMoveData CurrentIntent { get; private set; }
         public bool IsDead => Hp <= 0;
 
+        /// <summary>파멸(Doom) 카운트다운. -1이면 비활성, 0이면 이번 적 턴에 발동.</summary>
+        public int DoomTimer { get; private set; } = -1;
+        public void SetDoomTimer(int value) => DoomTimer = value;
+
         public void SetHp(int value) => Hp = value;
         public void SetBlock(int value) => Block = value;
         public int GetStatus(StatusType status) => _statuses.TryGetValue(status, out var v) ? v : 0;
@@ -34,7 +38,7 @@ namespace Hwatu.Core.Combat
         /// <summary>AI에서 다음 move를 계산해 intent로 노출한다(완전정보).</summary>
         public void RefreshIntent()
         {
-            CurrentIntent = Ai.PeekNext();
+            CurrentIntent = Ai.PeekNext(this);
         }
     }
 }

@@ -1,6 +1,7 @@
 using Hwatu.Core.Cards;
 using Hwatu.Core.Effects;
 using Hwatu.Core.Enemies;
+using Hwatu.Core.Run;
 
 namespace Hwatu.Core.Combat
 {
@@ -33,7 +34,10 @@ namespace Hwatu.Core.Combat
                     break;
                 case CombatPhase.PlayerTurnStart:
                     StartPlayerTurn();
-                    State.Phase = CombatPhase.PlayerAction;
+                    if (State.Phase == CombatPhase.PlayerTurnStart)   // 독사로 Lose가 안 됐으면 입력 대기로
+                    {
+                        State.Phase = CombatPhase.PlayerAction;
+                    }
                     break;
                 case CombatPhase.PlayerAction:
                     break; // 입력 대기 — 멈춤
@@ -94,6 +98,7 @@ namespace Hwatu.Core.Combat
             }
 
             State.Player.Energy -= card.Data.Cost;
+            State.Log.Add($"플레이어: {card.Data.Name}");
 
             var effects = card.Data.Effects;
             if (targetType == TargetType.AllEnemies)
@@ -156,29 +161,81 @@ namespace Hwatu.Core.Combat
             return true;
         }
 
+        /// <summary>PlayerAction에서 포션 사용(즉시 Player에 효과). 성공 시 true.</summary>
+        public bool UsePotion(PotionData potion)
+        {
+            if (State.Phase != CombatPhase.PlayerAction || potion == null)
+            {
+                return false;
+            }
+            potion.Apply(State);
+            State.Log.Add($"포션: {potion.Name}");
+            return true;
+        }
+
         // --- phase 동작 ---
 
         private void StartCombat()
         {
             State.ShuffleRng.Shuffle(State.DrawPile);
+            MoveInnateToTop();
             for (int i = 0; i < State.Enemies.Count; i++)
             {
                 State.Enemies[i].RefreshIntent();
             }
         }
 
+        // Innate 카드를 더미 맨 위(리스트 끝)로 올려 첫 손패에 들어오게 한다.
+        private void MoveInnateToTop()
+        {
+            for (int i = State.DrawPile.Count - 1; i >= 0; i--)
+            {
+                if (State.DrawPile[i].Data.Innate)
+                {
+                    CardInstance c = State.DrawPile[i];
+                    State.DrawPile.RemoveAt(i);
+                    State.DrawPile.Add(c);
+                }
+            }
+        }
+
         private void StartPlayerTurn()
         {
             State.Turn++;
+            State.Log.Add($"── {State.Turn}턴 ──");
             State.Player.SetBlock(0);
+            TickPoison(State.Player);
+            if (State.Player.Hp <= 0)
+            {
+                State.Result = CombatResult.Lose;
+                State.Phase = CombatPhase.Lose;
+                return;
+            }
             State.Player.Energy = State.Player.BaseEnergy;
             PileSystem.Draw(State.Hand, State.DrawPile, State.DiscardPile, State.ShuffleRng, State.Player.HandSize);
         }
 
         private void EndPlayerTurn()
         {
-            State.DiscardPile.AddRange(State.Hand);
-            State.Hand.Clear();
+            // Retain은 손패 유지, Ethereal은 소멸, 나머지는 버림.
+            for (int i = State.Hand.Count - 1; i >= 0; i--)
+            {
+                CardInstance card = State.Hand[i];
+                if (card.Data.Retain)
+                {
+                    continue;
+                }
+                if (card.Data.Ethereal)
+                {
+                    State.ExhaustPile.Add(card);
+                }
+                else
+                {
+                    State.DiscardPile.Add(card);
+                }
+                State.Hand.RemoveAt(i);
+            }
+            DecayDebuffs(State.Player);   // 플레이어 턴 종료 — 약화·취약 1 감소
         }
 
         private void EnemyTurn()
@@ -192,10 +249,34 @@ namespace Hwatu.Core.Combat
                 }
 
                 enemy.SetBlock(0);
+                TickPoison(enemy);
+                if (enemy.IsDead)
+                {
+                    continue;   // 독으로 쓰러지면 행동하지 않음
+                }
 
                 // 실행은 항상 현재 AI 상태(PeekNext)를 직접 사용한다.
                 // CurrentIntent는 UI 표시 전용 캐시이므로 실행 소스로 겸용하지 않는다(의도 변경 효과 대비).
-                EnemyMoveData move = enemy.Ai.PeekNext();
+                EnemyMoveData move = enemy.Ai.PeekNext(enemy);
+
+                // Doom 카운트다운: DoomTurns>0이면 그만큼 예고 후 발동(예고 턴은 effects 보류 + AI 진행 보류).
+                if (move.Intent == IntentType.Doom && move.DoomTurns > 0)
+                {
+                    if (enemy.DoomTimer < 0)
+                    {
+                        enemy.SetDoomTimer(move.DoomTurns);   // 예고 시작
+                    }
+                    if (enemy.DoomTimer > 0)
+                    {
+                        enemy.SetDoomTimer(enemy.DoomTimer - 1);
+                        State.Log.Add($"{enemy.Data.Name}: 파멸 예고({enemy.DoomTimer + 1})");
+                        enemy.RefreshIntent();
+                        continue;
+                    }
+                    enemy.SetDoomTimer(-1);   // 발동
+                }
+
+                State.Log.Add($"{enemy.Data.Name}: {move.Intent} {move.Value}");
                 var ctx = new CombatEffectContext(State, enemy, State.Player);
                 var effects = move.Effects;
                 for (int j = 0; j < effects.Count; j++)
@@ -205,7 +286,26 @@ namespace Hwatu.Core.Combat
 
                 enemy.Ai.Advance();
                 enemy.RefreshIntent(); // 다음 턴에 보여줄 의도 갱신
+                DecayDebuffs(enemy);    // 적 턴 종료 — 약화·취약 1 감소
             }
+        }
+
+        // Poison(중독): 턴 시작 시 스택만큼 피해(Block 무시), 그 후 1 감소.
+        private static void TickPoison(ICombatant c)
+        {
+            int p = c.GetStatus(StatusType.Poison);
+            if (p > 0)
+            {
+                c.SetHp(System.Math.Max(0, c.Hp - p));
+                c.AddStatus(StatusType.Poison, -1);
+            }
+        }
+
+        // Weak·Vulnerable 등 지속 턴 디버프는 그 대상의 턴 종료 시 1씩 감소(STS 규칙).
+        private static void DecayDebuffs(ICombatant c)
+        {
+            if (c.GetStatus(StatusType.Weak) > 0) { c.AddStatus(StatusType.Weak, -1); }
+            if (c.GetStatus(StatusType.Vulnerable) > 0) { c.AddStatus(StatusType.Vulnerable, -1); }
         }
 
         private void CheckDeath()

@@ -10,5 +10,6 @@ namespace Hwatu.Core.Effects
         public const string Draw = "draw";
         public const string ApplyStatus = "apply_status";
         public const string GainResource = "gain_resource";
+        public const string ClearStatus = "clear_status";
     }
 }

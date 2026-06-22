@@ -6,6 +6,7 @@ using UnityEngine.InputSystem;
 using TMPro;
 using Hwatu.Core.Cards;
 using Hwatu.Core.Effects;
+using Hwatu.Core.Combat;
 
 namespace Hwatu.Game
 {
@@ -87,11 +88,17 @@ namespace Hwatu.Game
             // 이름(아트 아래)
             _nameText = CreateText(rt, "NameText", new Vector2(0.5f, 0.36f), new Vector2(0.5f, 0.36f), Vector2.zero, 24, TextAlignmentOptions.Center);
             _nameText.rectTransform.sizeDelta = new Vector2(180, 38);
+            _nameText.enableAutoSizing = true;   // 강화(+)·인챈트 마크로 길어진 이름을 카드 폭에 맞게 축소
+            _nameText.fontSizeMin = 15f;
+            _nameText.fontSizeMax = 24f;
 
             // 효과(하단)
             _descText = CreateText(rt, "DescText", new Vector2(0.5f, 0.16f), new Vector2(0.5f, 0.16f), Vector2.zero, 20, TextAlignmentOptions.Center);
             _descText.rectTransform.sizeDelta = new Vector2(176, 64);
             _descText.textWrappingMode = TextWrappingModes.Normal;
+            _descText.enableAutoSizing = true;   // 긴 효과 설명도 카드 안에 맞게 축소
+            _descText.fontSizeMin = 13f;
+            _descText.fontSizeMax = 20f;
         }
 
         /// <summary>카드 데이터를 비주얼에 반영한다. playable=false면 어둡게 표시.</summary>
@@ -106,6 +113,7 @@ namespace Hwatu.Game
             _typeText.text = TypeKor(d.Type);
             _nameText.text = d.Name;
             _descText.text = Describe(d);
+            // 카드 자체에 이름·효과가 적혀 있어 hover 툴팁은 두지 않는다(손패에서 카드를 가리는 문제 회피).
 
             float a = playable ? 1f : 0.6f;
             _nameText.color = new Color(1f, 1f, 1f, a);
@@ -403,19 +411,45 @@ namespace Hwatu.Game
 
         private static string Describe(CardData d)
         {
-            if (d.Effects.Count == 0)
+            var parts = new System.Collections.Generic.List<string>();
+            foreach (EffectData e in d.Effects)
             {
-                return "-";
+                switch (e.Op)
+                {
+                    case EffectOp.DealDamage:   parts.Add($"{e.Amount} 피해"); break;
+                    case EffectOp.GainBlock:    parts.Add($"{e.Amount} 방어"); break;
+                    case EffectOp.GainResource: parts.Add($"광 +{e.Amount}"); break;
+                    case EffectOp.Draw:         parts.Add($"{e.Amount}장 뽑기"); break;
+                    case EffectOp.ApplyStatus:  parts.Add($"{StatusKor(e.Status)} {e.Amount}"); break;
+                    case EffectOp.ClearStatus:  parts.Add($"{StatusKor(e.Status)} 제거"); break;
+                    default:                    parts.Add(e.Op.ToString()); break;
+                }
             }
-            EffectData e = d.Effects[0];
-            switch (e.Op)
+            var kw = new System.Collections.Generic.List<string>();
+            if (d.Innate) { kw.Add("선제"); }
+            if (d.Retain) { kw.Add("유지"); }
+            if (d.Exhaust) { kw.Add("소멸"); }
+            if (d.Ethereal) { kw.Add("휘발"); }
+
+            string body = parts.Count > 0 ? string.Join(", ", parts) : "-";
+            if (kw.Count > 0)
             {
-                case EffectOp.DealDamage:   return $"{e.Amount} 피해";
-                case EffectOp.GainBlock:    return $"{e.Amount} 방어";
-                case EffectOp.GainResource: return $"광 +{e.Amount}";
-                case EffectOp.Draw:         return $"{e.Amount}장 뽑기";
-                case EffectOp.ApplyStatus:  return $"{e.Status} {e.Amount}";
-                default:                    return e.Op;
+                body += $"\n<size=78%><color=#C9B98C>[{string.Join("·", kw)}]</color></size>";
+            }
+            return body;
+        }
+
+        /// <summary>StatusType을 카드 설명용 한글로.</summary>
+        private static string StatusKor(StatusType s)
+        {
+            switch (s)
+            {
+                case StatusType.Poison:     return "중독";
+                case StatusType.Weak:       return "약화";
+                case StatusType.Vulnerable: return "취약";
+                case StatusType.Radiance:   return "광";
+                case StatusType.Dexterity:  return "민첩";
+                default:                    return s.ToString();
             }
         }
 

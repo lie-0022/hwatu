@@ -1,3 +1,5 @@
+using Hwatu.Core.Combat;
+
 namespace Hwatu.Core.Enemies
 {
     /// <summary>
@@ -6,8 +8,8 @@ namespace Hwatu.Core.Enemies
     /// </summary>
     public interface IEnemyAi
     {
-        /// <summary>다음에 실행할 move(아직 소비하지 않음). 여러 번 호출해도 같은 값을 반환한다.</summary>
-        EnemyMoveData PeekNext();
+        /// <summary>다음에 실행할 move(self의 HP 등으로 페이즈 분기 가능). 같은 상태면 같은 값.</summary>
+        EnemyMoveData PeekNext(EnemyState self);
 
         /// <summary>현재 move를 소비하고 다음으로 진행한다.</summary>
         void Advance();
