@@ -120,13 +120,24 @@ namespace Hwatu.Core.Content
                 new EffectData(EffectOp.DealDamage, amount: 3, target: TargetType.Enemy),
             }, CardRarity.Uncommon);
 
-        /// <summary>보상 추첨에 쓰는 광객 카드 풀(23장: Common5/Uncommon10/Rare8).</summary>
+        // ── 광 시너지 추가(STS2 Regent의 Stars 영감 — 광을 쌓고 활용) ──
+        public static CardData LightVeil() => new CardData("lum_veil", "광막", CardType.Skill, 1, TargetType.Self, false,
+            new[]
+            {
+                new EffectData(EffectOp.GainBlock, amount: 7, target: TargetType.Self),
+                new EffectData(EffectOp.GainResource, amount: 1, target: TargetType.Self, resource: ResourceType.Radiance),
+            }, CardRarity.Uncommon);
+
+        public static CardData Glint() => new CardData("lum_glint", "섬광", CardType.Attack, 0, TargetType.Enemy, true,
+            new[] { new EffectData(EffectOp.DealDamage, amount: 5, target: TargetType.Enemy) }, CardRarity.Uncommon);
+
+        /// <summary>보상 추첨에 쓰는 광객 카드 풀(25장: Common5/Uncommon12/Rare8).</summary>
         public static List<CardData> RewardPool()
         {
             return new List<CardData>
             {
                 HeavyStrike(), Guard(), Whet(), Jab(), Check(),
-                Glow(), Daybreak(), Pierce(), LightRay(), Stockpile(), Purify(), Vigil(), Dawn(), Bulwark(), Volley(),
+                Glow(), Daybreak(), Pierce(), LightRay(), Stockpile(), Purify(), Vigil(), Dawn(), Bulwark(), Volley(), LightVeil(), Glint(),
                 Burst(), GreatShield(), RadiantSurge(), Frenzy(), WhiteFlash(), Awaken(), Meteor(), LightWave(),
             };
         }
