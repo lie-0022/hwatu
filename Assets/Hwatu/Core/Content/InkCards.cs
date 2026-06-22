@@ -61,6 +61,13 @@ namespace Hwatu.Core.Content
                 new EffectData(EffectOp.ApplyStatus, amount: 1, target: TargetType.Enemy, status: StatusType.Weak),
             }, CardRarity.Uncommon);
 
+        public static CardData Corrode() => new CardData("ink_corrode", "부식", CardType.Attack, 2, TargetType.Enemy, false,
+            new[]
+            {
+                new EffectData(EffectOp.DealDamage, amount: 8, target: TargetType.Enemy),
+                new EffectData(EffectOp.ApplyStatus, amount: 4, target: TargetType.Enemy, status: StatusType.Poison),
+            }, CardRarity.Rare);
+
         // Rare
         public static CardData Plague() => new CardData("ink_plague", "역병", CardType.Skill, 2, TargetType.Enemy, false,
             new[] { new EffectData(EffectOp.ApplyStatus, amount: 8, target: TargetType.Enemy, status: StatusType.Poison) }, CardRarity.Rare);
@@ -107,14 +114,14 @@ namespace Hwatu.Core.Content
             return deck;
         }
 
-        /// <summary>묵귀 보상 풀(15장: Common4/Uncommon7/Rare4).</summary>
+        /// <summary>묵귀 보상 풀(16장: Common4/Uncommon7/Rare5).</summary>
         public static List<CardData> RewardPool()
         {
             return new List<CardData>
             {
                 InkStrike(), Soot(), DarkGuard(), Lacquer(),
                 Seep(), Miasma(), Veil(), Gu(), Lingering(), ToxicCloud(), Sting(),
-                Plague(), Decay(), BlackSpot(), Venom(),
+                Plague(), Decay(), BlackSpot(), Venom(), Corrode(),
             };
         }
     }
