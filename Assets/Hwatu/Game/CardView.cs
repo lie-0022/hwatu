@@ -107,6 +107,9 @@ namespace Hwatu.Game
             _typeText.text = TypeKor(d.Type);
             _nameText.text = d.Name;
             _descText.text = Describe(d);
+            var tip = gameObject.GetComponent<TooltipTrigger>();
+            if (tip == null) { tip = gameObject.AddComponent<TooltipTrigger>(); }
+            tip.Set(GameInfo.KeywordDesc(d));
 
             float a = playable ? 1f : 0.6f;
             _nameText.color = new Color(1f, 1f, 1f, a);
