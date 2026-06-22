@@ -87,7 +87,7 @@ RewardOption  { CardData Card; ... }  // 3택1
 
 ## 11. 구현 현황 (2026-06-22 자율 확장, feature/run-loop)
 설계(MVP)를 넘어 콘텐츠·메커닉·UI를 자율 확장. EditMode **133/133 통과**.
-- **루프**: 메인→캐릭터→맵(분기 7×15)→전투→보상3택1+포션→이벤트/휴식/상점/보물→보스(페이즈+Doom)→액트전환(FinalAct=3 승리). 노드 7종 전부 UI 작동.
+- **루프**: 메인→캐릭터→맵(분기 7×15)→전투→보상3택1+포션→이벤트/휴식/상점/보물→보스(페이즈+Doom)→액트전환(act↑마다 적 HP ×1.25, FinalAct=3 승리). 노드 7종 전부 UI 작동.
 - **전투**: 턴 상태머신, 효과 op 6종(deal_damage/gain_block/draw/apply_status/gain_resource/clear_status), 키워드 4(Exhaust/Retain/Innate/Ethereal), Doom 카운트다운(예고→발동).
 - **status 5**: Radiance(빛=힘)·Weak·Vulnerable·Poison(턴틱)·Dexterity(방어+).
 - **적 14**: 일반8(잡도깨비·까마귀떼·허수아비·도깨비불·장승·그슨대·멧돼지·두꺼비)·엘리트3(광귀·외눈도깨비·구렁이)·보스3(달그림자·구미호[Doom]·장군, PhaseAi HP광폭).
