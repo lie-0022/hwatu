@@ -17,7 +17,7 @@ namespace Hwatu.Tests.Combat
 
             bool used = engine.UsePotion(PotionContent.Block());
             Assert.IsTrue(used);
-            Assert.AreEqual(12, state.Player.Block);   // 방패약 +12
+            Assert.AreEqual(14, state.Player.Block);   // 방패약 +14
         }
 
         [Test]
@@ -39,7 +39,7 @@ namespace Hwatu.Tests.Combat
             var engine = new CombatEngine(state, new EffectDispatcher());
             engine.Advance(); engine.Advance(); // PlayerAction
             engine.UsePotion(PotionContent.Heal());
-            Assert.AreEqual(75, state.Player.Hp);   // 60+15
+            Assert.AreEqual(80, state.Player.Hp);   // 60+20 (max 80)
         }
     }
 }

@@ -168,7 +168,7 @@ namespace Hwatu.Core.Combat
             {
                 return false;
             }
-            potion.Apply(State.Player);
+            potion.Apply(State);
             State.Log.Add($"포션: {potion.Name}");
             return true;
         }
