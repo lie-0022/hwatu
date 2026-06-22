@@ -40,6 +40,7 @@ namespace Hwatu.Game
         private RectTransform _eventChoiceArea;
         private GameObject _restPanel;
         private GameObject _shopPanel;
+        private RectTransform _shopItemsRoot;
         private TextMeshProUGUI _shopText;
 
         private MapView _mapView;
@@ -163,15 +164,21 @@ namespace Hwatu.Game
             CreateButton(_upgradePanel, "취소", new Vector2(0, -470), () => CloseUpgradeView());
             _upgradePanel.SetActive(false);
 
-            // 상점(매물 카드 1 + 구매/나가기)
+            // 상점(STS2식 다중 매물: 카드·유물·포션 동시 진열 + 개별 구매)
             _shopPanel = CreatePanel(root, "ShopPanel", new Color(0.10f, 0.08f, 0.04f, 0.97f));
-            CreateText(_shopPanel, "상점", 50f, new Vector2(0, 180));
-            _shopText = CreateText(_shopPanel, "", 32f, new Vector2(0, 50));
-            CreateButton(_shopPanel, "구매", new Vector2(0, -50), () => _flow.OnBuyCard());
-            CreateButton(_shopPanel, "매물 새로고침 (15골드)", new Vector2(0, -110), () => { _flow.ShopReroll(); BuildShop(); });
-            CreateButton(_shopPanel, "포션 구매 (랜덤, 50골드)", new Vector2(0, -170), () => { _flow.ShopBuyPotion(); BuildShop(); });
-            CreateButton(_shopPanel, "카드 제거 (첫 카드, 75골드)", new Vector2(0, -230), () => { _flow.ShopRemoveFirstCard(); BuildShop(); });
-            CreateButton(_shopPanel, "나가기", new Vector2(0, -290), () => _flow.OnShopLeave());
+            CreateText(_shopPanel, "상점", 50f, new Vector2(0, 440));
+            _shopText = CreateText(_shopPanel, "", 30f, new Vector2(0, 380));
+            var itemsRootGo = new GameObject("ShopItems", typeof(RectTransform));
+            itemsRootGo.transform.SetParent(_shopPanel.transform, false);
+            _shopItemsRoot = (RectTransform)itemsRootGo.transform;
+            _shopItemsRoot.anchorMin = new Vector2(0.5f, 0.5f);
+            _shopItemsRoot.anchorMax = new Vector2(0.5f, 0.5f);
+            _shopItemsRoot.pivot = new Vector2(0.5f, 0.5f);
+            _shopItemsRoot.anchoredPosition = Vector2.zero;
+            _shopItemsRoot.sizeDelta = new Vector2(1240f, 720f);
+            CreateButton(_shopPanel, "매물 새로고침 (15골드)", new Vector2(-220, -430), () => { _flow.ShopReroll(); BuildShop(); });
+            CreateButton(_shopPanel, "카드 제거 (첫 카드, 75골드)", new Vector2(220, -430), () => { _flow.ShopRemoveFirstCard(); BuildShop(); });
+            CreateButton(_shopPanel, "나가기", new Vector2(0, -510), () => _flow.OnShopLeave());
 
             // 전투 GO(자체 Canvas, 초기 비활성)
             _combatGo = new GameObject("RunCombat", typeof(CombatController), typeof(CombatView));
@@ -287,19 +294,81 @@ namespace Hwatu.Game
             }
         }
 
-        /// <summary>상점 화면을 현재 매물로 채운다(골드 + 카드명/가격).</summary>
+        /// <summary>상점 화면을 현재 매물(카드·유물·포션)로 채운다 — 개별 구매 버튼 그리드.</summary>
         private void BuildShop()
         {
-            if (_flow.CurrentShopCard == null)
+            _shopText.text = $"골드 {_flow.Run.Gold}    <size=64%>(매물에 마우스를 올리면 효과)</size>";
+
+            var kill = new List<GameObject>();
+            foreach (Transform c in _shopItemsRoot) { kill.Add(c.gameObject); }
+            foreach (GameObject g in kill) { Destroy(g); }
+
+            ShopStock shop = _flow.CurrentShop;
+            if (shop == null) { return; }
+            for (int i = 0; i < shop.Items.Count; i++)
             {
-                _shopText.text = $"골드 {_flow.Run.Gold}\n(매진)";
-                return;
+                ShopItem it = shop.Items[i];
+                int idx = i;
+                bool left = i < 5;            // 좌열 카드5 / 우열 유물·포션
+                int row = left ? i : i - 5;
+                float x = left ? -300f : 300f;
+                float y = 280f - row * 92f;
+                CreateShopButton(it, new Vector2(x, y), () => { if (_flow.BuyShopItem(idx)) { BuildShop(); } });
             }
-            _shopText.text = $"골드 {_flow.Run.Gold}\n매물: <b>{_flow.CurrentShopCard.Name}</b> — {_flow.ShopPrice}골드\n<size=64%>(매물에 마우스를 올리면 효과)</size>";
-            _shopText.raycastTarget = true;
-            var stip = _shopText.gameObject.GetComponent<TooltipTrigger>();
-            if (stip == null) { stip = _shopText.gameObject.AddComponent<TooltipTrigger>(); }
-            stip.Set(GameInfo.CardDesc(_flow.CurrentShopCard));
+        }
+
+        /// <summary>상점 매물 1칸 버튼(종류·이름·가격 + hover 설명, 품절/골드부족 시 비활성).</summary>
+        private void CreateShopButton(ShopItem it, Vector2 pos, Action onClick)
+        {
+            var go = new GameObject("Shop_" + it.DisplayName, typeof(RectTransform), typeof(Image), typeof(Button), typeof(TooltipTrigger));
+            go.transform.SetParent(_shopItemsRoot, false);
+            var rt = (RectTransform)go.transform;
+            rt.anchorMin = new Vector2(0.5f, 0.5f);
+            rt.anchorMax = new Vector2(0.5f, 0.5f);
+            rt.pivot = new Vector2(0.5f, 0.5f);
+            rt.anchoredPosition = pos;
+            rt.sizeDelta = new Vector2(560f, 80f);
+            string kindTag = it.Kind == ShopItemKind.Card ? "카드" : (it.Kind == ShopItemKind.Relic ? "유물" : "포션");
+            bool afford = _flow.Run.Gold >= it.Price && !it.Sold;
+            go.GetComponent<Image>().color = it.Sold
+                ? new Color(0.18f, 0.16f, 0.14f)
+                : (afford ? new Color(0.30f, 0.25f, 0.13f) : new Color(0.24f, 0.15f, 0.13f));
+            var btn = go.GetComponent<Button>();
+            btn.interactable = !it.Sold;
+            btn.onClick.AddListener(() => onClick());
+            go.GetComponent<TooltipTrigger>().Set(ShopItemDesc(it));
+
+            var t = new GameObject("Label", typeof(RectTransform), typeof(TextMeshProUGUI));
+            t.transform.SetParent(rt, false);
+            var tmp = t.GetComponent<TextMeshProUGUI>();
+            tmp.font = _font;
+            tmp.fontSize = 26f;
+            tmp.enableAutoSizing = true;
+            tmp.fontSizeMin = 14f;
+            tmp.fontSizeMax = 26f;
+            tmp.textWrappingMode = TextWrappingModes.NoWrap;
+            tmp.alignment = TextAlignmentOptions.Center;
+            tmp.color = Color.white;
+            tmp.text = it.Sold
+                ? $"[{kindTag}] {it.DisplayName} — 품절"
+                : $"[{kindTag}] {it.DisplayName} — {it.Price}골드";
+            tmp.raycastTarget = false;
+            var lrt = tmp.rectTransform;
+            lrt.anchorMin = Vector2.zero;
+            lrt.anchorMax = Vector2.one;
+            lrt.offsetMin = new Vector2(12f, 0f);
+            lrt.offsetMax = new Vector2(-12f, 0f);
+        }
+
+        /// <summary>매물 종류별 hover 설명(카드/유물/포션).</summary>
+        private string ShopItemDesc(ShopItem it)
+        {
+            switch (it.Kind)
+            {
+                case ShopItemKind.Card: return GameInfo.CardDesc(it.Card);
+                case ShopItemKind.Relic: return GameInfo.RelicDesc(it.Relic);
+                default: return GameInfo.PotionDesc(it.Potion);
+            }
         }
 
         /// <summary>덱 보기 모달을 현재 덱(카드명 ×수량, 이름순)으로 채워 연다.</summary>

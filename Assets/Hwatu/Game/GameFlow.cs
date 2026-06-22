@@ -38,8 +38,7 @@ namespace Hwatu.Game
         public RunState Run { get; private set; }
         public RunPhase Phase { get; private set; }
         public EventData CurrentEvent { get; private set; }   // 이벤트 노드 진입 시 채워짐(RunUI가 읽음)
-        public CardData CurrentShopCard { get; private set; }   // 상점 노드 진입 시 매물 카드
-        public int ShopPrice { get; private set; }
+        public ShopStock CurrentShop { get; private set; }   // 상점 노드 진입 시 생성되는 매물 묶음(카드·유물·포션)
 
         /// <summary>페이즈 전환 시 발생(현재 페이즈 전달).</summary>
         public event Action<RunPhase> OnPhaseChanged;
@@ -104,31 +103,28 @@ namespace Hwatu.Game
             SetPhase(RunPhase.Map);
         }
 
-        /// <summary>상점 매물 카드 구매(골드 충분 시). 후 맵 복귀.</summary>
-        public void OnBuyCard()
+        /// <summary>상점 매물 1칸을 구매한다(골드·포션 슬롯 충분 시). 상점은 유지된다(여러 개 구매 가능).</summary>
+        public bool BuyShopItem(int index)
         {
-            if (CurrentShopCard != null && Run.TrySpend(ShopPrice))
+            if (CurrentShop == null || index < 0 || index >= CurrentShop.Items.Count) { return false; }
+            ShopItem it = CurrentShop.Items[index];
+            if (it.Sold) { return false; }
+            if (it.Kind == ShopItemKind.Potion && Run.Potions.Count >= RunState.MaxPotions) { return false; }
+            if (!Run.TrySpend(it.Price)) { return false; }
+            switch (it.Kind)
             {
-                Run.AddCard(CurrentShopCard);
-                CurrentShopCard = null;
+                case ShopItemKind.Card: Run.AddCard(it.Card); break;
+                case ShopItemKind.Relic: Run.AddRelic(it.Relic); break;
+                case ShopItemKind.Potion: Run.AddPotion(it.Potion); break;
             }
-            SetPhase(RunPhase.Map);
+            it.Sold = true;
+            return true;
         }
 
         /// <summary>상점 나가기.</summary>
         public void OnShopLeave()
         {
             SetPhase(RunPhase.Map);
-        }
-
-        private static int ShopCardPrice(CardRarity rarity)
-        {
-            switch (rarity)
-            {
-                case CardRarity.Rare: return 150;
-                case CardRarity.Uncommon: return 75;
-                default: return 50;
-            }
         }
 
         /// <summary>현재 액트의 맵을 생성한다(맵 전용 RNG 스트림).</summary>
@@ -156,25 +152,13 @@ namespace Hwatu.Game
             return false;
         }
 
-        /// <summary>상점 매물을 골드 15로 새로 뽑는다(STS reroll).</summary>
+        /// <summary>상점 매물 전체를 골드 15로 새로 뽑는다(STS reroll).</summary>
         public void ShopReroll()
         {
             if (Run.TrySpend(15))
             {
                 IRandom rng = new RngStreams(Run.Seed).ForStream("shop_reroll_" + Run.Gold);
-                var pool = CharacterPools.RewardPool(Run.Character.Id);
-                CurrentShopCard = pool[rng.NextInt(pool.Count)];
-                ShopPrice = ShopCardPrice(CurrentShopCard.Rarity);
-            }
-        }
-
-        /// <summary>상점에서 골드 50으로 무작위 포션 1개 구매(슬롯 여유 시).</summary>
-        public void ShopBuyPotion()
-        {
-            if (Run.Potions.Count < RunState.MaxPotions && Run.TrySpend(50))
-            {
-                IRandom rng = new RngStreams(Run.Seed).ForStream("shop_potion_" + Run.Gold);
-                Run.AddPotion(PotionContent.Pick(rng));
+                CurrentShop = ShopStock.Generate(Run, rng);
             }
         }
 
@@ -224,9 +208,7 @@ namespace Hwatu.Game
                     // 상점: 매물 카드 1장(캐릭터 풀에서) + 가격. 구매/나가기는 RunUI.
                     {
                         IRandom shopRng = new RngStreams(Run.Seed).ForStream("shop_" + node.Id);
-                        var pool = Hwatu.Core.Content.CharacterPools.RewardPool(Run.Character.Id);
-                        CurrentShopCard = pool[shopRng.NextInt(pool.Count)];
-                        ShopPrice = ShopCardPrice(CurrentShopCard.Rarity);
+                        CurrentShop = ShopStock.Generate(Run, shopRng);
                     }
                     SetPhase(RunPhase.Shop);
                     break;
