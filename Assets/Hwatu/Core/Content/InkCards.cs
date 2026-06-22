@@ -54,6 +54,13 @@ namespace Hwatu.Core.Content
         public static CardData Veil() => new CardData("ink_veil", "흑무", CardType.Skill, 1, TargetType.Enemy, false,
             new[] { new EffectData(EffectOp.ApplyStatus, amount: 2, target: TargetType.Enemy, status: StatusType.Vulnerable) }, CardRarity.Uncommon);
 
+        public static CardData Gu() => new CardData("ink_gu", "고독", CardType.Skill, 1, TargetType.Enemy, false,
+            new[]
+            {
+                new EffectData(EffectOp.ApplyStatus, amount: 3, target: TargetType.Enemy, status: StatusType.Poison),
+                new EffectData(EffectOp.ApplyStatus, amount: 1, target: TargetType.Enemy, status: StatusType.Weak),
+            }, CardRarity.Uncommon);
+
         // Rare
         public static CardData Plague() => new CardData("ink_plague", "역병", CardType.Skill, 2, TargetType.Enemy, false,
             new[] { new EffectData(EffectOp.ApplyStatus, amount: 8, target: TargetType.Enemy, status: StatusType.Poison) }, CardRarity.Rare);
@@ -100,13 +107,13 @@ namespace Hwatu.Core.Content
             return deck;
         }
 
-        /// <summary>묵귀 보상 풀(14장: Common4/Uncommon6/Rare4).</summary>
+        /// <summary>묵귀 보상 풀(15장: Common4/Uncommon7/Rare4).</summary>
         public static List<CardData> RewardPool()
         {
             return new List<CardData>
             {
                 InkStrike(), Soot(), DarkGuard(), Lacquer(),
-                Seep(), Miasma(), Veil(), Lingering(), ToxicCloud(), Sting(),
+                Seep(), Miasma(), Veil(), Gu(), Lingering(), ToxicCloud(), Sting(),
                 Plague(), Decay(), BlackSpot(), Venom(),
             };
         }
