@@ -482,6 +482,7 @@ namespace Hwatu.Game
             ulong combatSeed = _flow.Run.Seed + (ulong)(_flow.Run.CurrentNodeId + 1);
             _combatCtrl.StartCombat(_flow.Run.Deck, enemy, combatSeed, _flow.Run.MaxHp, _flow.Run.Hp, _flow.Run.Relics);
             _combatView.SetVisible(true);
+            _combatView.ResetForNewCombat();
             _combatView.Refresh();
         }
 
@@ -492,6 +493,13 @@ namespace Hwatu.Game
             {
                 _flow.Run.Hp = s.Player.Hp;
             }
+            StartCoroutine(EndCombatAfterDelay(won));
+        }
+
+        /// <summary>처치 데미지 팝업·승패 연출을 잠깐 보여준 뒤 화면을 전환한다.</summary>
+        private IEnumerator EndCombatAfterDelay(bool won)
+        {
+            yield return new WaitForSeconds(0.7f);
             _combatView.SetVisible(false);
             _flow.OnCombatEnded(won);
         }

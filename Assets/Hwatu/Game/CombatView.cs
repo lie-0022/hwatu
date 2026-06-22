@@ -303,6 +303,20 @@ namespace Hwatu.Game
             go.AddComponent<DamagePopup>().Show(_font, amount, color);
         }
 
+        /// <summary>새 전투 시작 시 호출: 이전 전투의 데미지 팝업 잔존을 제거하고 HP 기준점을 초기화한다.</summary>
+        public void ResetForNewCombat()
+        {
+            var kill = new System.Collections.Generic.List<GameObject>();
+            foreach (Transform c in _root)
+            {
+                if (c.name == "DamagePopup") { kill.Add(c.gameObject); }
+            }
+            foreach (GameObject g in kill) { Destroy(g); }
+            CombatState s = _controller.State;
+            _prevEnemyHp = (s != null && s.Enemies.Count > 0) ? s.Enemies[0].Hp : 0;
+            _prevPlayerHp = s != null ? s.Player.Hp : 0;
+        }
+
         // 손패를 InstanceId로 재사용해 갱신한다(유지 카드는 위치만 트윈, 빠진 카드만 제거, 새 카드만 생성).
         /// <summary>플레이어 status를 칩으로 다시 그린다(active만, hover 설명 — STS2식).</summary>
         private void RebuildStatus(PlayerState p)
