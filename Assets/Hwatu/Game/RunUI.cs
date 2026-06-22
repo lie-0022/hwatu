@@ -516,7 +516,7 @@ namespace Hwatu.Game
             _flow.Run.RareOffset = offset;
             int goldReward = 10 + rng.NextInt(11);   // 전투 골드 보상(STS식 10~20)
             _flow.Run.Gold += goldReward;
-            _rewardTitle.text = $"카드 보상 — 1장 선택 (또는 건너뛰기)   <size=68%>골드 +{goldReward}</size>";
+            _rewardTitle.text = $"카드 보상 — 1장 선택 (또는 건너뛰기)   <size=68%>골드 +{goldReward}{(potion != null ? $" · 포션 +{potion.Name}" : "")}</size>";
 
             const float spacing = 280f;
             float startX = -(reward.Count - 1) * spacing / 2f;
