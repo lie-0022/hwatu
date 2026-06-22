@@ -31,6 +31,7 @@ namespace Hwatu.Game
         private GameObject _mapPanel;
         private GameObject _rewardPanel;
         private RectTransform _rewardCardArea;
+        private TextMeshProUGUI _rewardTitle;
         private GameObject _resultPanel;
         private TextMeshProUGUI _resultText;
         private TextMeshProUGUI _mapHud;
@@ -115,7 +116,7 @@ namespace Hwatu.Game
 
             // 보상(카드 3택1 + 스킵)
             _rewardPanel = CreatePanel(root, "RewardPanel", new Color(0.09f, 0.09f, 0.06f, 0.97f));
-            CreateText(_rewardPanel, "카드 보상 — 1장 선택 (또는 건너뛰기)", 46f, new Vector2(0, 300));
+            _rewardTitle = CreateText(_rewardPanel, "카드 보상 — 1장 선택 (또는 건너뛰기)", 46f, new Vector2(0, 300));
             CreateButton(_rewardPanel, "건너뛰기 (덱 압축)", new Vector2(0, -320), () => _flow.OnRewardDone());
             var areaGo = new GameObject("RewardCards", typeof(RectTransform));
             areaGo.transform.SetParent(_rewardPanel.transform, false);
@@ -507,7 +508,9 @@ namespace Hwatu.Game
                 _flow.Run.AddPotion(potion);
             }
             _flow.Run.RareOffset = offset;
-            _flow.Run.Gold += 10 + rng.NextInt(11);   // 전투 골드 보상(STS식 10~20). 맵 HUD에 반영
+            int goldReward = 10 + rng.NextInt(11);   // 전투 골드 보상(STS식 10~20)
+            _flow.Run.Gold += goldReward;
+            _rewardTitle.text = $"카드 보상 — 1장 선택 (또는 건너뛰기)   <size=68%>골드 +{goldReward}</size>";
 
             const float spacing = 280f;
             float startX = -(reward.Count - 1) * spacing / 2f;
