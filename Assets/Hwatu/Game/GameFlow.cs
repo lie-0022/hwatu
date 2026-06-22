@@ -16,7 +16,8 @@ namespace Hwatu.Game
         BossReward,
         GameOver,
         Victory,
-        Event
+        Event,
+        Rest
     }
 
     /// <summary>
@@ -66,6 +67,20 @@ namespace Hwatu.Game
             SetPhase(RunPhase.Map);
         }
 
+        /// <summary>휴식처 선택: 0=회복(최대HP 30%), 1=덱 첫 카드 강화. 후 맵 복귀.</summary>
+        public void OnRest(int choice)
+        {
+            if (choice == 0)
+            {
+                Run.Heal(Run.MaxHp * 30 / 100);
+            }
+            else if (choice == 1 && Run.Deck.Count > 0)
+            {
+                Run.UpgradeCard(0);
+            }
+            SetPhase(RunPhase.Map);
+        }
+
         /// <summary>현재 액트의 맵을 생성한다(맵 전용 RNG 스트림).</summary>
         public void GenerateActMap()
         {
@@ -86,9 +101,8 @@ namespace Hwatu.Game
                     SetPhase(RunPhase.Combat);
                     break;
                 case NodeType.Rest:
-                    // 휴식: 최대 HP의 30% 회복(STS) 후 맵 복귀.
-                    Run.Hp = System.Math.Min(Run.MaxHp, Run.Hp + Run.MaxHp * 30 / 100);
-                    SetPhase(RunPhase.Map);
+                    // 휴식: 회복/강화 선택 화면으로(적용은 OnRest).
+                    SetPhase(RunPhase.Rest);
                     break;
                 case NodeType.Treasure:
                     // 보물: 유물 1개 자동 획득(중복 제외는 후속).

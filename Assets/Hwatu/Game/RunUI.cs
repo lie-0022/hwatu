@@ -37,6 +37,7 @@ namespace Hwatu.Game
         private GameObject _eventPanel;
         private TextMeshProUGUI _eventText;
         private RectTransform _eventChoiceArea;
+        private GameObject _restPanel;
 
         private MapView _mapView;
         private GameObject _combatGo;
@@ -108,6 +109,12 @@ namespace Hwatu.Game
             _eventChoiceArea = (RectTransform)evAreaGo.transform;
             _eventChoiceArea.anchoredPosition = new Vector2(0, -40);
 
+            // 휴식처(회복/강화 선택)
+            _restPanel = CreatePanel(root, "RestPanel", new Color(0.05f, 0.09f, 0.07f, 0.97f));
+            CreateText(_restPanel, "휴식처", 50f, new Vector2(0, 160));
+            CreateButton(_restPanel, "회복 (HP 30%)", new Vector2(0, 20), () => _flow.OnRest(0));
+            CreateButton(_restPanel, "강화 (첫 카드 +)", new Vector2(0, -60), () => _flow.OnRest(1));
+
             // 전투 GO(자체 Canvas, 초기 비활성)
             _combatGo = new GameObject("RunCombat", typeof(CombatController), typeof(CombatView));
             _combatCtrl = _combatGo.GetComponent<CombatController>();
@@ -124,6 +131,7 @@ namespace Hwatu.Game
             _rewardPanel.SetActive(p == RunPhase.Reward);
             _resultPanel.SetActive(p == RunPhase.GameOver || p == RunPhase.Victory);
             _eventPanel.SetActive(p == RunPhase.Event);
+            _restPanel.SetActive(p == RunPhase.Rest);
             _combatGo.SetActive(p == RunPhase.Combat);
 
             if (p == RunPhase.Map)
