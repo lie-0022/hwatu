@@ -156,6 +156,18 @@ namespace Hwatu.Game
             return false;
         }
 
+        /// <summary>상점 매물을 골드 15로 새로 뽑는다(STS reroll).</summary>
+        public void ShopReroll()
+        {
+            if (Run.TrySpend(15))
+            {
+                IRandom rng = new RngStreams(Run.Seed).ForStream("shop_reroll_" + Run.Gold);
+                var pool = CharacterPools.RewardPool(Run.Character.Id);
+                CurrentShopCard = pool[rng.NextInt(pool.Count)];
+                ShopPrice = ShopCardPrice(CurrentShopCard.Rarity);
+            }
+        }
+
         public void GenerateActMap()
         {
             IRandom rng = new RngStreams(Run.Seed).ForStream("map_act" + Run.Act);
