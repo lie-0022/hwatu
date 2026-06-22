@@ -102,10 +102,32 @@ namespace Hwatu.Game
             {
                 return;
             }
+            int current = _flow.Run.CurrentNodeId;
             HashSet<int> reachable = ReachableNodeIds(map);
             foreach (KeyValuePair<int, Button> kv in _buttons)
             {
-                kv.Value.interactable = reachable.Contains(kv.Key);
+                bool canEnter = reachable.Contains(kv.Key);
+                kv.Value.interactable = canEnter;
+
+                // 현재 위치(노랑 굵은 테두리) / 진입 가능(연한 테두리) / 그 외(없음)
+                var outline = kv.Value.GetComponent<Outline>();
+                if (outline == null) { outline = kv.Value.gameObject.AddComponent<Outline>(); }
+                if (kv.Key == current)
+                {
+                    outline.enabled = true;
+                    outline.effectColor = new Color(1f, 0.9f, 0.3f, 1f);
+                    outline.effectDistance = new Vector2(4f, 4f);
+                }
+                else if (canEnter)
+                {
+                    outline.enabled = true;
+                    outline.effectColor = new Color(0.9f, 0.95f, 1f, 0.7f);
+                    outline.effectDistance = new Vector2(2.5f, 2.5f);
+                }
+                else
+                {
+                    outline.enabled = false;
+                }
             }
         }
 
