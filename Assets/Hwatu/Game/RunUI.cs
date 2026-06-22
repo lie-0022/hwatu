@@ -656,6 +656,10 @@ namespace Hwatu.Game
             var tmp = t.GetComponent<TextMeshProUGUI>();
             tmp.font = _font;
             tmp.fontSize = 30f;
+            tmp.enableAutoSizing = true;   // 긴 라벨(캐릭터 선택·휴식 옵션 등)을 버튼 안에 1줄로 맞춤
+            tmp.fontSizeMin = 16f;
+            tmp.fontSizeMax = 30f;
+            tmp.textWrappingMode = TextWrappingModes.NoWrap;
             tmp.alignment = TextAlignmentOptions.Center;
             tmp.color = Color.white;
             tmp.text = label;
