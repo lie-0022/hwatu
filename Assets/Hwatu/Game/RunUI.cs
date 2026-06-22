@@ -96,6 +96,10 @@ namespace Hwatu.Game
             _mapView = _mapPanel.AddComponent<MapView>();
             _mapView.Init(_flow, _font, _mapPanel.GetComponent<RectTransform>());
             _mapHud = CreateText(_mapPanel, "", 30f, new Vector2(0, 320));
+            _mapHud.rectTransform.anchorMin = new Vector2(0.5f, 1f);
+            _mapHud.rectTransform.anchorMax = new Vector2(0.5f, 1f);
+            _mapHud.rectTransform.anchoredPosition = new Vector2(0f, -28f);
+            _mapHud.rectTransform.sizeDelta = new Vector2(1100f, 48f);
             CreateButton(_mapPanel, "덱 보기", new Vector2(720, 320), () => OpenDeckView());
 
             // 덱 보기 모달(맵 위 오버레이 — 버튼으로 열고 닫음)
