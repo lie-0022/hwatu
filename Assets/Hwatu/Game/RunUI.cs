@@ -419,10 +419,10 @@ namespace Hwatu.Game
             foreach (Transform c in parent) { kill.Add(c.gameObject); }
             foreach (GameObject g in kill) { Destroy(g); }
 
-            int cols = cards.Count > 18 ? 8 : 6;
-            float scale = cards.Count > 18 ? 0.48f : 0.62f;
-            float cw = (200f * scale) + 24f;
-            float ch = (280f * scale) + 18f;
+            int cols = 5;                                            // 한 줄에 5장
+            float scale = cards.Count > 15 ? 0.54f : 0.66f;
+            float cw = (200f * scale) + 30f;
+            float ch = (280f * scale) + 22f;
             float x0 = -(cols - 1) / 2f * cw;
             float y0 = (parent.sizeDelta.y / 2f) - (ch / 2f) - 6f;
             for (int i = 0; i < cards.Count; i++)
@@ -435,6 +435,7 @@ namespace Hwatu.Game
                 var cv = go.AddComponent<CardView>();
                 cv.Build(_font);
                 cv.Bind(new CardInstance(cards[i], i), true);
+                cv.enabled = false;   // 손패 트윈 Update 비활성 — 모달은 정적 배치(안 끄면 전부 중앙으로 모이고 스케일이 덮어써짐)
                 var rt = (RectTransform)go.transform;
                 rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
                 rt.pivot = new Vector2(0.5f, 0.5f);
