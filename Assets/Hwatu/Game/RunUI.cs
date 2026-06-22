@@ -333,7 +333,8 @@ namespace Hwatu.Game
                 int col = i % 6;
                 int row = i / 6;
                 var pos = new Vector2(-750f + col * 300f, 330f - row * 80f);
-                CreateButton(_upgradeCardArea, deck[i].Name, pos, () => UpgradeAndClose(idx));
+                var ubtn = CreateButton(_upgradeCardArea, deck[i].Name, pos, () => UpgradeAndClose(idx));
+                ubtn.gameObject.AddComponent<TooltipTrigger>().Set(GameInfo.CardDesc(deck[idx]));
             }
             _upgradePanel.SetActive(true);
             _upgradePanel.transform.SetAsLastSibling();
