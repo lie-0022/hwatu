@@ -113,6 +113,13 @@ namespace Hwatu.Game
         }
 
         /// <summary>현재 액트의 맵을 생성한다(맵 전용 RNG 스트림).</summary>
+        /// <summary>휴식에서 선택한 덱 카드를 강화하고 맵으로 돌아간다.</summary>
+        public void RestUpgradeCard(int index)
+        {
+            Run.UpgradeCard(index);
+            SetPhase(RunPhase.Map);
+        }
+
         public void GenerateActMap()
         {
             IRandom rng = new RngStreams(Run.Seed).ForStream("map_act" + Run.Act);
