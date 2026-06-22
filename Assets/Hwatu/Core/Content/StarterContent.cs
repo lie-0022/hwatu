@@ -50,6 +50,19 @@ namespace Hwatu.Core.Content
             EnemyAiKind.Sequence,
             new[] { "swipe", "swipe", "guard" });
 
+        // 일반: 멧돼지 — 씩씩대기(자버프 광+2)→들이받기(공10, 강화 시 12). 화투 7월 홍싸리 멧돼지
+        public static EnemyData Boar() => new EnemyData(
+            "boar", "멧돼지", 20, 26,
+            new[]
+            {
+                new EnemyMoveData("gore", IntentType.Attack, 10,
+                    new[] { new EffectData(EffectOp.DealDamage, amount: 10, target: TargetType.Enemy) }),
+                new EnemyMoveData("snort", IntentType.Buff, 0,
+                    new[] { new EffectData(EffectOp.ApplyStatus, amount: 2, target: TargetType.Self, status: StatusType.Radiance) }),
+            },
+            EnemyAiKind.Sequence,
+            new[] { "snort", "gore", "gore" });
+
         // 보스: 달그림자 도깨비 — 1페이즈 [강타13/광폭9/방벽12], HP 50%↓ 2페이즈 광폭화 [월식18/강타13/광폭9]
         public static EnemyData DokkaebiBoss() => new EnemyData(
             "dokkaebi_boss", "달그림자 도깨비", 45, 55,
