@@ -421,7 +421,8 @@ namespace Hwatu.Game
             {
                 PotionData potion = potions[i];
                 var pos = new Vector2(-840f, 380f - i * 90f);
-                CreateButton(_potionBarGo, potion.Name, pos, () => UsePotionInCombat(potion));
+                var pbtn = CreateButton(_potionBarGo, potion.Name, pos, () => UsePotionInCombat(potion));
+                pbtn.gameObject.AddComponent<TooltipTrigger>().Set(GameInfo.PotionDesc(potion));
             }
         }
 
