@@ -63,6 +63,23 @@ namespace Hwatu.Core.Content
             EnemyAiKind.Sequence,
             new[] { "snort", "gore", "gore" });
 
+        // 일반: 두꺼비 — 웅크리기(방어10)→독침(공5+중독2). 방어/독 지구전형
+        public static EnemyData Toad() => new EnemyData(
+            "toad", "두꺼비", 24, 30,
+            new[]
+            {
+                new EnemyMoveData("crouch", IntentType.Block, 10,
+                    new[] { new EffectData(EffectOp.GainBlock, amount: 10, target: TargetType.Self) }),
+                new EnemyMoveData("venomspit", IntentType.Attack, 5,
+                    new[]
+                    {
+                        new EffectData(EffectOp.DealDamage, amount: 5, target: TargetType.Enemy),
+                        new EffectData(EffectOp.ApplyStatus, amount: 2, target: TargetType.Enemy, status: StatusType.Poison),
+                    }),
+            },
+            EnemyAiKind.Sequence,
+            new[] { "crouch", "venomspit", "venomspit" });
+
         // 보스: 달그림자 도깨비 — 1페이즈 [강타13/광폭9/방벽12], HP 50%↓ 2페이즈 광폭화 [월식18/강타13/광폭9]
         public static EnemyData DokkaebiBoss() => new EnemyData(
             "dokkaebi_boss", "달그림자 도깨비", 45, 55,

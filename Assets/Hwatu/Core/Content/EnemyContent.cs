@@ -22,14 +22,15 @@ namespace Hwatu.Core.Content
                          : el == 1 ? StarterContent.CyclopsOni()
                          : StarterContent.Serpent();
                 default:
-                    int i = rng.NextInt(7);
+                    int i = rng.NextInt(8);
                     return i == 0 ? StarterContent.DokkaebiMinion()
                          : i == 1 ? StarterContent.Crows()
                          : i == 2 ? StarterContent.Scarecrow()
                          : i == 3 ? StarterContent.WillOWisp()
                          : i == 4 ? StarterContent.Jangseung()
                          : i == 5 ? StarterContent.Geuseundae()
-                         : StarterContent.Boar();
+                         : i == 6 ? StarterContent.Boar()
+                         : StarterContent.Toad();
             }
         }
     }
