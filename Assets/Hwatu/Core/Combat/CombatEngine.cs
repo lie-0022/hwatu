@@ -235,6 +235,7 @@ namespace Hwatu.Core.Combat
                 }
                 State.Hand.RemoveAt(i);
             }
+            DecayDebuffs(State.Player);   // 플레이어 턴 종료 — 약화·취약 1 감소
         }
 
         private void EnemyTurn()
@@ -285,6 +286,7 @@ namespace Hwatu.Core.Combat
 
                 enemy.Ai.Advance();
                 enemy.RefreshIntent(); // 다음 턴에 보여줄 의도 갱신
+                DecayDebuffs(enemy);    // 적 턴 종료 — 약화·취약 1 감소
             }
         }
 
@@ -297,6 +299,13 @@ namespace Hwatu.Core.Combat
                 c.SetHp(System.Math.Max(0, c.Hp - p));
                 c.AddStatus(StatusType.Poison, -1);
             }
+        }
+
+        // Weak·Vulnerable 등 지속 턴 디버프는 그 대상의 턴 종료 시 1씩 감소(STS 규칙).
+        private static void DecayDebuffs(ICombatant c)
+        {
+            if (c.GetStatus(StatusType.Weak) > 0) { c.AddStatus(StatusType.Weak, -1); }
+            if (c.GetStatus(StatusType.Vulnerable) > 0) { c.AddStatus(StatusType.Vulnerable, -1); }
         }
 
         private void CheckDeath()
