@@ -82,6 +82,12 @@ namespace Hwatu.Game
             CheckEnd();
         }
 
+        /// <summary>전투 중 포션 사용(즉시 효과). 성공 시 true.</summary>
+        public bool UsePotion(Hwatu.Core.Run.PotionData potion)
+        {
+            return _engine != null && _engine.UsePotion(potion);
+        }
+
         /// <summary>자동 phase를 PlayerAction(또는 전투 종료)까지 진행.</summary>
         private void AdvanceToInput()
         {
