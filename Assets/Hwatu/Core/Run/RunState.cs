@@ -101,6 +101,15 @@ namespace Hwatu.Core.Run
             }
         }
 
+        /// <summary>덱 카드에 인챈트를 영구 적용(STS2 Enchantments식).</summary>
+        public void EnchantCard(int index, string enchant)
+        {
+            if (index >= 0 && index < Deck.Count)
+            {
+                Deck[index] = Deck[index].WithEnchant(enchant);
+            }
+        }
+
         /// <summary>HP 회복(최대 초과 안 함).</summary>
         public void Heal(int amount)
         {

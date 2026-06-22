@@ -26,9 +26,18 @@ namespace Hwatu.Core.Content
                 new EventChoice("거절한다", "도깨비가 연기처럼 사라진다.", run => { }),
             });
 
+        public static EventData Forge() => new EventData(
+            "forge", "오래된 대장간", "식지 않은 화로가 손에 든 카드를 벼릴 수 있다.",
+            new[]
+            {
+                new EventChoice("첫 카드를 벼린다 (공격/방어 +2 영구)", "쇳소리와 함께 날이 선다.",
+                    run => run.EnchantCard(0, "sharp")),
+                new EventChoice("그냥 지나간다", "화로가 식어간다.", run => { }),
+            });
+
         public static List<EventData> All()
         {
-            return new List<EventData> { Spring(), Bargain() };
+            return new List<EventData> { Spring(), Bargain(), Forge() };
         }
 
         /// <summary>시드로 이벤트 1개 선택.</summary>

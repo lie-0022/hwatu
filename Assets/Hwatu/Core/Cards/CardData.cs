@@ -50,5 +50,21 @@ namespace Hwatu.Core.Cards
             }
             return new CardData(Id + "+", Name + "+", Type, Cost, Target, Exhaust, up, Rarity, Retain, Innate, Ethereal);
         }
+
+        /// <summary>인챈트를 영구 적용한 복제본(STS2 Enchantments식). sharp=공격/방어 +2, brittle=소멸 부여.</summary>
+        public CardData WithEnchant(string enchant)
+        {
+            var list = new System.Collections.Generic.List<EffectData>(Effects.Count);
+            bool sharp = enchant == "sharp";
+            for (int i = 0; i < Effects.Count; i++)
+            {
+                EffectData e = Effects[i];
+                int amt = (sharp && (e.Op == EffectOp.DealDamage || e.Op == EffectOp.GainBlock)) ? e.Amount + 2 : e.Amount;
+                list.Add(new EffectData(e.Op, amt, e.Target, e.Status, e.Resource));
+            }
+            bool exhaust = Exhaust || enchant == "brittle";
+            string mark = sharp ? " ✦" : " ✷";
+            return new CardData(Id + "_e", Name + mark, Type, Cost, Target, exhaust, list, Rarity, Retain, Innate, Ethereal);
+        }
     }
 }
