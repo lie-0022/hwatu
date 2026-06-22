@@ -51,6 +51,7 @@ namespace Hwatu.Game
         private GameObject _upgradePanel;
         private GameObject _upgradeCardArea;
         private GameObject _relicBarGo;
+        private GameObject _neowPanel;
 
         private void Start()
         {
@@ -100,6 +101,14 @@ namespace Hwatu.Game
             _deckText.alignment = TextAlignmentOptions.Top;
             CreateButton(_deckPanel, "닫기", new Vector2(0, -440), () => CloseDeckView());
             _deckPanel.SetActive(false);
+
+            // 시작 축복(Neow) — 캐릭터 선택 직후 보너스 택1
+            _neowPanel = CreatePanel(root, "NeowPanel", new Color(0.06f, 0.05f, 0.12f, 1f));
+            CreateText(_neowPanel, "시작 축복 — 하나 선택", 50f, new Vector2(0, 180));
+            CreateButton(_neowPanel, "최대 체력 +8", new Vector2(0, 60), () => _flow.ApplyNeowBoon(0));
+            CreateButton(_neowPanel, "골드 +100", new Vector2(0, -20), () => _flow.ApplyNeowBoon(1));
+            CreateButton(_neowPanel, "유물 1개 획득", new Vector2(0, -100), () => _flow.ApplyNeowBoon(2));
+            _neowPanel.SetActive(false);
 
             // 보상(카드 3택1 + 스킵)
             _rewardPanel = CreatePanel(root, "RewardPanel", new Color(0.09f, 0.09f, 0.06f, 0.97f));
@@ -190,6 +199,7 @@ namespace Hwatu.Game
         private void OnPhaseChanged(RunPhase p)
         {
             _menuPanel.SetActive(p == RunPhase.MainMenu);
+            _neowPanel.SetActive(p == RunPhase.NeowBoon);
             _charPanel.SetActive(p == RunPhase.CharacterSelect);
             _mapPanel.SetActive(p == RunPhase.Map);
             _deckPanel.SetActive(false);

@@ -60,7 +60,7 @@ namespace Hwatu.Game
         {
             Run = new RunState(character, _seed);
             GenerateActMap();
-            SetPhase(RunPhase.Map);
+            SetPhase(RunPhase.NeowBoon);
         }
 
         /// <summary>런 시작 보너스(Neow) 적용 후 맵으로. 0=최대HP+8, 1=골드+100, 2=유물 1개.</summary>
