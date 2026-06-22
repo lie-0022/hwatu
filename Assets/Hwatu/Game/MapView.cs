@@ -168,6 +168,10 @@ namespace Hwatu.Game
             var t = label.GetComponent<TextMeshProUGUI>();
             t.font = _font;
             t.fontSize = 18f;
+            t.enableAutoSizing = true;   // "엘리트" 등 긴 라벨을 노드(56px) 안에 맞게 축소
+            t.fontSizeMin = 11f;
+            t.fontSizeMax = 18f;
+            t.textWrappingMode = TextWrappingModes.NoWrap;
             t.alignment = TextAlignmentOptions.Center;
             t.color = Color.white;
             t.text = NodeLabel(n.Type);
