@@ -498,6 +498,9 @@ namespace Hwatu.Game
 
             var txt = CreateText(rt, "Label", Vector2.zero, Vector2.one, Vector2.zero, 22, TextAlignmentOptions.Center);
             txt.rectTransform.sizeDelta = Vector2.zero;
+            txt.enableAutoSizing = true;   // 긴 버튼 라벨도 버튼 안에 맞춤
+            txt.fontSizeMin = 13f;
+            txt.fontSizeMax = 22f;
             txt.text = label;
             return go.GetComponent<Button>();
         }
