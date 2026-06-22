@@ -38,6 +38,8 @@ namespace Hwatu.Game
         private TextMeshProUGUI _eventText;
         private RectTransform _eventChoiceArea;
         private GameObject _restPanel;
+        private GameObject _shopPanel;
+        private TextMeshProUGUI _shopText;
 
         private MapView _mapView;
         private GameObject _combatGo;
@@ -115,6 +117,13 @@ namespace Hwatu.Game
             CreateButton(_restPanel, "회복 (HP 30%)", new Vector2(0, 20), () => _flow.OnRest(0));
             CreateButton(_restPanel, "강화 (첫 카드 +)", new Vector2(0, -60), () => _flow.OnRest(1));
 
+            // 상점(매물 카드 1 + 구매/나가기)
+            _shopPanel = CreatePanel(root, "ShopPanel", new Color(0.10f, 0.08f, 0.04f, 0.97f));
+            CreateText(_shopPanel, "상점", 50f, new Vector2(0, 180));
+            _shopText = CreateText(_shopPanel, "", 32f, new Vector2(0, 50));
+            CreateButton(_shopPanel, "구매", new Vector2(0, -50), () => _flow.OnBuyCard());
+            CreateButton(_shopPanel, "나가기", new Vector2(0, -130), () => _flow.OnShopLeave());
+
             // 전투 GO(자체 Canvas, 초기 비활성)
             _combatGo = new GameObject("RunCombat", typeof(CombatController), typeof(CombatView));
             _combatCtrl = _combatGo.GetComponent<CombatController>();
@@ -132,6 +141,7 @@ namespace Hwatu.Game
             _resultPanel.SetActive(p == RunPhase.GameOver || p == RunPhase.Victory);
             _eventPanel.SetActive(p == RunPhase.Event);
             _restPanel.SetActive(p == RunPhase.Rest);
+            _shopPanel.SetActive(p == RunPhase.Shop);
             _combatGo.SetActive(p == RunPhase.Combat);
 
             if (p == RunPhase.Map)
@@ -142,6 +152,10 @@ namespace Hwatu.Game
             else if (p == RunPhase.Event)
             {
                 BuildEvent();
+            }
+            else if (p == RunPhase.Shop)
+            {
+                BuildShop();
             }
             else if (p == RunPhase.Reward)
             {
@@ -179,6 +193,17 @@ namespace Hwatu.Game
                 int idx = i;
                 CreateButton(_eventChoiceArea.gameObject, ev.Choices[i].Label, new Vector2(0, -i * 70), () => _flow.OnEventChoice(idx));
             }
+        }
+
+        /// <summary>상점 화면을 현재 매물로 채운다(골드 + 카드명/가격).</summary>
+        private void BuildShop()
+        {
+            if (_flow.CurrentShopCard == null)
+            {
+                _shopText.text = $"골드 {_flow.Run.Gold}\n(매진)";
+                return;
+            }
+            _shopText.text = $"골드 {_flow.Run.Gold}\n매물: <b>{_flow.CurrentShopCard.Name}</b> — {_flow.ShopPrice}골드";
         }
 
         // CombatView.Start(BuildUI)가 끝난 다음 프레임에 런 덱으로 전투 시작.
