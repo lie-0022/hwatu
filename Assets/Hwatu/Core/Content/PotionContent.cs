@@ -23,9 +23,12 @@ namespace Hwatu.Core.Content
         public static PotionData Heal() => new PotionData("pot_heal", "회복약", "HP 15 회복.",
             p => p.SetHp(System.Math.Min(p.MaxHp, p.Hp + 15)));
 
+        public static PotionData Valor() => new PotionData("pot_valor", "강심약", "광 +3, 방어 +6.",
+            p => { p.AddStatus(StatusType.Radiance, 3); p.SetBlock(p.Block + 6); });
+
         public static List<PotionData> All()
         {
-            return new List<PotionData> { Strength(), Block(), Swift(), Antidote(), Heal() };
+            return new List<PotionData> { Strength(), Block(), Swift(), Antidote(), Heal(), Valor() };
         }
 
         /// <summary>시드로 포션 1개 선택.</summary>
