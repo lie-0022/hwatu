@@ -50,10 +50,14 @@ namespace Hwatu.Game
         private GameObject _potionBarGo;
         private GameObject _deckPanel;
         private TextMeshProUGUI _deckText;
+        private RectTransform _deckGridArea;
         private GameObject _upgradePanel;
         private GameObject _upgradeCardArea;
         private bool _isEnchant;
         private TextMeshProUGUI _upgradeTitle;
+        private GameObject _removePanel;
+        private GameObject _removeCardArea;
+        private TextMeshProUGUI _removeTitle;
         private GameObject _relicBarGo;
         private GameObject _neowPanel;
 
@@ -105,11 +109,15 @@ namespace Hwatu.Game
 
             // 덱 보기 모달(맵 위 오버레이 — 버튼으로 열고 닫음)
             _deckPanel = CreatePanel(root, "DeckPanel", new Color(0.05f, 0.05f, 0.08f, 0.98f));
-            CreateText(_deckPanel, "보유 덱", 50f, new Vector2(0, 430));
-            _deckText = CreateText(_deckPanel, "", 30f, new Vector2(0, 0));
-            _deckText.rectTransform.sizeDelta = new Vector2(900f, 740f);
-            _deckText.alignment = TextAlignmentOptions.Top;
-            CreateButton(_deckPanel, "닫기", new Vector2(0, -440), () => CloseDeckView());
+            _deckText = CreateText(_deckPanel, "보유 덱", 44f, new Vector2(0, 470));
+            var deckGrid = new GameObject("DeckGrid", typeof(RectTransform));
+            deckGrid.transform.SetParent(_deckPanel.transform, false);
+            _deckGridArea = (RectTransform)deckGrid.transform;
+            _deckGridArea.anchorMin = _deckGridArea.anchorMax = new Vector2(0.5f, 0.5f);
+            _deckGridArea.pivot = new Vector2(0.5f, 0.5f);
+            _deckGridArea.anchoredPosition = new Vector2(0, -10);
+            _deckGridArea.sizeDelta = new Vector2(1040f, 770f);
+            CreateButton(_deckPanel, "닫기", new Vector2(0, -470), () => CloseDeckView());
             _deckPanel.SetActive(false);
 
             // 시작 축복(Neow) — 캐릭터 선택 직후 보너스 택1
@@ -160,9 +168,28 @@ namespace Hwatu.Game
             _upgradeTitle = CreateText(_upgradePanel, "강화할 카드 선택", 50f, new Vector2(0, 460));
             var upArea = new GameObject("UpgradeCardArea", typeof(RectTransform));
             upArea.transform.SetParent(_upgradePanel.transform, false);
+            var upRt = (RectTransform)upArea.transform;
+            upRt.anchorMin = upRt.anchorMax = new Vector2(0.5f, 0.5f);
+            upRt.pivot = new Vector2(0.5f, 0.5f);
+            upRt.anchoredPosition = new Vector2(0, -20);
+            upRt.sizeDelta = new Vector2(1040f, 770f);
             _upgradeCardArea = upArea;
             CreateButton(_upgradePanel, "취소", new Vector2(0, -470), () => CloseUpgradeView());
             _upgradePanel.SetActive(false);
+
+            // 카드 제거 선택 모달(상점 위 오버레이) — 덱을 카드 형태로 띄워 1장 골라 삭제
+            _removePanel = CreatePanel(root, "RemovePanel", new Color(0.09f, 0.05f, 0.05f, 0.98f));
+            _removeTitle = CreateText(_removePanel, "제거할 카드 선택", 46f, new Vector2(0, 470));
+            var rmArea = new GameObject("RemoveCardArea", typeof(RectTransform));
+            rmArea.transform.SetParent(_removePanel.transform, false);
+            var rmRt = (RectTransform)rmArea.transform;
+            rmRt.anchorMin = rmRt.anchorMax = new Vector2(0.5f, 0.5f);
+            rmRt.pivot = new Vector2(0.5f, 0.5f);
+            rmRt.anchoredPosition = new Vector2(0, -10);
+            rmRt.sizeDelta = new Vector2(1040f, 770f);
+            _removeCardArea = rmArea;
+            CreateButton(_removePanel, "취소", new Vector2(0, -470), () => CloseRemoveView());
+            _removePanel.SetActive(false);
 
             // 상점(STS2식 다중 매물: 카드·유물·포션 동시 진열 + 개별 구매)
             _shopPanel = CreatePanel(root, "ShopPanel", new Color(0.10f, 0.08f, 0.04f, 0.97f));
@@ -177,7 +204,7 @@ namespace Hwatu.Game
             _shopItemsRoot.anchoredPosition = Vector2.zero;
             _shopItemsRoot.sizeDelta = new Vector2(1240f, 720f);
             CreateButton(_shopPanel, "매물 새로고침 (15골드)", new Vector2(-220, -430), () => { _flow.ShopReroll(); BuildShop(); });
-            CreateButton(_shopPanel, "카드 제거 (첫 카드, 75골드)", new Vector2(220, -430), () => { _flow.ShopRemoveFirstCard(); BuildShop(); });
+            CreateButton(_shopPanel, "카드 제거 (75골드)", new Vector2(220, -430), () => OpenRemoveView());
             CreateButton(_shopPanel, "나가기", new Vector2(0, -510), () => _flow.OnShopLeave());
 
             // 전투 GO(자체 Canvas, 초기 비활성)
@@ -229,6 +256,7 @@ namespace Hwatu.Game
             _eventPanel.SetActive(p == RunPhase.Event);
             _restPanel.SetActive(p == RunPhase.Rest);
             _upgradePanel.SetActive(false);
+            _removePanel.SetActive(false);
             _shopPanel.SetActive(p == RunPhase.Shop);
             _combatGo.SetActive(p == RunPhase.Combat);
             _potionBarGo.SetActive(p == RunPhase.Combat);
@@ -371,36 +399,57 @@ namespace Hwatu.Game
             }
         }
 
-        /// <summary>덱 보기 모달을 현재 덱(카드명 ×수량, 이름순)으로 채워 연다.</summary>
+        /// <summary>덱 보기 모달을 현재 덱 카드(카드 형태 그리드)로 채워 연다.</summary>
         private void OpenDeckView()
         {
             if (_flow.Run == null)
             {
                 return;
             }
-            var counts = new Dictionary<string, int>();
-            var order = new List<string>();
-            foreach (CardData c in _flow.Run.Deck)
-            {
-                if (counts.TryGetValue(c.Name, out int n))
-                {
-                    counts[c.Name] = n + 1;
-                }
-                else
-                {
-                    counts[c.Name] = 1;
-                    order.Add(c.Name);
-                }
-            }
-            order.Sort();
-            string text = $"총 {_flow.Run.Deck.Count}장\n\n";
-            foreach (string name in order)
-            {
-                text += $"{name} ×{counts[name]}\n";
-            }
-            _deckText.text = text;
+            _deckText.text = $"보유 덱 — 총 {_flow.Run.Deck.Count}장";
+            PopulateCardGrid(_deckGridArea, _flow.Run.Deck, null, null);
             _deckPanel.SetActive(true);
             _deckPanel.transform.SetAsLastSibling();
+        }
+
+        /// <summary>부모에 덱 카드들을 CardView로 그리드 배치한다(축소 스케일, 클릭·hover 옵션). 카드에 이름·효과가 그려진다.</summary>
+        private void PopulateCardGrid(RectTransform parent, List<CardData> cards, Action<int> onClick, Func<CardData, string> hover)
+        {
+            var kill = new List<GameObject>();
+            foreach (Transform c in parent) { kill.Add(c.gameObject); }
+            foreach (GameObject g in kill) { Destroy(g); }
+
+            int cols = cards.Count > 18 ? 8 : 6;
+            float scale = cards.Count > 18 ? 0.48f : 0.62f;
+            float cw = (200f * scale) + 24f;
+            float ch = (280f * scale) + 18f;
+            float x0 = -(cols - 1) / 2f * cw;
+            float y0 = (parent.sizeDelta.y / 2f) - (ch / 2f) - 6f;
+            for (int i = 0; i < cards.Count; i++)
+            {
+                int idx = i;
+                int col = i % cols;
+                int row = i / cols;
+                var go = new GameObject("DeckCard", typeof(RectTransform));
+                go.transform.SetParent(parent, false);
+                var cv = go.AddComponent<CardView>();
+                cv.Build(_font);
+                cv.Bind(new CardInstance(cards[i], i), true);
+                var rt = (RectTransform)go.transform;
+                rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
+                rt.pivot = new Vector2(0.5f, 0.5f);
+                rt.localScale = new Vector3(scale, scale, 1f);
+                rt.anchoredPosition = new Vector2(x0 + col * cw, y0 - row * ch);
+                if (hover != null)
+                {
+                    go.AddComponent<TooltipTrigger>().Set(hover(cards[idx]));
+                }
+                if (onClick != null)
+                {
+                    var btn = go.AddComponent<Button>();
+                    btn.onClick.AddListener(() => onClick(idx));
+                }
+            }
         }
 
         /// <summary>덱 보기 모달을 닫는다.</summary>
@@ -409,36 +458,56 @@ namespace Hwatu.Game
             _deckPanel.SetActive(false);
         }
 
+        /// <summary>카드 제거 모달을 연다 — 덱을 카드 형태로 띄워 1장 골라 삭제(상점, 골드 소모).</summary>
+        private void OpenRemoveView()
+        {
+            if (_flow.Run == null) { return; }
+            int cost = _flow.CurrentShop != null ? _flow.CurrentShop.RemoveCost : 75;
+            bool used = _flow.CurrentShop != null && _flow.CurrentShop.RemoveUsed;
+            _removeTitle.text = used ? "이미 이 상점에서 카드를 제거했습니다" : $"제거할 카드 선택 — {cost}골드";
+            PopulateCardGrid((RectTransform)_removeCardArea.transform, _flow.Run.Deck, idx => RemoveAndClose(idx), c => GameInfo.CardDesc(c));
+            _removePanel.SetActive(true);
+            _removePanel.transform.SetAsLastSibling();
+        }
+
+        /// <summary>선택 카드를 제거하고(성공 시) 모달을 닫고 상점을 갱신한다.</summary>
+        private void RemoveAndClose(int index)
+        {
+            if (_flow.ShopRemoveCardAt(index))
+            {
+                _removePanel.SetActive(false);
+                BuildShop();
+            }
+        }
+
+        /// <summary>카드 제거 모달을 닫는다.</summary>
+        private void CloseRemoveView()
+        {
+            _removePanel.SetActive(false);
+        }
+
         /// <summary>강화할 카드를 덱에서 고르는 모달을 연다(카드별 버튼 6열 그리드).</summary>
         private void OpenUpgradeView(bool enchant)
         {
             _isEnchant = enchant;
-            _upgradeTitle.text = enchant ? "벼릴 카드 선택 (예리)" : "강화할 카드 선택";
+            _upgradeTitle.text = enchant
+                ? "벼릴 카드 선택 (예리) — 카드에 마우스를 올리면 강화 후 효과"
+                : "강화할 카드 선택 — 카드에 마우스를 올리면 강화 후 효과";
             if (_flow.Run == null)
             {
                 return;
             }
-            var existing = new List<GameObject>();
-            foreach (Transform child in _upgradeCardArea.transform)
-            {
-                existing.Add(child.gameObject);
-            }
-            foreach (GameObject go in existing)
-            {
-                Destroy(go);
-            }
-            var deck = _flow.Run.Deck;
-            for (int i = 0; i < deck.Count; i++)
-            {
-                int idx = i;
-                int col = i % 6;
-                int row = i / 6;
-                var pos = new Vector2(-750f + col * 300f, 330f - row * 80f);
-                var ubtn = CreateButton(_upgradeCardArea, deck[i].Name, pos, () => UpgradeAndClose(idx));
-                ubtn.gameObject.AddComponent<TooltipTrigger>().Set(GameInfo.CardDesc(deck[idx]));
-            }
+            PopulateCardGrid((RectTransform)_upgradeCardArea.transform, _flow.Run.Deck, idx => UpgradeAndClose(idx), EnchantPreviewDesc);
             _upgradePanel.SetActive(true);
             _upgradePanel.transform.SetAsLastSibling();
+        }
+
+        /// <summary>강화/벼리기 시 카드가 어떻게 바뀌는지 — 지금 효과와 강화 후 효과를 함께 보여준다.</summary>
+        private string EnchantPreviewDesc(CardData card)
+        {
+            CardData after = _isEnchant ? card.WithEnchant("sharp") : card.Upgrade();
+            string label = _isEnchant ? "벼린 후 (예리)" : "강화 후";
+            return $"<b>지금</b>\n{GameInfo.CardDesc(card)}\n\n<b>→ {label}</b>\n{GameInfo.CardDesc(after)}";
         }
 
         /// <summary>선택 카드를 강화하고 모달을 닫는다(휴식 종료 → 맵).</summary>

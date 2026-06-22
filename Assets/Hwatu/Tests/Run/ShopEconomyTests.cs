@@ -43,5 +43,24 @@ namespace Hwatu.Tests.Run
             Assert.IsTrue(run.RemoveCard(run.Deck[0]));
             Assert.AreEqual(before - 1, run.Deck.Count);
         }
+
+        [Test]
+        public void RemoveCardAt_RemovesThatIndex()
+        {
+            var run = new RunState(CharacterData.Luminary(), 1);   // 시작 덱 10
+            int before = run.Deck.Count;
+            Assert.IsTrue(run.RemoveCardAt(2));
+            Assert.AreEqual(before - 1, run.Deck.Count);
+        }
+
+        [Test]
+        public void RemoveCardAt_OutOfRange_ReturnsFalse()
+        {
+            var run = new RunState(CharacterData.Luminary(), 1);
+            int before = run.Deck.Count;
+            Assert.IsFalse(run.RemoveCardAt(-1));
+            Assert.IsFalse(run.RemoveCardAt(999));
+            Assert.AreEqual(before, run.Deck.Count);
+        }
     }
 }

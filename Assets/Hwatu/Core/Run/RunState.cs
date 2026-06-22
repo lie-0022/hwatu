@@ -92,6 +92,17 @@ namespace Hwatu.Core.Run
             return Deck.Remove(card);
         }
 
+        /// <summary>덱의 index 카드를 제거(상점 선택 제거). 성공 시 true.</summary>
+        public bool RemoveCardAt(int index)
+        {
+            if (index >= 0 && index < Deck.Count)
+            {
+                Deck.RemoveAt(index);
+                return true;
+            }
+            return false;
+        }
+
         /// <summary>덱의 index 카드를 업그레이드(휴식 Smith).</summary>
         public void UpgradeCard(int index)
         {
