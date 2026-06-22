@@ -282,7 +282,11 @@ namespace Hwatu.Game
                 _shopText.text = $"골드 {_flow.Run.Gold}\n(매진)";
                 return;
             }
-            _shopText.text = $"골드 {_flow.Run.Gold}\n매물: <b>{_flow.CurrentShopCard.Name}</b> — {_flow.ShopPrice}골드";
+            _shopText.text = $"골드 {_flow.Run.Gold}\n매물: <b>{_flow.CurrentShopCard.Name}</b> — {_flow.ShopPrice}골드\n<size=64%>(매물에 마우스를 올리면 효과)</size>";
+            _shopText.raycastTarget = true;
+            var stip = _shopText.gameObject.GetComponent<TooltipTrigger>();
+            if (stip == null) { stip = _shopText.gameObject.AddComponent<TooltipTrigger>(); }
+            stip.Set(GameInfo.CardDesc(_flow.CurrentShopCard));
         }
 
         /// <summary>덱 보기 모달을 현재 덱(카드명 ×수량, 이름순)으로 채워 연다.</summary>
