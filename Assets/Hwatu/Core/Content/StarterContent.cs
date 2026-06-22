@@ -39,11 +39,11 @@ namespace Hwatu.Core.Content
 
         // 잡도깨비: swipe 공격 7 / guard 방어 6, sequence [swipe, swipe, guard]
         public static EnemyData DokkaebiMinion() => new EnemyData(
-            "dokkaebi_minion", "잡도깨비", 12, 16,
+            "dokkaebi_minion", "잡도깨비", 28, 34,
             new[]
             {
-                new EnemyMoveData("swipe", IntentType.Attack, 7,
-                    new[] { new EffectData(EffectOp.DealDamage, amount: 7, target: TargetType.Enemy) }),
+                new EnemyMoveData("swipe", IntentType.Attack, 9,
+                    new[] { new EffectData(EffectOp.DealDamage, amount: 9, target: TargetType.Enemy) }),
                 new EnemyMoveData("guard", IntentType.Block, 6,
                     new[] { new EffectData(EffectOp.GainBlock, amount: 6, target: TargetType.Self) }),
             },
@@ -52,11 +52,11 @@ namespace Hwatu.Core.Content
 
         // 일반: 멧돼지 — 씩씩대기(자버프 광+2)→들이받기(공10, 강화 시 12). 화투 7월 홍싸리 멧돼지
         public static EnemyData Boar() => new EnemyData(
-            "boar", "멧돼지", 20, 26,
+            "boar", "멧돼지", 38, 46,
             new[]
             {
-                new EnemyMoveData("gore", IntentType.Attack, 10,
-                    new[] { new EffectData(EffectOp.DealDamage, amount: 10, target: TargetType.Enemy) }),
+                new EnemyMoveData("gore", IntentType.Attack, 12,
+                    new[] { new EffectData(EffectOp.DealDamage, amount: 12, target: TargetType.Enemy) }),
                 new EnemyMoveData("snort", IntentType.Buff, 0,
                     new[] { new EffectData(EffectOp.ApplyStatus, amount: 2, target: TargetType.Self, status: StatusType.Radiance) }),
             },
@@ -65,7 +65,7 @@ namespace Hwatu.Core.Content
 
         // 일반: 두꺼비 — 웅크리기(방어10)→독침(공5+중독2). 방어/독 지구전형
         public static EnemyData Toad() => new EnemyData(
-            "toad", "두꺼비", 24, 30,
+            "toad", "두꺼비", 44, 52,
             new[]
             {
                 new EnemyMoveData("crouch", IntentType.Block, 10,
@@ -82,17 +82,17 @@ namespace Hwatu.Core.Content
 
         // 보스: 달그림자 도깨비 — 1페이즈 [강타13/광폭9/방벽12], HP 50%↓ 2페이즈 광폭화 [월식18/강타13/광폭9]
         public static EnemyData DokkaebiBoss() => new EnemyData(
-            "dokkaebi_boss", "달그림자 도깨비", 45, 55,
+            "dokkaebi_boss", "달그림자 도깨비", 95, 115,
             new[]
             {
-                new EnemyMoveData("crush", IntentType.Attack, 13,
-                    new[] { new EffectData(EffectOp.DealDamage, amount: 13, target: TargetType.Enemy) }),
+                new EnemyMoveData("crush", IntentType.Attack, 16,
+                    new[] { new EffectData(EffectOp.DealDamage, amount: 16, target: TargetType.Enemy) }),
                 new EnemyMoveData("rage", IntentType.Attack, 9,
                     new[] { new EffectData(EffectOp.DealDamage, amount: 9, target: TargetType.Enemy) }),
                 new EnemyMoveData("barrier", IntentType.Block, 12,
                     new[] { new EffectData(EffectOp.GainBlock, amount: 12, target: TargetType.Self) }),
-                new EnemyMoveData("eclipse", IntentType.Attack, 18,
-                    new[] { new EffectData(EffectOp.DealDamage, amount: 18, target: TargetType.Enemy) }),
+                new EnemyMoveData("eclipse", IntentType.Attack, 24,
+                    new[] { new EffectData(EffectOp.DealDamage, amount: 24, target: TargetType.Enemy) }),
             },
             EnemyAiKind.Phase,
             new[] { "crush", "rage", "barrier" },
@@ -100,7 +100,7 @@ namespace Hwatu.Core.Content
 
         // 까마귀떼: 다회 약공 — peck(2×3) / flock(방어 4)
         public static EnemyData Crows() => new EnemyData(
-            "crows", "까마귀떼", 10, 14,
+            "crows", "까마귀떼", 22, 28,
             new[]
             {
                 new EnemyMoveData("peck", IntentType.AttackMulti, 2,
@@ -118,7 +118,7 @@ namespace Hwatu.Core.Content
 
         // 허수아비: 디버프 — weaken(약화 2) / poke(공격 5)
         public static EnemyData Scarecrow() => new EnemyData(
-            "scarecrow", "허수아비", 14, 18,
+            "scarecrow", "허수아비", 28, 34,
             new[]
             {
                 new EnemyMoveData("weaken", IntentType.Debuff, 2,
@@ -131,11 +131,11 @@ namespace Hwatu.Core.Content
 
         // 엘리트 광귀: 강타(11) / 취약화(취약 2) / 방벽(10)
         public static EnemyData GwangGwiElite() => new EnemyData(
-            "gwanggwi_elite", "광귀", 30, 38,
+            "gwanggwi_elite", "광귀", 52, 64,
             new[]
             {
-                new EnemyMoveData("smash", IntentType.Attack, 11,
-                    new[] { new EffectData(EffectOp.DealDamage, amount: 11, target: TargetType.Enemy) }),
+                new EnemyMoveData("smash", IntentType.Attack, 14,
+                    new[] { new EffectData(EffectOp.DealDamage, amount: 14, target: TargetType.Enemy) }),
                 new EnemyMoveData("expose", IntentType.Debuff, 2,
                     new[] { new EffectData(EffectOp.ApplyStatus, amount: 2, target: TargetType.Enemy, status: StatusType.Vulnerable) }),
                 new EnemyMoveData("wall", IntentType.Block, 10,
@@ -146,7 +146,7 @@ namespace Hwatu.Core.Content
 
         // 도깨비불: 화염 약공(3×2) + 화상(중독 3 부여)
         public static EnemyData WillOWisp() => new EnemyData(
-            "willowisp", "도깨비불", 9, 13,
+            "willowisp", "도깨비불", 20, 26,
             new[]
             {
                 new EnemyMoveData("ember", IntentType.AttackMulti, 3,
@@ -163,13 +163,13 @@ namespace Hwatu.Core.Content
 
         // 엘리트 외눈도깨비: 노려봄(약화2) / 내려찍기(14) / 분노(자기 광+3 → 이후 공격 강화)
         public static EnemyData CyclopsOni() => new EnemyData(
-            "cyclops_oni", "외눈도깨비", 32, 40,
+            "cyclops_oni", "외눈도깨비", 56, 68,
             new[]
             {
                 new EnemyMoveData("glare", IntentType.Debuff, 2,
                     new[] { new EffectData(EffectOp.ApplyStatus, amount: 2, target: TargetType.Enemy, status: StatusType.Weak) }),
-                new EnemyMoveData("oni_smash", IntentType.Attack, 14,
-                    new[] { new EffectData(EffectOp.DealDamage, amount: 14, target: TargetType.Enemy) }),
+                new EnemyMoveData("oni_smash", IntentType.Attack, 17,
+                    new[] { new EffectData(EffectOp.DealDamage, amount: 17, target: TargetType.Enemy) }),
                 new EnemyMoveData("enrage", IntentType.Buff, 3,
                     new[] { new EffectData(EffectOp.GainResource, amount: 3, target: TargetType.Self, resource: ResourceType.Radiance) }),
             },
@@ -178,7 +178,7 @@ namespace Hwatu.Core.Content
 
         // 보스 구미호: 환혹(약화3)/꼬리치기(4×3)/여우불(12), HP 50%↓ 광폭 [구미폭8×3/여우불/꼬리치기]
         public static EnemyData Gumiho() => new EnemyData(
-            "gumiho", "구미호", 48, 58,
+            "gumiho", "구미호", 100, 120,
             new[]
             {
                 new EnemyMoveData("charm", IntentType.Debuff, 3,
@@ -190,8 +190,8 @@ namespace Hwatu.Core.Content
                         new EffectData(EffectOp.DealDamage, amount: 4, target: TargetType.Enemy),
                         new EffectData(EffectOp.DealDamage, amount: 4, target: TargetType.Enemy),
                     }, hits: 3),
-                new EnemyMoveData("foxfire", IntentType.Attack, 12,
-                    new[] { new EffectData(EffectOp.DealDamage, amount: 12, target: TargetType.Enemy) }),
+                new EnemyMoveData("foxfire", IntentType.Attack, 15,
+                    new[] { new EffectData(EffectOp.DealDamage, amount: 15, target: TargetType.Enemy) }),
                 new EnemyMoveData("ninetails", IntentType.AttackMulti, 8,
                     new[]
                     {
@@ -199,8 +199,8 @@ namespace Hwatu.Core.Content
                         new EffectData(EffectOp.DealDamage, amount: 8, target: TargetType.Enemy),
                         new EffectData(EffectOp.DealDamage, amount: 8, target: TargetType.Enemy),
                     }, hits: 3),
-                new EnemyMoveData("doom", IntentType.Doom, 24,
-                    new[] { new EffectData(EffectOp.DealDamage, amount: 24, target: TargetType.Enemy) }, hits: 1, doomTurns: 1),
+                new EnemyMoveData("doom", IntentType.Doom, 32,
+                    new[] { new EffectData(EffectOp.DealDamage, amount: 32, target: TargetType.Enemy) }, hits: 1, doomTurns: 1),
             },
             EnemyAiKind.Phase,
             new[] { "charm", "tail", "foxfire" },
@@ -208,22 +208,22 @@ namespace Hwatu.Core.Content
 
         // 일반 장승: 방어형 — 수호(방10) / 노려봄(약화2) / 들이받기(10)
         public static EnemyData Jangseung() => new EnemyData(
-            "jangseung", "장승", 16, 20,
+            "jangseung", "장승", 34, 42,
             new[]
             {
                 new EnemyMoveData("ward", IntentType.Block, 10,
                     new[] { new EffectData(EffectOp.GainBlock, amount: 10, target: TargetType.Self) }),
                 new EnemyMoveData("stare", IntentType.Debuff, 2,
                     new[] { new EffectData(EffectOp.ApplyStatus, amount: 2, target: TargetType.Enemy, status: StatusType.Weak) }),
-                new EnemyMoveData("ram", IntentType.Attack, 10,
-                    new[] { new EffectData(EffectOp.DealDamage, amount: 10, target: TargetType.Enemy) }),
+                new EnemyMoveData("ram", IntentType.Attack, 13,
+                    new[] { new EffectData(EffectOp.DealDamage, amount: 13, target: TargetType.Enemy) }),
             },
             EnemyAiKind.Sequence,
             new[] { "ward", "stare", "ram" });
 
         // 일반 그슨대: 어둠 정령 — 할퀴기(3×2) / 저주(약화2)
         public static EnemyData Geuseundae() => new EnemyData(
-            "geuseundae", "그슨대", 13, 17,
+            "geuseundae", "그슨대", 26, 32,
             new[]
             {
                 new EnemyMoveData("claw", IntentType.AttackMulti, 3,
@@ -240,7 +240,7 @@ namespace Hwatu.Core.Content
 
         // 엘리트 구렁이: 독 특화 — 휘감기(12) / 독니(6+중독4) / 또아리(방10)
         public static EnemyData Serpent() => new EnemyData(
-            "serpent", "구렁이", 33, 41,
+            "serpent", "구렁이", 58, 70,
             new[]
             {
                 new EnemyMoveData("coil_strike", IntentType.Attack, 12,
@@ -259,11 +259,11 @@ namespace Hwatu.Core.Content
 
         // 보스 장군: 강공형 — 내려베기(14) / 진군(자기 광+3) / 철벽(방14)
         public static EnemyData General() => new EnemyData(
-            "general", "장군", 50, 60,
+            "general", "장군", 105, 125,
             new[]
             {
-                new EnemyMoveData("slash", IntentType.Attack, 14,
-                    new[] { new EffectData(EffectOp.DealDamage, amount: 14, target: TargetType.Enemy) }),
+                new EnemyMoveData("slash", IntentType.Attack, 18,
+                    new[] { new EffectData(EffectOp.DealDamage, amount: 18, target: TargetType.Enemy) }),
                 new EnemyMoveData("rally", IntentType.Buff, 3,
                     new[] { new EffectData(EffectOp.GainResource, amount: 3, target: TargetType.Self, resource: ResourceType.Radiance) }),
                 new EnemyMoveData("bastion", IntentType.Block, 14,
