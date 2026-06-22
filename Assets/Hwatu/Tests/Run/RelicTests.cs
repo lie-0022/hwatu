@@ -48,9 +48,26 @@ namespace Hwatu.Tests.Run
         }
 
         [Test]
-        public void AllRelics_AreEight()
+        public void RiceCake_GivesBlock3()
         {
-            Assert.AreEqual(8, RelicContent.AllRelics().Count);
+            var p = new PlayerState(80);
+            RelicContent.RiceCake().ApplyCombatStart(p);
+            Assert.AreEqual(3, p.Block);
+        }
+
+        [Test]
+        public void Gourd_GivesRadianceAndBlock()
+        {
+            var p = new PlayerState(80);
+            RelicContent.Gourd().ApplyCombatStart(p);
+            Assert.AreEqual(1, p.GetStatus(StatusType.Radiance));
+            Assert.AreEqual(3, p.Block);
+        }
+
+        [Test]
+        public void AllRelics_AreTen()
+        {
+            Assert.AreEqual(10, RelicContent.AllRelics().Count);
         }
     }
 }

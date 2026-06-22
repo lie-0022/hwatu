@@ -29,13 +29,19 @@ namespace Hwatu.Core.Content
         public static RelicData SteelScale() => new RelicData("relic_steel", "강철비늘", "전투 시작 시 민첩 +1.",
             p => p.AddStatus(StatusType.Dexterity, 1));
 
+        public static RelicData RiceCake() => new RelicData("relic_ricecake", "떡", "전투 시작 시 방어 +3.",
+            p => p.SetBlock(p.Block + 3));
+
+        public static RelicData Gourd() => new RelicData("relic_gourd", "호리병", "전투 시작 시 광 +1, 방어 +3.",
+            p => { p.AddStatus(StatusType.Radiance, 1); p.SetBlock(p.Block + 3); });
+
         /// <summary>전체 유물 풀(보물/엘리트/보스 보상 추첨용).</summary>
         public static List<RelicData> AllRelics()
         {
             return new List<RelicData>
             {
                 Cushion(), Blanket(), Lantern(), CoinPouch(), Whetstone(),
-                Charm(), RuneStone(), SteelScale(),
+                Charm(), RuneStone(), SteelScale(), RiceCake(), Gourd(),
             };
         }
     }
