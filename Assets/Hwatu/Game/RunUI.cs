@@ -234,7 +234,7 @@ namespace Hwatu.Game
             if (p == RunPhase.Map)
             {
                 _mapView.Build();
-                _mapHud.text = $"HP {_flow.Run.Hp}/{_flow.Run.MaxHp}    골드 {_flow.Run.Gold}    액트 {_flow.Run.Act}";
+                _mapHud.text = $"HP {_flow.Run.Hp}/{_flow.Run.MaxHp}    골드 {_flow.Run.Gold}    액트 {_flow.Run.Act}    유물 {_flow.Run.Relics.Count}    포션 {_flow.Run.Potions.Count}/{RunState.MaxPotions}";
             }
             else if (p == RunPhase.Event)
             {
