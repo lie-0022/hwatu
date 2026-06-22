@@ -112,6 +112,7 @@ namespace Hwatu.Game
             CreateButton(_neowPanel, "최대 체력 +8", new Vector2(0, 60), () => _flow.ApplyNeowBoon(0));
             CreateButton(_neowPanel, "골드 +100", new Vector2(0, -20), () => _flow.ApplyNeowBoon(1));
             CreateButton(_neowPanel, "유물 1개 획득", new Vector2(0, -100), () => _flow.ApplyNeowBoon(2));
+            CreateButton(_neowPanel, "첫 카드 강화 (+3)", new Vector2(0, -180), () => _flow.ApplyNeowBoon(3));
             _neowPanel.SetActive(false);
 
             // 보상(카드 3택1 + 스킵)
