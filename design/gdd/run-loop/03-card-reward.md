@@ -29,7 +29,7 @@ nextOffset = (rolled==Rare) ? -5 : min(40, offset+1)
 - 보스는 RollRarity가 Rare 확정.
 
 ## 6. Dependencies
-- `IRandom`, `CardData.Rarity`, `LuminaryCards.RewardPool`(7장), `RunState.RareOffset`.
+- `IRandom`, `CardData.Rarity`, `LuminaryCards.RewardPool`(23장)/`InkCards.RewardPool`(16장), `RunState.RareOffset`.
 - 소비처: 보상 화면(3택1 UI) → `RunState.AddCard`.
 
 ## 7. Tuning Knobs
@@ -38,4 +38,4 @@ nextOffset = (rolled==Rare) ? -5 : min(40, offset+1)
 
 ## 8. Acceptance Criteria
 - [x] 보스 Rare 확정 / 3장 중복 없음 / 같은 시드 동일 결과(결정론) / 피티 작동(Rare가 가끔, 과하지 않게).
-- [x] RewardSystemTests 5종 통과(전체 42/42).
+- [x] RewardSystemTests 5종 통과(전체 135/135).
