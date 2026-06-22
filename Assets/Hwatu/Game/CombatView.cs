@@ -33,6 +33,8 @@ namespace Hwatu.Game
         private int _prevPlayerHp;
         private readonly Dictionary<int, CardView> _cardViews = new Dictionary<int, CardView>();
         private RectTransform _handArea;
+        private RectTransform _playerStatusArea;
+        private static readonly StatusType[] s_statusOrder = { StatusType.Radiance, StatusType.Dexterity, StatusType.Weak, StatusType.Vulnerable, StatusType.Poison };
         private GameObject _resultPanel;
         private TextMeshProUGUI _resultText;
         private TargetingArrow _arrow;
@@ -112,6 +114,16 @@ namespace Hwatu.Game
             _playerText.rectTransform.offsetMin = new Vector2(16f, 12f);
             _playerText.rectTransform.offsetMax = new Vector2(-16f, -52f);
 
+            // 플레이어 status 칩 영역(PlayerView 위, hover 설명 — STS2식)
+            var pstatGo = new GameObject("PlayerStatus", typeof(RectTransform));
+            pstatGo.transform.SetParent(root, false);
+            _playerStatusArea = (RectTransform)pstatGo.transform;
+            _playerStatusArea.anchorMin = Vector2.zero;
+            _playerStatusArea.anchorMax = Vector2.zero;
+            _playerStatusArea.pivot = Vector2.zero;
+            _playerStatusArea.anchoredPosition = new Vector2(24f, 184f);
+            _playerStatusArea.sizeDelta = new Vector2(440f, 44f);
+
             // 손패(하단 중앙, 가로 배치)
             var handGo = new GameObject("HandArea", typeof(RectTransform));
             handGo.transform.SetParent(root, false);
@@ -189,8 +201,9 @@ namespace Hwatu.Game
             PlayerState p = s.Player;
             _playerHpBar.Set(p.Hp, p.MaxHp);
             _playerText.text =
-                $"에너지 {p.Energy}/{p.BaseEnergy}    광 {p.GetStatus(StatusType.Radiance)}\n" +
-                $"방어 {p.Block}    턴 {s.Turn}    덱 {s.DrawPile.Count}    버린 {s.DiscardPile.Count}";
+                $"에너지 {p.Energy}/{p.BaseEnergy}    방어 {p.Block}\n" +
+                $"턴 {s.Turn}    덱 {s.DrawPile.Count}    버린 {s.DiscardPile.Count}";
+            RebuildStatus(p);
 
             RebuildHand(s);
 
@@ -266,6 +279,47 @@ namespace Hwatu.Game
         }
 
         // 손패를 InstanceId로 재사용해 갱신한다(유지 카드는 위치만 트윈, 빠진 카드만 제거, 새 카드만 생성).
+        /// <summary>플레이어 status를 칩으로 다시 그린다(active만, hover 설명 — STS2식).</summary>
+        private void RebuildStatus(PlayerState p)
+        {
+            var kill = new System.Collections.Generic.List<GameObject>();
+            foreach (Transform c in _playerStatusArea) { kill.Add(c.gameObject); }
+            foreach (var g in kill) { Destroy(g); }
+            int idx = 0;
+            foreach (StatusType st in s_statusOrder)
+            {
+                int amt = p.GetStatus(st);
+                if (amt <= 0) { continue; }
+                var chip = new GameObject($"St_{st}", typeof(RectTransform), typeof(Image), typeof(TooltipTrigger));
+                chip.transform.SetParent(_playerStatusArea, false);
+                var crt = (RectTransform)chip.transform;
+                crt.anchorMin = new Vector2(0f, 0.5f);
+                crt.anchorMax = new Vector2(0f, 0.5f);
+                crt.pivot = new Vector2(0f, 0.5f);
+                crt.anchoredPosition = new Vector2(idx * 96f, 0f);
+                crt.sizeDelta = new Vector2(90f, 40f);
+                chip.GetComponent<Image>().color = StatusColor(st);
+                chip.GetComponent<TooltipTrigger>().Set(GameInfo.StatusDesc(st, amt));
+                var lbl = CreateText(crt, "L", Vector2.zero, Vector2.one, Vector2.zero, 20f, TextAlignmentOptions.Center);
+                lbl.text = $"{GameInfo.StatusName(st)} {amt}";
+                lbl.raycastTarget = false;
+                idx++;
+            }
+        }
+
+        private static Color StatusColor(StatusType s)
+        {
+            switch (s)
+            {
+                case StatusType.Radiance:   return new Color(0.85f, 0.65f, 0.2f, 0.95f);
+                case StatusType.Dexterity:  return new Color(0.2f, 0.5f, 0.7f, 0.95f);
+                case StatusType.Weak:       return new Color(0.5f, 0.35f, 0.6f, 0.95f);
+                case StatusType.Vulnerable: return new Color(0.7f, 0.35f, 0.3f, 0.95f);
+                case StatusType.Poison:     return new Color(0.35f, 0.6f, 0.3f, 0.95f);
+                default:                    return new Color(0.4f, 0.4f, 0.4f, 0.95f);
+            }
+        }
+
         private void RebuildHand(CombatState s)
         {
             var hand = s.Hand;
