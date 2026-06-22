@@ -50,6 +50,7 @@ namespace Hwatu.Game
         private TextMeshProUGUI _deckText;
         private GameObject _upgradePanel;
         private GameObject _upgradeCardArea;
+        private GameObject _relicBarGo;
 
         private void Start()
         {
@@ -166,6 +167,23 @@ namespace Hwatu.Game
             pscaler.referenceResolution = new Vector2(1920, 1080);
             _potionBarGo = potionCanvasGo;
             _potionBarGo.SetActive(false);
+
+            // 공통 툴팁(최상위 sortingOrder 200)
+            var tooltipGo = new GameObject("Tooltip", typeof(TooltipUI));
+            tooltipGo.transform.SetParent(transform, false);
+            tooltipGo.GetComponent<TooltipUI>().Build(_font);
+
+            // 유물 보유 바(맵·전투 상단, hover 효과 설명)
+            var relicCanvasGo = new GameObject("RelicBar", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
+            relicCanvasGo.transform.SetParent(transform, false);
+            var rcanvas = relicCanvasGo.GetComponent<Canvas>();
+            rcanvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            rcanvas.sortingOrder = 55;
+            var rscaler = relicCanvasGo.GetComponent<CanvasScaler>();
+            rscaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+            rscaler.referenceResolution = new Vector2(1920, 1080);
+            _relicBarGo = relicCanvasGo;
+            _relicBarGo.SetActive(false);
         }
 
         private void OnPhaseChanged(RunPhase p)
@@ -185,6 +203,11 @@ namespace Hwatu.Game
             if (p == RunPhase.Combat)
             {
                 BuildPotions();
+            }
+            _relicBarGo.SetActive(p == RunPhase.Map || p == RunPhase.Combat);
+            if (p == RunPhase.Map || p == RunPhase.Combat)
+            {
+                BuildRelicBar();
             }
 
             if (p == RunPhase.Map)
@@ -327,6 +350,54 @@ namespace Hwatu.Game
         private void CloseUpgradeView()
         {
             _upgradePanel.SetActive(false);
+        }
+
+        /// <summary>보유 유물을 상단 가로 바에 칩으로 그린다(hover 시 효과 설명 — STS2식).</summary>
+        private void BuildRelicBar()
+        {
+            if (_flow.Run == null)
+            {
+                return;
+            }
+            var existing = new List<GameObject>();
+            foreach (Transform child in _relicBarGo.transform)
+            {
+                existing.Add(child.gameObject);
+            }
+            foreach (GameObject go in existing)
+            {
+                Destroy(go);
+            }
+            var relics = _flow.Run.Relics;
+            for (int i = 0; i < relics.Count; i++)
+            {
+                var chip = new GameObject($"Relic{i}", typeof(RectTransform), typeof(Image), typeof(TooltipTrigger));
+                chip.transform.SetParent(_relicBarGo.transform, false);
+                var crt = (RectTransform)chip.transform;
+                crt.anchorMin = new Vector2(0f, 1f);
+                crt.anchorMax = new Vector2(0f, 1f);
+                crt.pivot = new Vector2(0f, 1f);
+                crt.anchoredPosition = new Vector2(24f + i * 132f, -18f);
+                crt.sizeDelta = new Vector2(124f, 48f);
+                chip.GetComponent<Image>().color = new Color(0.28f, 0.22f, 0.12f, 0.96f);
+                chip.GetComponent<TooltipTrigger>().Set(GameInfo.RelicDesc(relics[i]));
+
+                var labelGo = new GameObject("Label", typeof(RectTransform), typeof(TextMeshProUGUI));
+                labelGo.transform.SetParent(chip.transform, false);
+                var lbl = labelGo.GetComponent<TextMeshProUGUI>();
+                lbl.font = _font;
+                lbl.fontSize = 22f;
+                lbl.alignment = TextAlignmentOptions.Center;
+                lbl.color = Color.white;
+                lbl.raycastTarget = false;
+                lbl.textWrappingMode = TextWrappingModes.NoWrap;
+                lbl.text = relics[i].Name;
+                var lrt = lbl.rectTransform;
+                lrt.anchorMin = Vector2.zero;
+                lrt.anchorMax = Vector2.one;
+                lrt.offsetMin = Vector2.zero;
+                lrt.offsetMax = Vector2.zero;
+            }
         }
 
         /// <summary>전투 중 포션 슬롯 버튼을 현재 보유 포션으로 다시 그린다(좌측 세로).</summary>
