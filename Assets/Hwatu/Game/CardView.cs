@@ -88,11 +88,17 @@ namespace Hwatu.Game
             // 이름(아트 아래)
             _nameText = CreateText(rt, "NameText", new Vector2(0.5f, 0.36f), new Vector2(0.5f, 0.36f), Vector2.zero, 24, TextAlignmentOptions.Center);
             _nameText.rectTransform.sizeDelta = new Vector2(180, 38);
+            _nameText.enableAutoSizing = true;   // 강화(+)·인챈트 마크로 길어진 이름을 카드 폭에 맞게 축소
+            _nameText.fontSizeMin = 15f;
+            _nameText.fontSizeMax = 24f;
 
             // 효과(하단)
             _descText = CreateText(rt, "DescText", new Vector2(0.5f, 0.16f), new Vector2(0.5f, 0.16f), Vector2.zero, 20, TextAlignmentOptions.Center);
             _descText.rectTransform.sizeDelta = new Vector2(176, 64);
             _descText.textWrappingMode = TextWrappingModes.Normal;
+            _descText.enableAutoSizing = true;   // 긴 효과 설명도 카드 안에 맞게 축소
+            _descText.fontSizeMin = 13f;
+            _descText.fontSizeMax = 20f;
         }
 
         /// <summary>카드 데이터를 비주얼에 반영한다. playable=false면 어둡게 표시.</summary>
