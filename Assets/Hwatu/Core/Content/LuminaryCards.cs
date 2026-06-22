@@ -22,6 +22,13 @@ namespace Hwatu.Core.Content
         public static CardData Glow() => new CardData("lum_glow", "광휘", CardType.Skill, 1, TargetType.Self, false,
             new[] { new EffectData(EffectOp.GainResource, amount: 2, target: TargetType.Self, resource: ResourceType.Radiance) }, CardRarity.Uncommon);
 
+        public static CardData Daybreak() => new CardData("lum_daybreak", "여명", CardType.Skill, 1, TargetType.Self, false,
+            new[]
+            {
+                new EffectData(EffectOp.GainBlock, amount: 5, target: TargetType.Self),
+                new EffectData(EffectOp.GainResource, amount: 1, target: TargetType.Self, resource: ResourceType.Radiance),
+            }, CardRarity.Uncommon);
+
         public static CardData Pierce() => new CardData("lum_pierce", "취약타", CardType.Attack, 1, TargetType.Enemy, false,
             new[]
             {
@@ -106,13 +113,13 @@ namespace Hwatu.Core.Content
                 new EffectData(EffectOp.DealDamage, amount: 3, target: TargetType.Enemy),
             }, CardRarity.Uncommon);
 
-        /// <summary>보상 추첨에 쓰는 광객 카드 풀(21장: Common5/Uncommon9/Rare7).</summary>
+        /// <summary>보상 추첨에 쓰는 광객 카드 풀(22장: Common5/Uncommon10/Rare7).</summary>
         public static List<CardData> RewardPool()
         {
             return new List<CardData>
             {
                 HeavyStrike(), Guard(), Whet(), Jab(), Check(),
-                Glow(), Pierce(), LightRay(), Stockpile(), Purify(), Vigil(), Dawn(), Bulwark(), Volley(),
+                Glow(), Daybreak(), Pierce(), LightRay(), Stockpile(), Purify(), Vigil(), Dawn(), Bulwark(), Volley(),
                 Burst(), GreatShield(), RadiantSurge(), Frenzy(), WhiteFlash(), Awaken(), Meteor(),
             };
         }
