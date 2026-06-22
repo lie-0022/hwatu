@@ -20,6 +20,7 @@ namespace Hwatu.Game
         private HpBar _hpBar;
         private Image _intentBg;
         private TextMeshProUGUI _intentText;
+        private TextMeshProUGUI _blockText;
         private RectTransform _enemyStatusArea;
         private static readonly StatusType[] s_statusOrder = { StatusType.Weak, StatusType.Vulnerable, StatusType.Poison, StatusType.Radiance, StatusType.Dexterity };
 
@@ -81,6 +82,13 @@ namespace Hwatu.Game
             _enemyStatusArea.pivot = new Vector2(0f, 1f);
             _enemyStatusArea.anchoredPosition = new Vector2(30f, -6f);
             _enemyStatusArea.sizeDelta = new Vector2(400f, 36f);
+
+            // 방어도(Block) — HP바 위 좌측. 0이면 숨김(STS2식 방패 표기)
+            _blockText = CreateText(transform, "Block", 22f, new Vector2(0.5f, 0.66f), new Vector2(160f, 30f));
+            _blockText.rectTransform.anchoredPosition = new Vector2(-110f, 0f);
+            _blockText.color = new Color(0.55f, 0.78f, 1f);
+            _blockText.fontStyle = FontStyles.Bold;
+            _blockText.alignment = TextAlignmentOptions.Left;
         }
 
         /// <summary>적 상태를 박스에 반영한다.</summary>
@@ -88,6 +96,7 @@ namespace Hwatu.Game
         {
             _nameText.text = e.Data.Name;
             _hpBar.Set(e.Hp, e.MaxHp);
+            _blockText.text = e.Block > 0 ? $"방어 {e.Block}" : "";
 
             if (e.CurrentIntent != null)
             {
