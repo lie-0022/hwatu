@@ -56,11 +56,12 @@ namespace Hwatu.Core.Cards
         {
             var list = new System.Collections.Generic.List<EffectData>(Effects.Count);
             bool sharp = enchant == "sharp";
+            bool brittle = enchant == "brittle";
             for (int i = 0; i < Effects.Count; i++)
             {
                 EffectData e = Effects[i];
-                int amt = (sharp && (e.Op == EffectOp.DealDamage || e.Op == EffectOp.GainBlock)) ? e.Amount + 2 : e.Amount;
-                list.Add(new EffectData(e.Op, amt, e.Target, e.Status, e.Resource));
+                int bonus = (e.Op == EffectOp.DealDamage || e.Op == EffectOp.GainBlock) ? (sharp ? 2 : brittle ? 4 : 0) : 0;
+                list.Add(new EffectData(e.Op, e.Amount + bonus, e.Target, e.Status, e.Resource));
             }
             bool exhaust = Exhaust || enchant == "brittle";
             string mark = sharp ? " ✦" : " ✷";
