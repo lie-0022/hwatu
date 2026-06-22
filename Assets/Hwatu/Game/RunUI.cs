@@ -103,7 +103,8 @@ namespace Hwatu.Game
 
             // 보상(카드 3택1 + 스킵)
             _rewardPanel = CreatePanel(root, "RewardPanel", new Color(0.09f, 0.09f, 0.06f, 0.97f));
-            CreateText(_rewardPanel, "카드 보상 — 1장 선택", 46f, new Vector2(0, 300));
+            CreateText(_rewardPanel, "카드 보상 — 1장 선택 (또는 건너뛰기)", 46f, new Vector2(0, 300));
+            CreateButton(_rewardPanel, "건너뛰기 (덱 압축)", new Vector2(0, -320), () => _flow.OnRewardDone());
             var areaGo = new GameObject("RewardCards", typeof(RectTransform));
             areaGo.transform.SetParent(_rewardPanel.transform, false);
             _rewardCardArea = (RectTransform)areaGo.transform;
