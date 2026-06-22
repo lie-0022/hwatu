@@ -135,5 +135,14 @@ namespace Hwatu.Game
                 default:                return t.ToString();
             }
         }
+
+        /// <summary>캐릭터 설명(선택 화면 hover).</summary>
+        public static string CharacterDesc(CharacterData c)
+        {
+            string flavor = c.StartMaxHp >= 80
+                ? "빛(광)을 쌓아 공격 피해를 키운다. 공격·방어 균형형."
+                : "먹(독)·약화로 적을 서서히 무너뜨린다. 지속 피해형.";
+            return $"<b>{c.Name}</b> (HP {c.StartMaxHp} · 골드 {c.StartGold})\n{flavor}";
+        }
     }
 }
