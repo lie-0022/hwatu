@@ -142,12 +142,15 @@ namespace Hwatu.Game
             SetPhase(RunPhase.Map);
         }
 
-        /// <summary>상점에서 골드 75로 덱 첫 카드를 제거(STS식 덱 압축). 상점은 유지.</summary>
-        public bool ShopRemoveFirstCard()
+        /// <summary>상점에서 덱의 특정 카드를 제거(선택식, 상점당 1회, 골드 소모). 상점은 유지.</summary>
+        public bool ShopRemoveCardAt(int index)
         {
-            if (Run.Deck.Count > 0 && Run.TrySpend(75))
+            if (CurrentShop != null && CurrentShop.RemoveUsed) { return false; }
+            int cost = CurrentShop != null ? CurrentShop.RemoveCost : 75;
+            if (index >= 0 && index < Run.Deck.Count && Run.TrySpend(cost))
             {
-                return Run.RemoveCard(Run.Deck[0]);
+                if (CurrentShop != null) { CurrentShop.RemoveUsed = true; }
+                return Run.RemoveCardAt(index);
             }
             return false;
         }
