@@ -86,16 +86,17 @@ RewardOption  { CardData Card; ... }  // 3택1
 - 카드 풀: 광객의 빛 계열(빛타격·방패·점화) + 보상으로 확장.
 
 ## 11. 구현 현황 (2026-06-22 자율 확장, feature/run-loop)
-설계(MVP)를 넘어 콘텐츠·메커닉을 자율 확장. EditMode **94/94 통과**.
-- **루프**: 메인→캐릭터→맵→전투→보상3택1→맵→액트전환(보스→보상→다음 액트, FinalAct=3 승리). 보물 노드 유물 자동 획득.
-- **전투**: 턴 상태머신, 효과 op 6종(deal_damage/gain_block/draw/apply_status/gain_resource/clear_status), 키워드 4(Exhaust/Retain/Innate/Ethereal).
+설계(MVP)를 넘어 콘텐츠·메커닉·UI를 자율 확장. EditMode **131/131 통과**.
+- **루프**: 메인→캐릭터→맵(분기 7×15)→전투→보상3택1+포션→이벤트/휴식/상점/보물→보스(페이즈+Doom)→액트전환(FinalAct=3 승리). 노드 7종 전부 UI 작동.
+- **전투**: 턴 상태머신, 효과 op 6종(deal_damage/gain_block/draw/apply_status/gain_resource/clear_status), 키워드 4(Exhaust/Retain/Innate/Ethereal), Doom 카운트다운(예고→발동).
 - **status 5**: Radiance(빛=힘)·Weak·Vulnerable·Poison(턴틱)·Dexterity(방어+).
-- **적**: 일반5(잡도깨비·까마귀떼·허수아비·도깨비불·장승)·엘리트2(광귀·외눈도깨비)·보스2(달그림자·구미호, PhaseAi HP50% 광폭).
-- **카드**: 광객 풀 20장(빛/공격/방어/Exhaust/Innate/Ethereal), 묵귀 풀 12장(독/약화). 캐릭터별 풀 선택(CharacterPools).
+- **적 12**: 일반6(잡도깨비·까마귀떼·허수아비·도깨비불·장승·그슨대)·엘리트3(광귀·외눈도깨비·구렁이)·보스3(달그림자·구미호[Doom]·장군, PhaseAi HP광폭).
+- **카드 35**: 광객 풀 21장(빛/공격/방어/Exhaust/Innate/Ethereal), 묵귀 풀 14장(독/약화). 캐릭터별 풀(CharacterPools).
 - **캐릭터 2**: 광객(HP80, radiance)·묵귀(HP70, poison). 시작 덱·보상 풀 차등.
-- **경제/메타**: 골드 TrySpend·유물 8종(전투 시작 효과)·카드 업그레이드·이벤트 2·어센션(난이도 HP스케일)·전투 로그.
-- **기능 문서**: `08~18`(유물·액트·휴식·상점·밸런스·보스페이즈·이벤트·status·어센션·캐릭터·키워드).
-- **남은 Play 게이트**(자율 미검증): 캐릭터 선택 UI·휴식 Smith UI·상점/이벤트 UI·키워드/유물 카드 표시·체감 밸런싱.
+- **경제/메타**: 골드 TrySpend·유물 8종(전투 시작 효과)·카드 업그레이드(+3, 이름 "+")·포션 5·이벤트 2·어센션(HP스케일)·전투 로그.
+- **UI(uGUI 자율)**: 캐릭터 2택·맵 HUD/분기 선택·전투(인텐트 색/Doom 카운트)·보상 3택1·이벤트 선택·휴식(회복/강화 카드택1)·상점 구매·덱 보기 모달·전투 포션 버튼.
+- **기능 문서**: `08~19`(유물·액트·휴식·상점·밸런스·보스페이즈·이벤트·status·어센션·캐릭터·키워드·포션).
+- **남은 Play 게이트**(본인 체감만): 조작감·난이도 밸런싱·시각 미세 튜닝(코드/기능은 자율 검증 완료).
 
 ## 출처
 - 맵: [sts_map_oracle (원본 복제)](https://github.com/Ru5ty0ne/sts_map_oracle) · [Map Generation wiki.gg](https://slaythespire.wiki.gg/wiki/Map_Generation)
