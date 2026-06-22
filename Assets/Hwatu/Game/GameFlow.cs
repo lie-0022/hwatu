@@ -168,6 +168,16 @@ namespace Hwatu.Game
             }
         }
 
+        /// <summary>상점에서 골드 50으로 무작위 포션 1개 구매(슬롯 여유 시).</summary>
+        public void ShopBuyPotion()
+        {
+            if (Run.Potions.Count < RunState.MaxPotions && Run.TrySpend(50))
+            {
+                IRandom rng = new RngStreams(Run.Seed).ForStream("shop_potion_" + Run.Gold);
+                Run.AddPotion(PotionContent.Pick(rng));
+            }
+        }
+
         public void GenerateActMap()
         {
             IRandom rng = new RngStreams(Run.Seed).ForStream("map_act" + Run.Act);
