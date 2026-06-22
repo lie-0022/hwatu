@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Hwatu.Core.Combat;
 using Hwatu.Core.Effects;
 
 namespace Hwatu.Core.Cards
@@ -57,14 +58,19 @@ namespace Hwatu.Core.Cards
             var list = new System.Collections.Generic.List<EffectData>(Effects.Count);
             bool sharp = enchant == "sharp";
             bool brittle = enchant == "brittle";
+            bool radiant = enchant == "radiant";
             for (int i = 0; i < Effects.Count; i++)
             {
                 EffectData e = Effects[i];
                 int bonus = (e.Op == EffectOp.DealDamage || e.Op == EffectOp.GainBlock) ? (sharp ? 2 : brittle ? 4 : 0) : 0;
                 list.Add(new EffectData(e.Op, e.Amount + bonus, e.Target, e.Status, e.Resource));
             }
+            if (radiant)
+            {
+                list.Add(new EffectData(EffectOp.GainResource, amount: 1, target: TargetType.Self, resource: ResourceType.Radiance));
+            }
             bool exhaust = Exhaust || enchant == "brittle";
-            string mark = sharp ? " ✦" : " ✷";
+            string mark = sharp ? " ✦" : brittle ? " ✷" : radiant ? " ☀" : "";
             return new CardData(Id + "_e", Name + mark, Type, Cost, Target, exhaust, list, Rarity, Retain, Innate, Ethereal);
         }
     }
