@@ -45,6 +45,7 @@ namespace Hwatu.Game
         private GameObject _combatGo;
         private CombatController _combatCtrl;
         private CombatView _combatView;
+        private GameObject _potionBarGo;
 
         private void Start()
         {
@@ -130,6 +131,18 @@ namespace Hwatu.Game
             _combatView = _combatGo.GetComponent<CombatView>();
             _combatCtrl.OnCombatEnded += HandleCombatEnded;
             _combatGo.SetActive(false);
+
+            // 포션 바(전투 위 오버레이 — 별도 캔버스 sortingOrder=50, 전투 중에만 표시)
+            var potionCanvasGo = new GameObject("PotionBar", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
+            potionCanvasGo.transform.SetParent(transform, false);
+            var pcanvas = potionCanvasGo.GetComponent<Canvas>();
+            pcanvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            pcanvas.sortingOrder = 50;
+            var pscaler = potionCanvasGo.GetComponent<CanvasScaler>();
+            pscaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+            pscaler.referenceResolution = new Vector2(1920, 1080);
+            _potionBarGo = potionCanvasGo;
+            _potionBarGo.SetActive(false);
         }
 
         private void OnPhaseChanged(RunPhase p)
@@ -143,6 +156,11 @@ namespace Hwatu.Game
             _restPanel.SetActive(p == RunPhase.Rest);
             _shopPanel.SetActive(p == RunPhase.Shop);
             _combatGo.SetActive(p == RunPhase.Combat);
+            _potionBarGo.SetActive(p == RunPhase.Combat);
+            if (p == RunPhase.Combat)
+            {
+                BuildPotions();
+            }
 
             if (p == RunPhase.Map)
             {
@@ -204,6 +222,42 @@ namespace Hwatu.Game
                 return;
             }
             _shopText.text = $"골드 {_flow.Run.Gold}\n매물: <b>{_flow.CurrentShopCard.Name}</b> — {_flow.ShopPrice}골드";
+        }
+
+        /// <summary>전투 중 포션 슬롯 버튼을 현재 보유 포션으로 다시 그린다(좌측 세로).</summary>
+        private void BuildPotions()
+        {
+            if (_flow.Run == null)
+            {
+                return;
+            }
+            var existing = new List<GameObject>();
+            foreach (Transform child in _potionBarGo.transform)
+            {
+                existing.Add(child.gameObject);
+            }
+            foreach (GameObject go in existing)
+            {
+                Destroy(go);
+            }
+            var potions = _flow.Run.Potions;
+            for (int i = 0; i < potions.Count; i++)
+            {
+                PotionData potion = potions[i];
+                var pos = new Vector2(-840f, 380f - i * 90f);
+                CreateButton(_potionBarGo, potion.Name, pos, () => UsePotionInCombat(potion));
+            }
+        }
+
+        /// <summary>포션을 전투에 사용하고(즉시 효과) 슬롯에서 제거한 뒤 전투 화면을 갱신한다.</summary>
+        private void UsePotionInCombat(PotionData potion)
+        {
+            if (_combatCtrl.UsePotion(potion))
+            {
+                _flow.Run.Potions.Remove(potion);
+                _combatView.Refresh();
+                BuildPotions();
+            }
         }
 
         // CombatView.Start(BuildUI)가 끝난 다음 프레임에 런 덱으로 전투 시작.
