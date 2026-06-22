@@ -411,7 +411,7 @@ namespace Hwatu.Game
                 crt.anchorMin = new Vector2(0f, 1f);
                 crt.anchorMax = new Vector2(0f, 1f);
                 crt.pivot = new Vector2(0f, 1f);
-                crt.anchoredPosition = new Vector2(24f + i * 132f, -18f);
+                crt.anchoredPosition = new Vector2(24f + i * 132f, -78f);
                 crt.sizeDelta = new Vector2(124f, 48f);
                 chip.GetComponent<Image>().color = new Color(0.28f, 0.22f, 0.12f, 0.96f);
                 chip.GetComponent<TooltipTrigger>().Set(GameInfo.RelicDesc(relics[i]));
