@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using Hwatu.Core.Cards;
+using Hwatu.Core.Content;
 using Hwatu.Core.Rng;
 using Hwatu.Core.Run;
 
@@ -19,7 +20,8 @@ namespace Hwatu.Game
         Victory,
         Event,
         Rest,
-        Shop
+        Shop,
+        NeowBoon
     }
 
     /// <summary>
@@ -58,6 +60,22 @@ namespace Hwatu.Game
         {
             Run = new RunState(character, _seed);
             GenerateActMap();
+            SetPhase(RunPhase.Map);
+        }
+
+        /// <summary>런 시작 보너스(Neow) 적용 후 맵으로. 0=최대HP+8, 1=골드+100, 2=유물 1개.</summary>
+        public void ApplyNeowBoon(int choice)
+        {
+            switch (choice)
+            {
+                case 0: Run.MaxHp += 8; Run.Hp += 8; break;
+                case 1: Run.Gold += 100; break;
+                default:
+                    IRandom rng = new RngStreams(Run.Seed).ForStream("neow_relic");
+                    RelicData relic = RewardSystem.RollRelicReward(rng, RelicContent.AllRelics());
+                    if (relic != null) { Run.AddRelic(relic); }
+                    break;
+            }
             SetPhase(RunPhase.Map);
         }
 
