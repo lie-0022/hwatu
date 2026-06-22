@@ -37,6 +37,7 @@ namespace Hwatu.Game
         private static readonly StatusType[] s_statusOrder = { StatusType.Radiance, StatusType.Dexterity, StatusType.Weak, StatusType.Vulnerable, StatusType.Poison };
         private GameObject _pilePanel;
         private TextMeshProUGUI _pileText;
+        private RectTransform _pileGridArea;
         private GameObject _resultPanel;
         private TextMeshProUGUI _resultText;
         private TargetingArrow _arrow;
@@ -178,8 +179,15 @@ namespace Hwatu.Game
             pp.offsetMin = Vector2.zero;
             pp.offsetMax = Vector2.zero;
             _pilePanel.GetComponent<Image>().color = new Color(0.02f, 0.02f, 0.04f, 0.9f);
-            _pileText = CreateText(pp, "PileText", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, 30f, TextAlignmentOptions.Top);
-            _pileText.rectTransform.sizeDelta = new Vector2(840f, 720f);
+            _pileText = CreateText(pp, "PileText", new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -64f), 34f, TextAlignmentOptions.Center);
+            _pileText.rectTransform.sizeDelta = new Vector2(900f, 56f);
+            var pileGridGo = new GameObject("PileGrid", typeof(RectTransform));
+            pileGridGo.transform.SetParent(pp, false);
+            _pileGridArea = (RectTransform)pileGridGo.transform;
+            _pileGridArea.anchorMin = _pileGridArea.anchorMax = new Vector2(0.5f, 0.5f);
+            _pileGridArea.pivot = new Vector2(0.5f, 0.5f);
+            _pileGridArea.anchoredPosition = new Vector2(0f, -10f);
+            _pileGridArea.sizeDelta = new Vector2(1180f, 780f);
             CreateButton(pp, "닫기", new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 130f), new Vector2(220f, 62f),
                 () => _pilePanel.SetActive(false));
             _pilePanel.SetActive(false);
@@ -365,27 +373,41 @@ namespace Hwatu.Game
         /// <summary>더미(뽑을/버린/소멸) 내용을 카드명 ×수량으로 모달에 표시 — STS2식.</summary>
         private void ShowPile(System.Collections.Generic.List<CardInstance> pile, string title)
         {
-            var counts = new System.Collections.Generic.Dictionary<string, int>();
-            var order = new System.Collections.Generic.List<string>();
-            foreach (CardInstance c in pile)
-            {
-                string n = c.Data.Name;
-                if (counts.ContainsKey(n)) { counts[n]++; }
-                else { counts[n] = 1; order.Add(n); }
-            }
-            order.Sort();
-            var sb = new System.Text.StringBuilder($"<b>{title}</b>  ({pile.Count}장)\n\n");
-            if (pile.Count == 0)
-            {
-                sb.Append("(비어 있음)");
-            }
-            foreach (string n in order)
-            {
-                sb.Append($"{n} ×{counts[n]}\n");
-            }
-            _pileText.text = sb.ToString();
+            _pileText.text = pile.Count == 0 ? $"<b>{title}</b>  (비어 있음)" : $"<b>{title}</b>  ({pile.Count}장)";
+            PopulatePileGrid(pile);
             _pilePanel.SetActive(true);
             _pilePanel.transform.SetAsLastSibling();
+        }
+
+        /// <summary>더미 모달을 카드(CardView) 그리드로 채운다 — 한 줄 5장, 정적 배치(트윈 끔).</summary>
+        private void PopulatePileGrid(System.Collections.Generic.List<CardInstance> pile)
+        {
+            var kill = new System.Collections.Generic.List<GameObject>();
+            foreach (Transform c in _pileGridArea) { kill.Add(c.gameObject); }
+            foreach (GameObject g in kill) { Destroy(g); }
+
+            int cols = 5;
+            float scale = pile.Count > 15 ? 0.54f : 0.64f;
+            float cw = (200f * scale) + 30f;
+            float ch = (280f * scale) + 22f;
+            float x0 = -(cols - 1) / 2f * cw;
+            float y0 = (_pileGridArea.sizeDelta.y / 2f) - (ch / 2f) - 6f;
+            for (int i = 0; i < pile.Count; i++)
+            {
+                int col = i % cols;
+                int row = i / cols;
+                var go = new GameObject("PileCard", typeof(RectTransform));
+                go.transform.SetParent(_pileGridArea, false);
+                var cv = go.AddComponent<CardView>();
+                cv.Build(_font);
+                cv.Bind(pile[i], true);
+                cv.enabled = false;   // 손패 트윈 비활성 — 모달은 정적 배치
+                var rt = (RectTransform)go.transform;
+                rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
+                rt.pivot = new Vector2(0.5f, 0.5f);
+                rt.localScale = new Vector3(scale, scale, 1f);
+                rt.anchoredPosition = new Vector2(x0 + col * cw, y0 - row * ch);
+            }
         }
 
         private void RebuildHand(CombatState s)
