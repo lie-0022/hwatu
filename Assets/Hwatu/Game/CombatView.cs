@@ -227,7 +227,7 @@ namespace Hwatu.Game
             _playerHpBar.Set(p.Hp, p.MaxHp);
             _playerText.text =
                 $"에너지 {p.Energy}/{p.BaseEnergy}    방어 {p.Block}\n" +
-                $"턴 {s.Turn}    덱 {s.DrawPile.Count}    버린 {s.DiscardPile.Count}";
+                $"턴 {s.Turn}   덱 {s.DrawPile.Count}  버린 {s.DiscardPile.Count}  소멸 {s.ExhaustPile.Count}";
             RebuildStatus(p);
 
             RebuildHand(s);

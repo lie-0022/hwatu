@@ -497,6 +497,7 @@ namespace Hwatu.Game
         {
             var go = new GameObject("Reward_" + card.Id, typeof(RectTransform), typeof(Image), typeof(Button));
             go.transform.SetParent(_rewardCardArea, false);
+            go.AddComponent<TooltipTrigger>().Set(GameInfo.CardDesc(card));
             var rt = (RectTransform)go.transform;
             rt.anchorMin = new Vector2(0.5f, 0.5f);
             rt.anchorMax = new Vector2(0.5f, 0.5f);
