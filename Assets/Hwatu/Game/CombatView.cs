@@ -35,6 +35,8 @@ namespace Hwatu.Game
         private RectTransform _handArea;
         private RectTransform _playerStatusArea;
         private static readonly StatusType[] s_statusOrder = { StatusType.Radiance, StatusType.Dexterity, StatusType.Weak, StatusType.Vulnerable, StatusType.Poison };
+        private GameObject _pilePanel;
+        private TextMeshProUGUI _pileText;
         private GameObject _resultPanel;
         private TextMeshProUGUI _resultText;
         private TargetingArrow _arrow;
@@ -158,6 +160,29 @@ namespace Hwatu.Game
             CreateButton(rp, "다시 시작", new Vector2(0.5f, 0.42f), new Vector2(0.5f, 0.42f), Vector2.zero, new Vector2(220, 66),
                 () => { _controller.NewCombat(); Refresh(); });
             _resultPanel.SetActive(false);
+
+            // 더미 보기 버튼(우하단 세로) — STS2식 draw/discard/exhaust
+            CreateButton(root, "뽑을 카드", new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-130f, 486f), new Vector2(170f, 52f),
+                () => ShowPile(_controller.State.DrawPile, "뽑을 카드 (남은 덱)"));
+            CreateButton(root, "버린 카드", new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-130f, 428f), new Vector2(170f, 52f),
+                () => ShowPile(_controller.State.DiscardPile, "버린 카드"));
+            CreateButton(root, "소멸 카드", new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-130f, 370f), new Vector2(170f, 52f),
+                () => ShowPile(_controller.State.ExhaustPile, "소멸한 카드"));
+
+            // 더미 내용 모달
+            _pilePanel = new GameObject("PilePanel", typeof(RectTransform), typeof(Image));
+            _pilePanel.transform.SetParent(root, false);
+            var pp = _pilePanel.GetComponent<RectTransform>();
+            pp.anchorMin = Vector2.zero;
+            pp.anchorMax = Vector2.one;
+            pp.offsetMin = Vector2.zero;
+            pp.offsetMax = Vector2.zero;
+            _pilePanel.GetComponent<Image>().color = new Color(0.02f, 0.02f, 0.04f, 0.9f);
+            _pileText = CreateText(pp, "PileText", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, 30f, TextAlignmentOptions.Top);
+            _pileText.rectTransform.sizeDelta = new Vector2(840f, 720f);
+            CreateButton(pp, "닫기", new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 130f), new Vector2(220f, 62f),
+                () => _pilePanel.SetActive(false));
+            _pilePanel.SetActive(false);
         }
 
         /// <summary>전투 화면(Canvas) 표시 토글(한 판 루프에서 GameFlow가 제어).</summary>
@@ -318,6 +343,32 @@ namespace Hwatu.Game
                 case StatusType.Poison:     return new Color(0.35f, 0.6f, 0.3f, 0.95f);
                 default:                    return new Color(0.4f, 0.4f, 0.4f, 0.95f);
             }
+        }
+
+        /// <summary>더미(뽑을/버린/소멸) 내용을 카드명 ×수량으로 모달에 표시 — STS2식.</summary>
+        private void ShowPile(System.Collections.Generic.List<CardInstance> pile, string title)
+        {
+            var counts = new System.Collections.Generic.Dictionary<string, int>();
+            var order = new System.Collections.Generic.List<string>();
+            foreach (CardInstance c in pile)
+            {
+                string n = c.Data.Name;
+                if (counts.ContainsKey(n)) { counts[n]++; }
+                else { counts[n] = 1; order.Add(n); }
+            }
+            order.Sort();
+            var sb = new System.Text.StringBuilder($"<b>{title}</b>  ({pile.Count}장)\n\n");
+            if (pile.Count == 0)
+            {
+                sb.Append("(비어 있음)");
+            }
+            foreach (string n in order)
+            {
+                sb.Append($"{n} ×{counts[n]}\n");
+            }
+            _pileText.text = sb.ToString();
+            _pilePanel.SetActive(true);
+            _pilePanel.transform.SetAsLastSibling();
         }
 
         private void RebuildHand(CombatState s)
