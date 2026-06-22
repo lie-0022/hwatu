@@ -270,7 +270,8 @@ namespace Hwatu.Game
             for (int i = 0; i < ev.Choices.Count; i++)
             {
                 int idx = i;
-                CreateButton(_eventChoiceArea.gameObject, ev.Choices[i].Label, new Vector2(0, -i * 70), () => _flow.OnEventChoice(idx));
+                CreateButton(_eventChoiceArea.gameObject, ev.Choices[i].Label, new Vector2(0, -i * 70), () => _flow.OnEventChoice(idx))
+                    .gameObject.AddComponent<TooltipTrigger>().Set(ev.Choices[idx].Result);
             }
         }
 
