@@ -34,6 +34,8 @@ namespace Hwatu.Core.Content
                     run => run.EnchantCard(0, "sharp")),
                 new EventChoice("강하게 벼린다 (공격/방어 +4, 단 1회 쓰면 소멸)", "강철빛이 돌지만 한 번 쓰면 부서진다.",
                     run => run.EnchantCard(0, "brittle")),
+                new EventChoice("빛을 새긴다 (쓸 때마다 광 +1)", "은은한 빛이 깃든다.",
+                    run => run.EnchantCard(0, "radiant")),
                 new EventChoice("그냥 지나간다", "화로가 식어간다.", run => { }),
             });
 
