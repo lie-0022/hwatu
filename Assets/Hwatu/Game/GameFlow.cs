@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using Hwatu.Core.Cards;
 using Hwatu.Core.Rng;
 using Hwatu.Core.Run;
 
@@ -17,7 +18,8 @@ namespace Hwatu.Game
         GameOver,
         Victory,
         Event,
-        Rest
+        Rest,
+        Shop
     }
 
     /// <summary>
@@ -34,6 +36,8 @@ namespace Hwatu.Game
         public RunState Run { get; private set; }
         public RunPhase Phase { get; private set; }
         public EventData CurrentEvent { get; private set; }   // 이벤트 노드 진입 시 채워짐(RunUI가 읽음)
+        public CardData CurrentShopCard { get; private set; }   // 상점 노드 진입 시 매물 카드
+        public int ShopPrice { get; private set; }
 
         /// <summary>페이즈 전환 시 발생(현재 페이즈 전달).</summary>
         public event Action<RunPhase> OnPhaseChanged;
@@ -81,6 +85,33 @@ namespace Hwatu.Game
             SetPhase(RunPhase.Map);
         }
 
+        /// <summary>상점 매물 카드 구매(골드 충분 시). 후 맵 복귀.</summary>
+        public void OnBuyCard()
+        {
+            if (CurrentShopCard != null && Run.TrySpend(ShopPrice))
+            {
+                Run.AddCard(CurrentShopCard);
+                CurrentShopCard = null;
+            }
+            SetPhase(RunPhase.Map);
+        }
+
+        /// <summary>상점 나가기.</summary>
+        public void OnShopLeave()
+        {
+            SetPhase(RunPhase.Map);
+        }
+
+        private static int ShopCardPrice(CardRarity rarity)
+        {
+            switch (rarity)
+            {
+                case CardRarity.Rare: return 150;
+                case CardRarity.Uncommon: return 75;
+                default: return 50;
+            }
+        }
+
         /// <summary>현재 액트의 맵을 생성한다(맵 전용 RNG 스트림).</summary>
         public void GenerateActMap()
         {
@@ -124,8 +155,17 @@ namespace Hwatu.Game
                     }
                     SetPhase(RunPhase.Event);
                     break;
+                case NodeType.Shop:
+                    // 상점: 매물 카드 1장(캐릭터 풀에서) + 가격. 구매/나가기는 RunUI.
+                    {
+                        IRandom shopRng = new RngStreams(Run.Seed).ForStream("shop_" + node.Id);
+                        var pool = Hwatu.Core.Content.CharacterPools.RewardPool(Run.Character.Id);
+                        CurrentShopCard = pool[shopRng.NextInt(pool.Count)];
+                        ShopPrice = ShopCardPrice(CurrentShopCard.Rarity);
+                    }
+                    SetPhase(RunPhase.Shop);
+                    break;
                 default:
-                    // 상점 — MVP stub(즉시 맵 복귀). UI 후속.
                     SetPhase(RunPhase.Map);
                     break;
             }
