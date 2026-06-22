@@ -84,7 +84,7 @@ namespace Hwatu.Game
         }
 
         /// <summary>적 상태를 박스에 반영한다.</summary>
-        public void Bind(EnemyState e)
+        public void Bind(EnemyState e, PlayerState player)
         {
             _nameText.text = e.Data.Name;
             _hpBar.Set(e.Hp, e.MaxHp);
@@ -93,9 +93,15 @@ namespace Hwatu.Game
             {
                 _intentBg.enabled = true;
                 _intentBg.color = IntentColor(e.CurrentIntent.Intent);
+                // 공격류는 약화·취약·광을 반영한 "실제로 들어올" 데미지로 표시(EffectDispatcher와 같은 DamageMath 공유)
+                IntentType it = e.CurrentIntent.Intent;
+                bool isAttack = it == IntentType.Attack || it == IntentType.AttackMulti || it == IntentType.Doom;
+                int shown = (isAttack && player != null)
+                    ? DamageMath.RawDamage(e, player, e.CurrentIntent.Value)
+                    : e.CurrentIntent.Value;
                 string num = e.CurrentIntent.Hits > 1
-                    ? $"{e.CurrentIntent.Value}×{e.CurrentIntent.Hits}"
-                    : e.CurrentIntent.Value.ToString();
+                    ? $"{shown}×{e.CurrentIntent.Hits}"
+                    : shown.ToString();
                 string doomTag = (e.CurrentIntent.Intent == IntentType.Doom && e.DoomTimer > 0)
                     ? $"  <size=80%>({e.DoomTimer})</size>" : "";
                 _intentText.text = $"{IntentKor(e.CurrentIntent.Intent)}  <b><size=135%>{num}</size></b>{doomTag}";

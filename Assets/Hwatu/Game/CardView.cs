@@ -113,9 +113,7 @@ namespace Hwatu.Game
             _typeText.text = TypeKor(d.Type);
             _nameText.text = d.Name;
             _descText.text = Describe(d);
-            var tip = gameObject.GetComponent<TooltipTrigger>();
-            if (tip == null) { tip = gameObject.AddComponent<TooltipTrigger>(); }
-            tip.Set(GameInfo.CardDesc(d));
+            // 카드 자체에 이름·효과가 적혀 있어 hover 툴팁은 두지 않는다(손패에서 카드를 가리는 문제 회피).
 
             float a = playable ? 1f : 0.6f;
             _nameText.color = new Color(1f, 1f, 1f, a);

@@ -220,7 +220,7 @@ namespace Hwatu.Game
 
             if (s.Enemies.Count > 0)
             {
-                _enemyView.Bind(s.Enemies[0]);
+                _enemyView.Bind(s.Enemies[0], s.Player);
             }
 
             PlayerState p = s.Player;
