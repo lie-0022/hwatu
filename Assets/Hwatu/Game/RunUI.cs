@@ -46,6 +46,8 @@ namespace Hwatu.Game
         private CombatController _combatCtrl;
         private CombatView _combatView;
         private GameObject _potionBarGo;
+        private GameObject _deckPanel;
+        private TextMeshProUGUI _deckText;
 
         private void Start()
         {
@@ -85,6 +87,16 @@ namespace Hwatu.Game
             _mapView = _mapPanel.AddComponent<MapView>();
             _mapView.Init(_flow, _font, _mapPanel.GetComponent<RectTransform>());
             _mapHud = CreateText(_mapPanel, "", 30f, new Vector2(0, 320));
+            CreateButton(_mapPanel, "덱 보기", new Vector2(720, 320), () => OpenDeckView());
+
+            // 덱 보기 모달(맵 위 오버레이 — 버튼으로 열고 닫음)
+            _deckPanel = CreatePanel(root, "DeckPanel", new Color(0.05f, 0.05f, 0.08f, 0.98f));
+            CreateText(_deckPanel, "보유 덱", 50f, new Vector2(0, 430));
+            _deckText = CreateText(_deckPanel, "", 30f, new Vector2(0, 0));
+            _deckText.rectTransform.sizeDelta = new Vector2(900f, 740f);
+            _deckText.alignment = TextAlignmentOptions.Top;
+            CreateButton(_deckPanel, "닫기", new Vector2(0, -440), () => CloseDeckView());
+            _deckPanel.SetActive(false);
 
             // 보상(카드 3택1 + 스킵)
             _rewardPanel = CreatePanel(root, "RewardPanel", new Color(0.09f, 0.09f, 0.06f, 0.97f));
@@ -150,6 +162,7 @@ namespace Hwatu.Game
             _menuPanel.SetActive(p == RunPhase.MainMenu);
             _charPanel.SetActive(p == RunPhase.CharacterSelect);
             _mapPanel.SetActive(p == RunPhase.Map);
+            _deckPanel.SetActive(false);
             _rewardPanel.SetActive(p == RunPhase.Reward);
             _resultPanel.SetActive(p == RunPhase.GameOver || p == RunPhase.Victory);
             _eventPanel.SetActive(p == RunPhase.Event);
@@ -222,6 +235,44 @@ namespace Hwatu.Game
                 return;
             }
             _shopText.text = $"골드 {_flow.Run.Gold}\n매물: <b>{_flow.CurrentShopCard.Name}</b> — {_flow.ShopPrice}골드";
+        }
+
+        /// <summary>덱 보기 모달을 현재 덱(카드명 ×수량, 이름순)으로 채워 연다.</summary>
+        private void OpenDeckView()
+        {
+            if (_flow.Run == null)
+            {
+                return;
+            }
+            var counts = new Dictionary<string, int>();
+            var order = new List<string>();
+            foreach (CardData c in _flow.Run.Deck)
+            {
+                if (counts.TryGetValue(c.Name, out int n))
+                {
+                    counts[c.Name] = n + 1;
+                }
+                else
+                {
+                    counts[c.Name] = 1;
+                    order.Add(c.Name);
+                }
+            }
+            order.Sort();
+            string text = $"총 {_flow.Run.Deck.Count}장\n\n";
+            foreach (string name in order)
+            {
+                text += $"{name} ×{counts[name]}\n";
+            }
+            _deckText.text = text;
+            _deckPanel.SetActive(true);
+            _deckPanel.transform.SetAsLastSibling();
+        }
+
+        /// <summary>덱 보기 모달을 닫는다.</summary>
+        private void CloseDeckView()
+        {
+            _deckPanel.SetActive(false);
         }
 
         /// <summary>전투 중 포션 슬롯 버튼을 현재 보유 포션으로 다시 그린다(좌측 세로).</summary>
