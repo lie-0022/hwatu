@@ -12,6 +12,7 @@ namespace Hwatu.Core.Enemies
         private readonly EnemyData _data;
         private readonly int _blockThreshold;
         private string _cached;
+        private int _step;   // Block 낮을 때 order[1..] 순환용(매턴 같은 강타 반복 방지)
 
         public ConditionalAi(EnemyData data, int blockThreshold = 8)
         {
@@ -35,13 +36,16 @@ namespace Hwatu.Core.Enemies
             if (order.Count == 0) { return null; }
             if (player != null && player.Block >= _blockThreshold)
             {
-                return order[0];
+                return order[0];   // 디버프(약화/취약)로 방어 무력화
             }
-            return order.Count >= 2 ? order[1] : order[0];
+            // Block 낮음: order[1..]를 순환(공격↔버프 — 매턴 같은 강타만 반복하지 않게)
+            if (order.Count <= 1) { return order[0]; }
+            return order[1 + (_step % (order.Count - 1))];
         }
 
         public void Advance()
         {
+            _step++;
             _cached = null;
         }
     }

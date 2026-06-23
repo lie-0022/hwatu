@@ -186,8 +186,8 @@ namespace Hwatu.Core.Content
                 new EnemyMoveData("enrage", IntentType.Buff, 3,
                     new[] { new EffectData(EffectOp.GainResource, amount: 3, target: TargetType.Self, resource: ResourceType.Radiance) }),
             },
-            EnemyAiKind.Sequence,
-            new[] { "glare", "enrage", "oni_smash" });
+            EnemyAiKind.Conditional,
+            new[] { "glare", "oni_smash", "enrage" });   // 조건부: Block↑면 glare(약화), Block↓면 oni_smash(강타)
 
         // 보스 구미호: 환혹(약화3)/꼬리치기(4×3)/여우불(12), HP 50%↓ 광폭 [구미폭8×3/여우불/꼬리치기]
         public static EnemyData Gumiho() => new EnemyData(
