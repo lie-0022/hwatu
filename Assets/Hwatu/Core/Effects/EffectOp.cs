@@ -11,5 +11,6 @@ namespace Hwatu.Core.Effects
         public const string ApplyStatus = "apply_status";
         public const string GainResource = "gain_resource";
         public const string ClearStatus = "clear_status";
+        public const string ConsumeRadiance = "consume_radiance";   // 광 전부 소비 → (소비한 광 × amount) 데미지 (STS2 Stars식)
     }
 }

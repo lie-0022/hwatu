@@ -131,13 +131,17 @@ namespace Hwatu.Core.Content
         public static CardData Glint() => new CardData("lum_glint", "섬광", CardType.Attack, 0, TargetType.Enemy, true,
             new[] { new EffectData(EffectOp.DealDamage, amount: 5, target: TargetType.Enemy) }, CardRarity.Uncommon);
 
-        /// <summary>보상 추첨에 쓰는 광객 카드 풀(25장: Common5/Uncommon12/Rare8).</summary>
+        // 광 폭발(STS2 Stars식 자원 소비 피니셔): 보유 광 전부 소비 → 광×3 데미지
+        public static CardData RadiantNova() => new CardData("lum_nova", "광폭발", CardType.Attack, 2, TargetType.Enemy, true,
+            new[] { new EffectData(EffectOp.ConsumeRadiance, amount: 3, target: TargetType.Enemy) }, CardRarity.Rare);
+
+        /// <summary>보상 추첨에 쓰는 광객 카드 풀(26장: Common5/Uncommon12/Rare9).</summary>
         public static List<CardData> RewardPool()
         {
             return new List<CardData>
             {
                 HeavyStrike(), Guard(), Whet(), Jab(), Check(),
-                Glow(), Daybreak(), Pierce(), LightRay(), Stockpile(), Purify(), Vigil(), Dawn(), Bulwark(), Volley(), LightVeil(), Glint(),
+                Glow(), Daybreak(), Pierce(), LightRay(), Stockpile(), Purify(), Vigil(), Dawn(), Bulwark(), Volley(), LightVeil(), Glint(), RadiantNova(),
                 Burst(), GreatShield(), RadiantSurge(), Frenzy(), WhiteFlash(), Awaken(), Meteor(), LightWave(),
             };
         }

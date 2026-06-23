@@ -20,6 +20,7 @@ namespace Hwatu.Core.Effects
                 case EffectOp.ApplyStatus: ApplyStatus(e, ctx); break;
                 case EffectOp.GainResource: GainResource(e, ctx); break;
                 case EffectOp.ClearStatus: ClearStatus(e, ctx); break;
+                case EffectOp.ConsumeRadiance: ConsumeRadiance(e, ctx); break;
                 default: throw new NotSupportedException("Unknown effect op: " + e.Op);
             }
         }
@@ -83,6 +84,19 @@ namespace Hwatu.Core.Effects
             {
                 who.AddStatus(e.Status, -cur);
             }
+        }
+
+        // 광(Radiance)을 전부 소비해 (소비한 광 × e.Amount) 데미지(STS2 Stars식 자원 폭발). 약화·취약은 적용.
+        private static void ConsumeRadiance(EffectData e, IEffectContext ctx)
+        {
+            int rad = ctx.Source.GetStatus(StatusType.Radiance);
+            if (rad <= 0) { return; }
+            ctx.Source.AddStatus(StatusType.Radiance, -rad);   // 광 전부 소비
+            int dmg = DamageMath.RawDamage(ctx.Source, ctx.Target, rad * e.Amount);  // 광 0 상태 → base만 + 약화/취약 보정
+            int block = ctx.Target.Block;
+            if (dmg <= block) { ctx.Target.SetBlock(block - dmg); return; }
+            ctx.Target.SetBlock(0);
+            ctx.Target.SetHp(ctx.Target.Hp - (dmg - block));
         }
 
         // Self면 Source(시전자), 그 외면 컨텍스트가 정한 Target.
