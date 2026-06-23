@@ -147,13 +147,21 @@ namespace Hwatu.Core.Content
         public static CardData Mend() => new CardData("lum_mend", "치유광", CardType.Skill, 1, TargetType.Self, false,
             new[] { new EffectData(EffectOp.ApplyStatus, amount: 3, target: TargetType.Self, status: StatusType.Regen) }, CardRarity.Uncommon);
 
-        /// <summary>보상 추첨에 쓰는 광객 카드 풀(28장: Common5/Uncommon14/Rare9).</summary>
+        // 가시: 피격 시 반사(방어7 + 가시3) — 광객 방어·반격 축
+        public static CardData ThornAura() => new CardData("lum_thorn", "가시광", CardType.Skill, 1, TargetType.Self, false,
+            new[]
+            {
+                new EffectData(EffectOp.GainBlock, amount: 7, target: TargetType.Self),
+                new EffectData(EffectOp.ApplyStatus, amount: 3, target: TargetType.Self, status: StatusType.Thorns),
+            }, CardRarity.Uncommon);
+
+        /// <summary>보상 추첨에 쓰는 광객 카드 풀(29장: Common5/Uncommon15/Rare9).</summary>
         public static List<CardData> RewardPool()
         {
             return new List<CardData>
             {
                 HeavyStrike(), Guard(), Whet(), Jab(), Check(),
-                Glow(), Daybreak(), Pierce(), LightRay(), Stockpile(), Purify(), Vigil(), Dawn(), Bulwark(), Volley(), LightVeil(), Glint(), RadiantNova(), RadiantPulse(), Mend(),
+                Glow(), Daybreak(), Pierce(), LightRay(), Stockpile(), Purify(), Vigil(), Dawn(), Bulwark(), Volley(), LightVeil(), Glint(), RadiantNova(), RadiantPulse(), Mend(), ThornAura(),
                 Burst(), GreatShield(), RadiantSurge(), Frenzy(), WhiteFlash(), Awaken(), Meteor(), LightWave(),
             };
         }

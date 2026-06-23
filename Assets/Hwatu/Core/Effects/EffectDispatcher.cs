@@ -38,10 +38,23 @@ namespace Hwatu.Core.Effects
             if (dmg <= block)
             {
                 ctx.Target.SetBlock(block - dmg);
-                return;
             }
-            ctx.Target.SetBlock(0);
-            ctx.Target.SetHp(ctx.Target.Hp - (dmg - block));
+            else
+            {
+                ctx.Target.SetBlock(0);
+                ctx.Target.SetHp(ctx.Target.Hp - (dmg - block));
+            }
+            ReflectThorns(ctx);   // 공격받으면 가시 반사(Block 흡수 여부와 무관)
+        }
+
+        // 가시(Thorns): 피격 시 공격자(Source)에게 스택만큼 반사(Block 무시). 영구 유지(감소 없음).
+        private static void ReflectThorns(IEffectContext ctx)
+        {
+            int thorns = ctx.Target.GetStatus(StatusType.Thorns);
+            if (thorns > 0)
+            {
+                ctx.Source.SetHp(System.Math.Max(0, ctx.Source.Hp - thorns));
+            }
         }
 
         private static void GainBlock(EffectData e, IEffectContext ctx)
