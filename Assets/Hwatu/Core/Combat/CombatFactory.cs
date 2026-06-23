@@ -20,8 +20,15 @@ namespace Hwatu.Core.Combat
                 masterSeed, playerMaxHp: 80, playerHp: 80);
         }
 
-        /// <summary>임의의 덱·적·플레이어 HP로 전투를 조립한다(한 판 루프: RunState가 주입). 시드로 결정론.</summary>
+        /// <summary>임의의 덱·적(1마리)·플레이어 HP로 전투를 조립한다(한 판 루프: RunState가 주입). 다중 오버로드에 위임.</summary>
         public static CombatState CreateCombat(IReadOnlyList<CardData> deck, EnemyData enemyData,
+            ulong masterSeed, int playerMaxHp, int playerHp, IReadOnlyList<RelicData> relics = null, int ascension = 0)
+        {
+            return CreateCombat(deck, new[] { enemyData }, masterSeed, playerMaxHp, playerHp, relics, ascension);
+        }
+
+        /// <summary>다중 적 전투 조립(STS식 1~다수 몬스터). 각 적 HP는 같은 enemyHp 스트림에서 순차 롤(결정론).</summary>
+        public static CombatState CreateCombat(IReadOnlyList<CardData> deck, IReadOnlyList<EnemyData> enemyDatas,
             ulong masterSeed, int playerMaxHp, int playerHp, IReadOnlyList<RelicData> relics = null, int ascension = 0)
         {
             var streams = new RngStreams(masterSeed);
@@ -39,15 +46,21 @@ namespace Hwatu.Core.Combat
                 }
             }
 
-            int hpRange = enemyData.MaxHpMax - enemyData.MaxHpMin + 1;
-            int baseHp = enemyData.MaxHpMin + streams.ForStream("enemyHp").NextInt(hpRange);
-            int enemyHp = baseHp * AscensionRules.EnemyHpPercent(ascension) / 100;
-            IEnemyAi ai = enemyData.AiKind == EnemyAiKind.Phase && enemyData.SecondPhaseOrder != null
-                ? new PhaseAi(enemyData, enemyData.AiOrder, enemyData.SecondPhaseOrder)
-                : (IEnemyAi)new SequenceAi(enemyData);
-            var enemy = new EnemyState(enemyData, enemyHp, ai);
+            var hpStream = streams.ForStream("enemyHp");
+            var enemies = new List<EnemyState>();
+            for (int i = 0; i < enemyDatas.Count; i++)
+            {
+                EnemyData ed = enemyDatas[i];
+                int hpRange = ed.MaxHpMax - ed.MaxHpMin + 1;
+                int baseHp = ed.MaxHpMin + hpStream.NextInt(hpRange);
+                int enemyHp = baseHp * AscensionRules.EnemyHpPercent(ascension) / 100;
+                IEnemyAi ai = ed.AiKind == EnemyAiKind.Phase && ed.SecondPhaseOrder != null
+                    ? new PhaseAi(ed, ed.AiOrder, ed.SecondPhaseOrder)
+                    : (IEnemyAi)new SequenceAi(ed);
+                enemies.Add(new EnemyState(ed, enemyHp, ai));
+            }
 
-            var state = new CombatState(player, new List<EnemyState> { enemy }, streams.ForStream("combatShuffle"));
+            var state = new CombatState(player, enemies, streams.ForStream("combatShuffle"));
 
             int instanceId = 0;
             foreach (CardData card in deck)
