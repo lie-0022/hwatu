@@ -44,13 +44,16 @@ namespace Hwatu.Core.Content
         public static RelicData RegenCharm() => new RelicData("relic_regen", "재생부적", "전투 시작 시 재생 3(이후 턴마다 회복).",
             p => p.AddStatus(StatusType.Regen, 3));
 
+        public static RelicData ThornMail() => new RelicData("relic_thornmail", "가시갑옷", "전투 시작 시 가시 2(피격 시 반사).",
+            p => p.AddStatus(StatusType.Thorns, 2));
+
         /// <summary>전체 유물 풀(보물/엘리트/보스 보상 추첨용).</summary>
         public static List<RelicData> AllRelics()
         {
             return new List<RelicData>
             {
                 Cushion(), Blanket(), Lantern(), CoinPouch(), Whetstone(),
-                Charm(), RuneStone(), SteelScale(), RiceCake(), Gourd(), InkStone(), Herb(), RegenCharm(),
+                Charm(), RuneStone(), SteelScale(), RiceCake(), Gourd(), InkStone(), Herb(), RegenCharm(), ThornMail(),
             };
         }
     }

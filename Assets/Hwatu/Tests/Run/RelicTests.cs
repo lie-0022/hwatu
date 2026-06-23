@@ -91,9 +91,17 @@ namespace Hwatu.Tests.Run
         }
 
         [Test]
-        public void AllRelics_AreThirteen()
+        public void ThornMail_GivesThornsOnCombatStart()
         {
-            Assert.AreEqual(13, RelicContent.AllRelics().Count);
+            var p = new PlayerState(80);
+            RelicContent.ThornMail().ApplyCombatStart(p);
+            Assert.AreEqual(2, p.GetStatus(StatusType.Thorns));
+        }
+
+        [Test]
+        public void AllRelics_AreFourteen()
+        {
+            Assert.AreEqual(14, RelicContent.AllRelics().Count);
         }
     }
 }
