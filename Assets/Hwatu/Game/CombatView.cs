@@ -24,12 +24,16 @@ namespace Hwatu.Game
         private TMP_FontAsset _font;
         private Canvas _canvas;
 
-        private EnemyView _enemyView;
+        /// <summary>최대 3마리 적 뷰(미리 생성, 슬롯 단위 재사용).</summary>
+        private readonly List<EnemyView> _enemyViews = new List<EnemyView>();
+        private int[] _prevEnemyHps = System.Array.Empty<int>();
+        private const int MaxEnemies = 3;
+        /// <summary>적 박스 폭(400) + 여백(40) = 슬롯 간격.</summary>
+        private const float EnemySpacing = 440f;
         private TextMeshProUGUI _playerText;
         private Outline _playerOutline;
         private HpBar _playerHpBar;
         private RectTransform _root;
-        private int _prevEnemyHp;
         private int _prevPlayerHp;
         private readonly Dictionary<int, CardView> _cardViews = new Dictionary<int, CardView>();
         private RectTransform _handArea;
@@ -78,16 +82,21 @@ namespace Hwatu.Game
             RectTransform root = canvasGo.GetComponent<RectTransform>();
             _root = root;
 
-            // 적 영역(상단 중앙) — 박스(드롭 타깃 + 조준 테두리)
-            var enemyGo = new GameObject("EnemyView", typeof(RectTransform));
-            enemyGo.transform.SetParent(root, false);
-            var ert = (RectTransform)enemyGo.transform;
-            ert.anchorMin = new Vector2(0.5f, 1f);
-            ert.anchorMax = new Vector2(0.5f, 1f);
-            ert.pivot = new Vector2(0.5f, 1f);
-            ert.anchoredPosition = new Vector2(0f, -70f);
-            _enemyView = enemyGo.AddComponent<EnemyView>();
-            _enemyView.Build(_font, 0);
+            // 적 영역(상단, 최대 3슬롯 미리 생성) — 실제 위치는 Refresh 시 적 수에 따라 가운데 정렬
+            for (int i = 0; i < MaxEnemies; i++)
+            {
+                var enemyGo = new GameObject($"EnemyView_{i}", typeof(RectTransform));
+                enemyGo.transform.SetParent(root, false);
+                var ert = (RectTransform)enemyGo.transform;
+                ert.anchorMin = new Vector2(0.5f, 1f);
+                ert.anchorMax = new Vector2(0.5f, 1f);
+                ert.pivot = new Vector2(0.5f, 1f);
+                ert.anchoredPosition = new Vector2(0f, -70f);
+                var ev = enemyGo.AddComponent<EnemyView>();
+                ev.Build(_font, i);
+                enemyGo.SetActive(false);
+                _enemyViews.Add(ev);
+            }
 
             // 플레이어 영역(좌하단) — 박스 + 테두리(방어 카드 드래그 시 강조)
             var playerGo = new GameObject("PlayerView", typeof(RectTransform), typeof(Image));
@@ -210,25 +219,60 @@ namespace Hwatu.Game
                 return;
             }
 
-            // HP 감소량만큼 피해 팝업(엔진 수정 없이 UI에서 감지)
-            int curEnemyHp = s.Enemies.Count > 0 ? s.Enemies[0].Hp : 0;
+            // 적별 HP 감소량만큼 피해 팝업(엔진 수정 없이 UI에서 감지)
             int curPlayerHp = s.Player.Hp;
-            int enemyDamage = _prevEnemyHp - curEnemyHp;
             int playerDamage = _prevPlayerHp - curPlayerHp;
-            if (enemyDamage > 0 && _enemyView != null)
-            {
-                ShowDamagePopup(_enemyView.transform.position, enemyDamage, new Color(1f, 0.95f, 0.45f));
-            }
             if (playerDamage > 0 && _playerOutline != null)
             {
                 ShowDamagePopup(_playerOutline.transform.position + new Vector3(0f, 80f, 0f), playerDamage, new Color(1f, 0.45f, 0.4f));
             }
-            _prevEnemyHp = curEnemyHp;
             _prevPlayerHp = curPlayerHp;
 
-            if (s.Enemies.Count > 0)
+            // 살아있는 적만 active + 위치 가운데 정렬
+            int activeCount = 0;
+            for (int i = 0; i < s.Enemies.Count && i < MaxEnemies; i++)
             {
-                _enemyView.Bind(s.Enemies[0], s.Player);
+                if (!s.Enemies[i].IsDead) { activeCount++; }
+            }
+
+            int slotIdx = 0;
+            for (int i = 0; i < MaxEnemies; i++)
+            {
+                bool inRange = i < s.Enemies.Count;
+                bool alive   = inRange && !s.Enemies[i].IsDead;
+                _enemyViews[i].gameObject.SetActive(alive);
+
+                if (alive)
+                {
+                    // 가운데 정렬: slotIdx 번째 표시 칸의 x = (slotIdx - (activeCount-1)/2f) * spacing
+                    float x = (slotIdx - (activeCount - 1) / 2f) * EnemySpacing;
+                    var ert = (RectTransform)_enemyViews[i].transform;
+                    ert.anchoredPosition = new Vector2(x, -70f);
+
+                    _enemyViews[i].Bind(s.Enemies[i], s.Player);
+
+                    // 적별 데미지 팝업
+                    if (i < _prevEnemyHps.Length)
+                    {
+                        int dmg = _prevEnemyHps[i] - s.Enemies[i].Hp;
+                        if (dmg > 0)
+                        {
+                            ShowDamagePopup(_enemyViews[i].transform.position, dmg, new Color(1f, 0.95f, 0.45f));
+                        }
+                    }
+
+                    slotIdx++;
+                }
+            }
+
+            // prevHp 배열 갱신(살아있는 적만 아니라 전체 슬롯 기준으로 저장해 인덱스 일치 유지)
+            if (_prevEnemyHps.Length != s.Enemies.Count)
+            {
+                _prevEnemyHps = new int[s.Enemies.Count];
+            }
+            for (int i = 0; i < s.Enemies.Count; i++)
+            {
+                _prevEnemyHps[i] = s.Enemies[i].Hp;
             }
 
             PlayerState p = s.Player;
@@ -277,12 +321,12 @@ namespace Hwatu.Game
             return ok;
         }
 
-        /// <summary>적 박스 조준 테두리(단일 적: 인자가 그 적이면 켜고, null이면 끈다).</summary>
+        /// <summary>적 박스 조준 테두리. 인자와 일치하는 뷰만 on, 나머지는 off(null이면 전부 off).</summary>
         public void SetEnemyHighlight(EnemyView enemy)
         {
-            if (_enemyView != null)
+            foreach (EnemyView ev in _enemyViews)
             {
-                _enemyView.SetHighlight(enemy == _enemyView);
+                ev.SetHighlight(enemy != null && ev == enemy);
             }
         }
 
@@ -313,9 +357,17 @@ namespace Hwatu.Game
                 if (c.name == "DamagePopup") { kill.Add(c.gameObject); }
             }
             foreach (GameObject g in kill) { Destroy(g); }
+
             CombatState s = _controller.State;
-            _prevEnemyHp = (s != null && s.Enemies.Count > 0) ? s.Enemies[0].Hp : 0;
             _prevPlayerHp = s != null ? s.Player.Hp : 0;
+
+            // 적별 prevHp 초기화
+            int count = (s != null) ? s.Enemies.Count : 0;
+            _prevEnemyHps = new int[count];
+            for (int i = 0; i < count; i++)
+            {
+                _prevEnemyHps[i] = s.Enemies[i].Hp;
+            }
         }
 
         // 손패를 InstanceId로 재사용해 갱신한다(유지 카드는 위치만 트윈, 빠진 카드만 제거, 새 카드만 생성).
