@@ -76,11 +76,13 @@ namespace Hwatu.Game
             float w = _boxRt.sizeDelta.x * sf;
             float h = _boxRt.sizeDelta.y * sf;
             float x = mp.x + 18f;
-            float y = mp.y - 18f;
             if (x + w > Screen.width) { x = mp.x - 18f - w; }   // 우측 넘침 → 마우스 왼쪽으로
             if (x < 4f) { x = 4f; }
-            if (y - h < 4f) { y = h + 4f; }                     // 하단 넘침 → 위로
-            if (y > Screen.height - 4f) { y = Screen.height - 4f; }
+            // 기본은 마우스 '위쪽'으로 펼친다 — 상태칩이 패널 하단(플레이어 HUD)에 있어도 가리거나 잘리지 않게.
+            // pivot이 좌상단이라 position.y는 박스 상단(top), 하단은 top-h. 박스 하단을 마우스 위 18px에 둔다.
+            float y = mp.y + 18f + h;
+            if (y > Screen.height - 4f) { y = mp.y - 18f; }     // 위 공간 부족 → 마우스 아래로 펼침
+            if (y - h < 4f) { y = h + 4f; }                     // 그래도 넘치면 화면 안에 고정
             _boxRt.position = new Vector2(x, y);
         }
 
