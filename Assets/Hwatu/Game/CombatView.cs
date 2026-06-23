@@ -388,30 +388,31 @@ namespace Hwatu.Game
                 crt.anchorMin = new Vector2(0f, 0.5f);
                 crt.anchorMax = new Vector2(0f, 0.5f);
                 crt.pivot = new Vector2(0f, 0.5f);
-                crt.anchoredPosition = new Vector2(idx * 96f, 0f);
-                crt.sizeDelta = new Vector2(90f, 40f);
-                chip.GetComponent<Image>().color = StatusColor(st);
+                crt.anchoredPosition = new Vector2(idx * 64f, 0f);
+                crt.sizeDelta = new Vector2(58f, 40f);   // 아이콘+수치(이름은 아이콘이 대신, hover 설명)
+                chip.GetComponent<Image>().color = DesignTokens.StatusColor(st);
                 chip.GetComponent<TooltipTrigger>().Set(GameInfo.StatusDesc(st, amt));
-                var lbl = CreateText(crt, "L", Vector2.zero, Vector2.one, Vector2.zero, 20f, TextAlignmentOptions.Center);
-                lbl.enableAutoSizing = true;   // 큰 수치(취약 12 등)도 칩 안에 맞춤
+
+                // 칩 아이콘(game-icons — 칩 왼쪽, IconSm 규격)
+                var icoGo = new GameObject("Icon", typeof(RectTransform), typeof(Image));
+                icoGo.transform.SetParent(crt, false);
+                var icoRt = (RectTransform)icoGo.transform;
+                icoRt.anchorMin = new Vector2(0f, 0.5f);
+                icoRt.anchorMax = new Vector2(0f, 0.5f);
+                icoRt.pivot = new Vector2(0f, 0.5f);
+                icoRt.anchoredPosition = new Vector2(4f, 0f);
+                var ico = icoGo.GetComponent<Image>();
+                ico.raycastTarget = false;
+                IconLoader.Apply(this, ico, IconCatalog.ForStatus(st), Color.white, DesignTokens.IconSm);
+
+                var lbl = CreateText(crt, "L", Vector2.zero, Vector2.one, Vector2.zero, 20f, TextAlignmentOptions.Right);
+                lbl.enableAutoSizing = true;
                 lbl.fontSizeMin = 12f;
                 lbl.fontSizeMax = 20f;
-                lbl.text = $"{GameInfo.StatusName(st)} {amt}";
+                lbl.text = amt.ToString();
                 lbl.raycastTarget = false;
+                lbl.margin = new Vector4(0f, 0f, 6f, 0f);   // 수치 우측 패딩(아이콘과 분리)
                 idx++;
-            }
-        }
-
-        private static Color StatusColor(StatusType s)
-        {
-            switch (s)
-            {
-                case StatusType.Radiance:   return new Color(0.85f, 0.65f, 0.2f, 0.95f);
-                case StatusType.Dexterity:  return new Color(0.2f, 0.5f, 0.7f, 0.95f);
-                case StatusType.Weak:       return new Color(0.5f, 0.35f, 0.6f, 0.95f);
-                case StatusType.Vulnerable: return new Color(0.7f, 0.35f, 0.3f, 0.95f);
-                case StatusType.Poison:     return new Color(0.35f, 0.6f, 0.3f, 0.95f);
-                default:                    return new Color(0.4f, 0.4f, 0.4f, 0.95f);
             }
         }
 
