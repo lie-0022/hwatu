@@ -44,6 +44,7 @@ namespace Hwatu.Game
         private GameObject _shopPanel;
         private RectTransform _shopItemsRoot;
         private TextMeshProUGUI _shopText;
+        private TextMeshProUGUI _shopGoldChip;
 
         private MapView _mapView;
         private GameObject _combatGo;
@@ -199,7 +200,8 @@ namespace Hwatu.Game
             // 상점(STS2식 다중 매물: 카드·유물·포션 동시 진열 + 개별 구매)
             _shopPanel = CreatePanel(root, "ShopPanel", new Color(0.10f, 0.08f, 0.04f, 0.97f));
             CreateText(_shopPanel, "상점", 50f, new Vector2(0, 440));
-            _shopText = CreateText(_shopPanel, "", 30f, new Vector2(0, 380));
+            _shopGoldChip = UiChips.MakeHudChip(this, _shopPanel.transform, _font, IconCatalog.Gold, DesignTokens.Gold, new Vector2(40f, -40f), 120f);
+            _shopText = CreateText(_shopPanel, "", 26f, new Vector2(0, 380));
             var itemsRootGo = new GameObject("ShopItems", typeof(RectTransform));
             itemsRootGo.transform.SetParent(_shopPanel.transform, false);
             _shopItemsRoot = (RectTransform)itemsRootGo.transform;
@@ -332,7 +334,8 @@ namespace Hwatu.Game
         /// <summary>상점 화면을 현재 매물(카드·유물·포션)로 채운다 — 개별 구매 버튼 그리드.</summary>
         private void BuildShop()
         {
-            _shopText.text = $"골드 {_flow.Run.Gold}    <size=64%>(매물에 마우스를 올리면 효과)</size>";
+            _shopGoldChip.text = _flow.Run.Gold.ToString();
+            _shopText.text = "<size=70%>(매물에 마우스를 올리면 효과)</size>";
 
             var kill = new List<GameObject>();
             foreach (Transform c in _shopItemsRoot) { kill.Add(c.gameObject); }
