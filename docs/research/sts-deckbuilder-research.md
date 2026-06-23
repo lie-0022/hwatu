@@ -86,6 +86,11 @@
 
 > 출처: [Relics — Fandom](https://slay-the-spire.fandom.com/wiki/Relics) · [Relic Tier List — Unduel](https://unduel.com/slay-the-spire/tier-list/the-best-common-uncommon-and-rare-relics)
 
+### 3.3 화투 트리거 확장 구현 (2026-06)
+- **1차 구현**: `RelicData.onTurnStart` 훅 추가 → 전투시작 외 **'매 턴 시작'** 트리거 도입. `EchoHide`(산울림 가죽, 매턴 방어4)가 첫 적용.
+- **순환 의존 회피**: RelicData(Run)가 PlayerState(Combat)를 참조하므로 CombatState가 RelicData를 직접 들면 Run↔Combat 순환. → `CombatState.OnTurnStartHooks`(`List<Action<PlayerState>>`)로 우회. CombatFactory가 `relic.ApplyTurnStart` 메서드 그룹을 주입, CombatEngine.StartPlayerTurn에서 실행.
+- **후속 트리거 후보**: 피격 시(EffectDispatcher.DealDamage 훅)·카드 플레이 시(타입별)·HP 임계·처치 시. 같은 Action-주입 패턴으로 확장 가능.
+
 ## 4. 적 AI / 의도(Intent) 패턴
 
 ### 4.1 핵심 (STS1/2)
