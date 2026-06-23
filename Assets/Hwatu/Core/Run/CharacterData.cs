@@ -36,5 +36,11 @@ namespace Hwatu.Core.Run
         {
             return new CharacterData("ink_spirit", "묵귀", 70, 99, InkCards.InkStarterDeck());
         }
+
+        /// <summary>백호 산군(Beast): HP 80, 골드 99, 시작 덱 10장(발톱질×4/웅크리기×3/정기주입×2/포효×1). 위엄 자가성장 브루저.</summary>
+        public static CharacterData Beast()
+        {
+            return new CharacterData("beast", "백호 산군", 80, 99, BeastCards.BeastStarterDeck());
+        }
     }
 }

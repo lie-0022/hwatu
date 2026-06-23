@@ -9,7 +9,7 @@ namespace Hwatu.Core.Combat
         /// </summary>
         public static int RawDamage(ICombatant source, ICombatant target, int baseAmount)
         {
-            int dmg = baseAmount + source.GetStatus(StatusType.Radiance);
+            int dmg = baseAmount + source.GetStatus(StatusType.Radiance) + source.GetStatus(StatusType.Majesty);
             if (source.GetStatus(StatusType.Weak) > 0)
             {
                 dmg = dmg * 3 / 4;

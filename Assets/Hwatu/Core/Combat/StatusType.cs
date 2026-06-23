@@ -11,6 +11,7 @@ namespace Hwatu.Core.Combat
         Poison,     // 독: 턴 시작 시 스택만큼 피해(Block 무시) + 1 감소 (CombatEngine.TickPoison)
         Dexterity,  // 민첩: GainBlock에 +Dexterity (Radiance의 방어판)
         Regen,      // 재생: 플레이어 턴 시작 시 스택만큼 회복(MaxHp 캡) + 1 감소 (CombatEngine.TickRegen)
-        Thorns      // 가시: 피격 시 공격자에게 스택만큼 반사(Block 무시·영구) (EffectDispatcher.ReflectThorns)
+        Thorns,     // 가시: 피격 시 공격자에게 스택만큼 반사(Block 무시·영구) (EffectDispatcher.ReflectThorns)
+        Majesty     // 위엄: 백호 산군 고유 — 모든 Attack 피해 +Majesty (Radiance의 백호판, 전투 내내 유지)
     }
 }
