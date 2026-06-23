@@ -14,19 +14,28 @@ namespace Hwatu.Core.Run
         public string Description { get; }
 
         private readonly Action<PlayerState> _onCombatStart;
+        private readonly Action<PlayerState> _onTurnStart;
 
-        public RelicData(string id, string name, string description, Action<PlayerState> onCombatStart = null)
+        public RelicData(string id, string name, string description,
+            Action<PlayerState> onCombatStart = null, Action<PlayerState> onTurnStart = null)
         {
             Id = id;
             Name = name;
             Description = description;
             _onCombatStart = onCombatStart;
+            _onTurnStart = onTurnStart;
         }
 
         /// <summary>전투 시작 시 플레이어에 효과 적용(없으면 무동작).</summary>
         public void ApplyCombatStart(PlayerState player)
         {
             _onCombatStart?.Invoke(player);
+        }
+
+        /// <summary>매 플레이어 턴 시작 시 효과 적용(없으면 무동작). 트리거 다양성(연구 §3.2).</summary>
+        public void ApplyTurnStart(PlayerState player)
+        {
+            _onTurnStart?.Invoke(player);
         }
     }
 }

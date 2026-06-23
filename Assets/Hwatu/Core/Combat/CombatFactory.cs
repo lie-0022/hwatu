@@ -72,6 +72,10 @@ namespace Hwatu.Core.Combat
             }
 
             var state = new CombatState(player, enemies, streams.ForStream("combatShuffle"));
+            if (relics != null)
+            {
+                for (int i = 0; i < relics.Count; i++) { state.OnTurnStartHooks.Add(relics[i].ApplyTurnStart); }
+            }
 
             int instanceId = 0;
             foreach (CardData card in deck)

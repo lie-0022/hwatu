@@ -47,13 +47,17 @@ namespace Hwatu.Core.Content
         public static RelicData ThornMail() => new RelicData("relic_thornmail", "가시갑옷", "전투 시작 시 가시 2(피격 시 반사).",
             p => p.AddStatus(StatusType.Thorns, 2));
 
+        // 트리거 다양성(연구 §3.2): '전투 시작'이 아니라 '매 턴 시작'에 발동하는 유물
+        public static RelicData EchoHide() => new RelicData("relic_echohide", "산울림 가죽", "매 턴 시작 시 방어 +4.",
+            null, p => p.SetBlock(p.Block + 4));
+
         /// <summary>전체 유물 풀(보물/엘리트/보스 보상 추첨용).</summary>
         public static List<RelicData> AllRelics()
         {
             return new List<RelicData>
             {
                 Cushion(), Blanket(), Lantern(), CoinPouch(), Whetstone(),
-                Charm(), RuneStone(), SteelScale(), RiceCake(), Gourd(), InkStone(), Herb(), RegenCharm(), ThornMail(),
+                Charm(), RuneStone(), SteelScale(), RiceCake(), Gourd(), InkStone(), Herb(), RegenCharm(), ThornMail(), EchoHide(),
             };
         }
     }

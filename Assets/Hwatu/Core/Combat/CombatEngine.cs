@@ -215,6 +215,7 @@ namespace Hwatu.Core.Combat
                 return;
             }
             TickRegen(State.Player);   // 독 정산 후 회복(MaxHp 캡)
+            for (int i = 0; i < State.OnTurnStartHooks.Count; i++) { State.OnTurnStartHooks[i](State.Player); }  // 턴시작 유물(연구 §3.2)
             State.Player.Energy = State.Player.BaseEnergy;
             PileSystem.Draw(State.Hand, State.DrawPile, State.DiscardPile, State.ShuffleRng, State.Player.HandSize);
         }

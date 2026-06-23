@@ -99,9 +99,20 @@ namespace Hwatu.Tests.Run
         }
 
         [Test]
-        public void AllRelics_AreFourteen()
+        public void EchoHide_AddsBlock_OnTurnStartNotCombatStart()
         {
-            Assert.AreEqual(14, RelicContent.AllRelics().Count);
+            // 산울림 가죽: 트리거 확장 — 전투시작엔 무효, 매 턴 시작에 방어 +4
+            var p = new PlayerState(80);
+            RelicContent.EchoHide().ApplyCombatStart(p);
+            Assert.AreEqual(0, p.Block, "전투시작엔 효과 없음");
+            RelicContent.EchoHide().ApplyTurnStart(p);
+            Assert.AreEqual(4, p.Block, "턴 시작에 방어 +4");
+        }
+
+        [Test]
+        public void AllRelics_AreFifteen()
+        {
+            Assert.AreEqual(15, RelicContent.AllRelics().Count);
         }
     }
 }
