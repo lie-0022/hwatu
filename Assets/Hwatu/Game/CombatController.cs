@@ -88,10 +88,13 @@ namespace Hwatu.Game
             CheckEnd();
         }
 
-        /// <summary>전투 중 포션 사용(즉시 효과). 성공 시 true.</summary>
-        public bool UsePotion(Hwatu.Core.Run.PotionData potion)
+        /// <summary>전투 중 포션 사용(즉시 효과). 성공 시 true.
+        /// <param name="potion">사용할 포션.</param>
+        /// <param name="enemyTargetIndex">Enemy 포션 대상 적 인덱스(기본 0). 범위 밖이거나 죽었으면 첫 생존 적으로 폴백.</param>
+        /// </summary>
+        public bool UsePotion(Hwatu.Core.Run.PotionData potion, int enemyTargetIndex = 0)
         {
-            return _engine != null && _engine.UsePotion(potion);
+            return _engine != null && _engine.UsePotion(potion, enemyTargetIndex);
         }
 
         /// <summary>자동 phase를 PlayerAction(또는 전투 종료)까지 진행.</summary>

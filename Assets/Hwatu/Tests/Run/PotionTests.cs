@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Hwatu.Core.Cards;
 using Hwatu.Core.Combat;
 using Hwatu.Core.Content;
+using Hwatu.Core.Enemies;
 using Hwatu.Core.Rng;
 using Hwatu.Core.Run;
 
@@ -73,6 +74,25 @@ namespace Hwatu.Tests.Run
             CombatState s = NewCombat();
             PotionContent.PoisonVial().Apply(s);
             Assert.AreEqual(7, s.Enemies[0].GetStatus(StatusType.Poison));
+        }
+
+        [Test]
+        public void Fire_TargetIndex1_DamagesSecondEnemyOnly()
+        {
+            // Arrange: 도깨비(index 0) + 멧돼지(index 1) 두 마리 전투
+            var deck = new List<CardData> { StarterContent.Shield() };
+            EnemyData[] enemies = new[] { StarterContent.DokkaebiMinion(), StarterContent.Boar() };
+            CombatState s = CombatFactory.CreateCombat(deck, enemies, 1, 80, 80);
+
+            int hp0Before = s.Enemies[0].Hp;
+            int hp1Before = s.Enemies[1].Hp;
+
+            // Act: index 1을 명시적으로 타겟
+            PotionContent.Fire().Apply(s, enemyTargetIndex: 1);
+
+            // Assert: index 1만 피해, index 0은 그대로
+            Assert.AreEqual(hp0Before, s.Enemies[0].Hp, "index 0 적은 피해를 받지 않아야 한다");
+            Assert.AreEqual(System.Math.Max(0, hp1Before - 22), s.Enemies[1].Hp, "index 1 적은 22 피해를 받아야 한다");
         }
 
         [Test]

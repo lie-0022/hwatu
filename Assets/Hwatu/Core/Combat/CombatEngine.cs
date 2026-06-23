@@ -161,14 +161,17 @@ namespace Hwatu.Core.Combat
             return true;
         }
 
-        /// <summary>PlayerAction에서 포션 사용(즉시 Player에 효과). 성공 시 true.</summary>
-        public bool UsePotion(PotionData potion)
+        /// <summary>PlayerAction에서 포션 사용(즉시 효과). 성공 시 true.
+        /// <param name="potion">사용할 포션.</param>
+        /// <param name="enemyTargetIndex">Enemy 포션 대상 적 인덱스(기본 0). 범위 밖이거나 죽었으면 첫 생존 적으로 폴백.</param>
+        /// </summary>
+        public bool UsePotion(PotionData potion, int enemyTargetIndex = 0)
         {
             if (State.Phase != CombatPhase.PlayerAction || potion == null)
             {
                 return false;
             }
-            potion.Apply(State);
+            potion.Apply(State, enemyTargetIndex);
             State.Log.Add($"포션: {potion.Name}");
             return true;
         }
