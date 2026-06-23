@@ -116,12 +116,12 @@ namespace Hwatu.Core.Content
             "crows", "까마귀떼", 22, 28,
             new[]
             {
-                new EnemyMoveData("peck", IntentType.AttackMulti, 2,
+                new EnemyMoveData("peck", IntentType.AttackMulti, 3,
                     new[]
                     {
-                        new EffectData(EffectOp.DealDamage, amount: 2, target: TargetType.Enemy),
-                        new EffectData(EffectOp.DealDamage, amount: 2, target: TargetType.Enemy),
-                        new EffectData(EffectOp.DealDamage, amount: 2, target: TargetType.Enemy),
+                        new EffectData(EffectOp.DealDamage, amount: 3, target: TargetType.Enemy),
+                        new EffectData(EffectOp.DealDamage, amount: 3, target: TargetType.Enemy),
+                        new EffectData(EffectOp.DealDamage, amount: 3, target: TargetType.Enemy),
                     }, hits: 3),
                 new EnemyMoveData("flock", IntentType.Block, 4,
                     new[] { new EffectData(EffectOp.GainBlock, amount: 4, target: TargetType.Self) }),
