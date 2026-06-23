@@ -78,7 +78,7 @@ namespace Hwatu.Tests.Run
             EnemyMoveData doom = g.FindMove("doom");
             Assert.IsNotNull(doom);
             Assert.AreEqual(IntentType.Doom, doom.Intent);
-            Assert.AreEqual(32, doom.Value);
+            Assert.AreEqual(28, doom.Value);
         }
     }
 }

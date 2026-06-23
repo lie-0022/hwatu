@@ -234,7 +234,7 @@ namespace Hwatu.Tests.Combat
             }
             int idx0 = dmgs.IndexOf(0);
             Assert.GreaterOrEqual(idx0, 0, "doom 예고 턴(피해 0)이 있어야 한다");
-            Assert.AreEqual(32, dmgs[idx0 + 1], "예고 다음 적 턴에 doom 발동 32");
+            Assert.AreEqual(28, dmgs[idx0 + 1], "예고 다음 적 턴에 doom 발동 28");
         }
     }
 }
