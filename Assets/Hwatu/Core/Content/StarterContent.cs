@@ -144,18 +144,18 @@ namespace Hwatu.Core.Content
 
         // 엘리트 광귀: 강타(11) / 취약화(취약 2) / 방벽(10)
         public static EnemyData GwangGwiElite() => new EnemyData(
-            "gwanggwi_elite", "광귀", 52, 64,
+            "gwanggwi_elite", "광귀", 90, 104,
             new[]
             {
-                new EnemyMoveData("smash", IntentType.Attack, 14,
-                    new[] { new EffectData(EffectOp.DealDamage, amount: 14, target: TargetType.Enemy) }),
+                new EnemyMoveData("smash", IntentType.Attack, 15,
+                    new[] { new EffectData(EffectOp.DealDamage, amount: 15, target: TargetType.Enemy) }),
                 new EnemyMoveData("expose", IntentType.Debuff, 2,
                     new[] { new EffectData(EffectOp.ApplyStatus, amount: 2, target: TargetType.Enemy, status: StatusType.Vulnerable) }),
                 new EnemyMoveData("wall", IntentType.Block, 10,
                     new[] { new EffectData(EffectOp.GainBlock, amount: 10, target: TargetType.Self) }),
             },
             EnemyAiKind.Sequence,
-            new[] { "smash", "expose", "wall" });
+            new[] { "smash", "expose", "smash" });
 
         // 도깨비불: 화염 약공(3×2) + 화상(중독 3 부여)
         public static EnemyData WillOWisp() => new EnemyData(
@@ -176,13 +176,13 @@ namespace Hwatu.Core.Content
 
         // 엘리트 외눈도깨비: 노려봄(약화2) / 내려찍기(14) / 분노(자기 광+3 → 이후 공격 강화)
         public static EnemyData CyclopsOni() => new EnemyData(
-            "cyclops_oni", "외눈도깨비", 56, 68,
+            "cyclops_oni", "외눈도깨비", 95, 110,
             new[]
             {
                 new EnemyMoveData("glare", IntentType.Debuff, 2,
                     new[] { new EffectData(EffectOp.ApplyStatus, amount: 2, target: TargetType.Enemy, status: StatusType.Weak) }),
-                new EnemyMoveData("oni_smash", IntentType.Attack, 17,
-                    new[] { new EffectData(EffectOp.DealDamage, amount: 17, target: TargetType.Enemy) }),
+                new EnemyMoveData("oni_smash", IntentType.Attack, 21,
+                    new[] { new EffectData(EffectOp.DealDamage, amount: 21, target: TargetType.Enemy) }),
                 new EnemyMoveData("enrage", IntentType.Buff, 3,
                     new[] { new EffectData(EffectOp.GainResource, amount: 3, target: TargetType.Self, resource: ResourceType.Radiance) }),
             },
@@ -253,11 +253,11 @@ namespace Hwatu.Core.Content
 
         // 엘리트 구렁이: 독 특화 — 휘감기(12) / 독니(6+중독4) / 또아리(방10)
         public static EnemyData Serpent() => new EnemyData(
-            "serpent", "구렁이", 58, 70,
+            "serpent", "구렁이", 92, 106,
             new[]
             {
-                new EnemyMoveData("coil_strike", IntentType.Attack, 12,
-                    new[] { new EffectData(EffectOp.DealDamage, amount: 12, target: TargetType.Enemy) }),
+                new EnemyMoveData("coil_strike", IntentType.Attack, 16,
+                    new[] { new EffectData(EffectOp.DealDamage, amount: 16, target: TargetType.Enemy) }),
                 new EnemyMoveData("fang", IntentType.Attack, 6,
                     new[]
                     {
