@@ -158,7 +158,7 @@ namespace Hwatu.Game
                 crt.pivot = new Vector2(0f, 1f);
                 crt.anchoredPosition = new Vector2(idx * 96f, 0f);
                 crt.sizeDelta = new Vector2(90f, 34f);
-                chip.GetComponent<Image>().color = EnemyStatusColor(st);
+                chip.GetComponent<Image>().color = DesignTokens.StatusColor(st);
                 chip.GetComponent<TooltipTrigger>().Set(GameInfo.StatusDesc(st, amt));
                 var lbl = CreateText((RectTransform)chip.transform, "L", 19f, new Vector2(0.5f, 0.5f), new Vector2(86f, 32f));
                 lbl.enableAutoSizing = true;   // 큰 수치(취약 12 등)도 칩 안에 맞춤
@@ -166,19 +166,6 @@ namespace Hwatu.Game
                 lbl.fontSizeMax = 19f;
                 lbl.text = $"{GameInfo.StatusName(st)} {amt}";
                 idx++;
-            }
-        }
-
-        private static Color EnemyStatusColor(StatusType s)
-        {
-            switch (s)
-            {
-                case StatusType.Radiance:   return new Color(0.85f, 0.65f, 0.2f, 0.95f);
-                case StatusType.Dexterity:  return new Color(0.2f, 0.5f, 0.7f, 0.95f);
-                case StatusType.Weak:       return new Color(0.5f, 0.35f, 0.6f, 0.95f);
-                case StatusType.Vulnerable: return new Color(0.7f, 0.35f, 0.3f, 0.95f);
-                case StatusType.Poison:     return new Color(0.35f, 0.6f, 0.3f, 0.95f);
-                default:                    return new Color(0.4f, 0.4f, 0.4f, 0.95f);
             }
         }
 
@@ -209,17 +196,18 @@ namespace Hwatu.Game
             return t;
         }
 
+        // 인텐트 박스 색 — 디자인 토큰(의미 색)으로 통일. Doom만 고유 흑보라.
         private static Color IntentColor(IntentType intent)
         {
             switch (intent)
             {
                 case IntentType.Attack:
-                case IntentType.AttackMulti: return new Color(0.70f, 0.20f, 0.18f, 0.95f);  // 공격: 빨강
-                case IntentType.Block:       return new Color(0.20f, 0.40f, 0.70f, 0.95f);  // 방어: 파랑
-                case IntentType.Buff:        return new Color(0.25f, 0.55f, 0.30f, 0.95f);  // 강화: 초록
-                case IntentType.Debuff:      return new Color(0.50f, 0.30f, 0.62f, 0.95f);  // 약화: 보라
-                case IntentType.Doom:        return new Color(0.12f, 0.02f, 0.16f, 0.98f);  // 파멸: 흑보라
-                default:                     return new Color(0.35f, 0.35f, 0.35f, 0.95f);  // 기타: 회색
+                case IntentType.AttackMulti: return DesignTokens.Danger;
+                case IntentType.Block:       return DesignTokens.Defense;
+                case IntentType.Buff:        return DesignTokens.Heal;
+                case IntentType.Debuff:      return DesignTokens.Weak;
+                case IntentType.Doom:        return new Color(0.12f, 0.02f, 0.16f, 0.98f);
+                default:                     return DesignTokens.PanelHi;
             }
         }
 
