@@ -151,14 +151,22 @@ namespace Hwatu.Core.Content
                 new EffectData(EffectOp.ApplyStatus, amount: 1, target: TargetType.Enemy, status: StatusType.Weak),
             }, CardRarity.Uncommon);
 
-        /// <summary>묵귀 보상 풀(23장: Common4/Uncommon12/Rare7).</summary>
+        // 맹독날: 저코 독 어플라이어(피해4 + 중독3)
+        public static CardData VenomFang() => new CardData("ink_fang", "맹독날", CardType.Attack, 1, TargetType.Enemy, false,
+            new[]
+            {
+                new EffectData(EffectOp.DealDamage, amount: 4, target: TargetType.Enemy),
+                new EffectData(EffectOp.ApplyStatus, amount: 3, target: TargetType.Enemy, status: StatusType.Poison),
+            }, CardRarity.Uncommon);
+
+        /// <summary>묵귀 보상 풀(24장: Common4/Uncommon13/Rare7).</summary>
         public static List<CardData> RewardPool()
         {
             return new List<CardData>
             {
                 InkStrike(), Soot(), DarkGuard(), Lacquer(),
                 Seep(), Miasma(), Veil(), Gu(), Lingering(), ToxicCloud(), Sting(),
-                Plague(), Decay(), BlackSpot(), Venom(), Corrode(), VenomShroud(), Assassinate(), Catalyst(), VenomFog(), Stealth(), GuMastery(), DarkStrike(),
+                Plague(), Decay(), BlackSpot(), Venom(), Corrode(), VenomShroud(), Assassinate(), Catalyst(), VenomFog(), Stealth(), GuMastery(), DarkStrike(), VenomFang(),
             };
         }
     }
