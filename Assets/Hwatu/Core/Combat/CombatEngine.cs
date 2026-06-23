@@ -211,6 +211,7 @@ namespace Hwatu.Core.Combat
                 State.Phase = CombatPhase.Lose;
                 return;
             }
+            TickRegen(State.Player);   // 독 정산 후 회복(MaxHp 캡)
             State.Player.Energy = State.Player.BaseEnergy;
             PileSystem.Draw(State.Hand, State.DrawPile, State.DiscardPile, State.ShuffleRng, State.Player.HandSize);
         }
@@ -298,6 +299,17 @@ namespace Hwatu.Core.Combat
             {
                 c.SetHp(System.Math.Max(0, c.Hp - p));
                 c.AddStatus(StatusType.Poison, -1);
+            }
+        }
+
+        // Regen(재생): 플레이어 턴 시작 시 스택만큼 회복(MaxHp 캡), 그 후 1 감소.
+        private static void TickRegen(PlayerState p)
+        {
+            int r = p.GetStatus(StatusType.Regen);
+            if (r > 0)
+            {
+                p.SetHp(System.Math.Min(p.MaxHp, p.Hp + r));
+                p.AddStatus(StatusType.Regen, -1);
             }
         }
 

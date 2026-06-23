@@ -9,6 +9,7 @@ namespace Hwatu.Core.Combat
         Weak,       // 약화: 공격자가 가하는 피해 ×3/4 (EffectDispatcher.DealDamage에서 적용)
         Vulnerable, // 취약: 대상이 받는 피해 ×3/2 (적용됨)
         Poison,     // 독: 턴 시작 시 스택만큼 피해(Block 무시) + 1 감소 (CombatEngine.TickPoison)
-        Dexterity   // 민첩: GainBlock에 +Dexterity (Radiance의 방어판)
+        Dexterity,  // 민첩: GainBlock에 +Dexterity (Radiance의 방어판)
+        Regen       // 재생: 플레이어 턴 시작 시 스택만큼 회복(MaxHp 캡) + 1 감소 (CombatEngine.TickRegen)
     }
 }
