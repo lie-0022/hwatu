@@ -156,15 +156,29 @@ namespace Hwatu.Game
                 crt.anchorMin = new Vector2(0f, 1f);
                 crt.anchorMax = new Vector2(0f, 1f);
                 crt.pivot = new Vector2(0f, 1f);
-                crt.anchoredPosition = new Vector2(idx * 96f, 0f);
-                crt.sizeDelta = new Vector2(90f, 34f);
+                crt.anchoredPosition = new Vector2(idx * 64f, 0f);
+                crt.sizeDelta = new Vector2(58f, 34f);   // 아이콘+수치(이름은 아이콘이 대신, hover로 설명)
                 chip.GetComponent<Image>().color = DesignTokens.StatusColor(st);
                 chip.GetComponent<TooltipTrigger>().Set(GameInfo.StatusDesc(st, amt));
-                var lbl = CreateText((RectTransform)chip.transform, "L", 19f, new Vector2(0.5f, 0.5f), new Vector2(86f, 32f));
-                lbl.enableAutoSizing = true;   // 큰 수치(취약 12 등)도 칩 안에 맞춤
+
+                // 칩 아이콘(game-icons — 칩 왼쪽, IconSm 규격)
+                var icoGo = new GameObject("Icon", typeof(RectTransform), typeof(Image));
+                icoGo.transform.SetParent(crt, false);
+                var icoRt = (RectTransform)icoGo.transform;
+                icoRt.anchorMin = new Vector2(0f, 0.5f);
+                icoRt.anchorMax = new Vector2(0f, 0.5f);
+                icoRt.pivot = new Vector2(0f, 0.5f);
+                icoRt.anchoredPosition = new Vector2(3f, 0f);
+                var ico = icoGo.GetComponent<Image>();
+                ico.raycastTarget = false;
+                IconLoader.Apply(this, ico, IconCatalog.ForStatus(st), Color.white, DesignTokens.IconSm);
+
+                var lbl = CreateText((RectTransform)chip.transform, "L", 19f, new Vector2(1f, 0.5f), new Vector2(28f, 32f));
+                lbl.rectTransform.anchoredPosition = new Vector2(-4f, 0f);
+                lbl.enableAutoSizing = true;
                 lbl.fontSizeMin = 12f;
                 lbl.fontSizeMax = 19f;
-                lbl.text = $"{GameInfo.StatusName(st)} {amt}";
+                lbl.text = amt.ToString();
                 idx++;
             }
         }
