@@ -106,6 +106,16 @@
 
 > 출처: [Intent — STS Wiki](https://slaythespire.wiki.gg/wiki/Intent) · [Enemy Patterns & AI — A20 Mastery](https://oboe.com/learn/slay-the-spire-ascension-20-mastery-rgvy3n/enemy-patterns-and-ai-4) · [Intent — Fandom](https://slay-the-spire.fandom.com/wiki/Intent)
 
+### 4.3 화투 AI 고도화 설계 (후속 — 구현 가이드)
+- **현 한계**: `IEnemyAi.PeekNext(EnemyState self)`가 self만 받아 **적이 플레이어 상태(Block/status/HP)를 못 본다** → 조건부 반응 AI 불가. 현재는 Sequence(고정)·Weighted(가중치+연속제한)·Phase(HP 임계)뿐.
+- **개선안(시그니처 확장)**: `PeekNext(EnemyState self, PlayerState player)`로 변경. 수정 대상 = `IEnemyAi`·`SequenceAi`·`WeightedAi`·`PhaseAi` + `CombatEngine.EnemyTurn`(호출부) + `EnemyState.RefreshIntent`. 완전정보(미리보기=실행) 유지 위해 캐시 패턴은 WeightedAi와 동일.
+- **`ConditionalAi`(`EnemyAiKind.Conditional`, 미구현)**: 플레이어/자기 조건별 move 선택. 예 —
+  - 플레이어 Block↑(예: ≥10)이면 디버프(약화·취약)로 방어 무력화
+  - 플레이어 Block 0이면 강타
+  - 자기 HP<50%면 방어/광폭(Phase와 결합 가능)
+  - STS 레퍼런스: Gremlin Nob(스킬 플레이 시 힘↑)·Lagavulin(수면→각성)·Cultist(의식 1회 후 공격 반복) 식 반응형.
+- **데이터 스키마**: EnemyData에 조건→move 매핑(예: `[{cond:"player_block>=10", move:"debuff"}, ...]`) 추가하거나, 적별 ConditionalAi 서브클래스로 구현.
+
 ## 5. 몬스터 (체력·수·패턴·특징)
 
 ### 5.1 Act1 기준 (STS1)
