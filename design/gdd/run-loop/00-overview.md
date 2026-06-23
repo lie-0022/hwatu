@@ -89,9 +89,9 @@ RewardOption  { CardData Card; ... }  // 3택1
 설계(MVP)를 넘어 콘텐츠·메커닉·UI를 자율 확장. EditMode **133/133 통과**.
 - **루프**: 메인→캐릭터→맵(분기 7×15)→전투→보상3택1+포션→이벤트/휴식/상점/보물→보스(페이즈+Doom)→액트전환(act↑마다 적 HP ×1.25, FinalAct=3 승리). 노드 7종 전부 UI 작동.
 - **전투**: 턴 상태머신, 효과 op 8종(deal_damage/gain_block/draw/apply_status/gain_resource/clear_status/consume_radiance/multiply_poison), 키워드 4(Exhaust/Retain/Innate/Ethereal), Doom 카운트다운(예고→발동).
-- **status 6**: Radiance(빛=힘)·Weak·Vulnerable·Poison(턴틱)·Dexterity(방어+)·Regen(턴 시작 회복).
+- **status 7**: Radiance(빛=힘)·Weak·Vulnerable·Poison(턴틱)·Dexterity(방어+)·Regen(턴 시작 회복)·Thorns(피격 반사).
 - **적 14**: 일반8(잡도깨비·까마귀떼·허수아비·도깨비불·장승·그슨대·멧돼지·두꺼비)·엘리트3(광귀·외눈도깨비·구렁이)·보스3(달그림자·구미호[Doom]·장군, PhaseAi HP광폭).
-- **카드 51**: 광객 풀 28장(빛/공격/방어/광막/섬광/광폭발/광휘파/치유광), 묵귀 풀 23장(독/약화/독막/암살/촉매/맹독무/잠행/고독술/암격). 캐릭터별 풀(CharacterPools). STS1/2 영감 메커닉 — 광 소비(consume_radiance), 독 증폭(multiply_poison), 재생(Regen 턴 회복).
+- **카드 52**: 광객 풀 29장(빛/공격/방어/광막/섬광/광폭발/광휘파/치유광/가시광), 묵귀 풀 23장(독/약화/독막/암살/촉매/맹독무/잠행/고독술/암격). 캐릭터별 풀(CharacterPools). STS1/2 영감 메커닉 — 광 소비(consume_radiance), 독 증폭(multiply_poison), 재생(Regen 회복), 가시(Thorns 반사).
 - **캐릭터 2**: 광객(HP80, radiance)·묵귀(HP70, poison). 시작 덱·보상 풀 차등.
 - **경제/메타**: 골드 TrySpend·유물 12종(+떡/호리병/먹/약초)·카드 업그레이드(+3)·**인챈트 3종(예리/취약/광휘)**·포션 7(+강심약/선약)·이벤트 4(+대장간/저주)·어센션·전투 로그.
 - **STS2 추가 기능**: Neow 시작 축복 4택 · 더미 보기(뽑을/버린/소멸) · **상점 다중 매물(카드5+유물2+포션2 개별 구매·리롤·제거, ShopStock)** · 보상 골드·건너뛰기 · 전 영역 hover 정보 레이어. (docs/systems/04-ui-ux §8)
