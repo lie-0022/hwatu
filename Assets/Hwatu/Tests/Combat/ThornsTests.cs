@@ -39,5 +39,19 @@ namespace Hwatu.Tests.Combat
             }
             Assert.AreEqual(enemyHp - 3, state.Enemies[0].Hp, "적 공격 시 가시 3 반사(Block 무시)");
         }
+
+        [Test]
+        public void Thorns_OnEnemy_ReflectsToPlayerAttacker()
+        {
+            // 밤송이도깨비처럼 적이 가시를 두르면, 플레이어가 공격할 때 반사당함(가시 양방향)
+            var deck = new List<CardData> { LuminaryCards.HeavyStrike() };
+            CombatState state = CombatFactory.CreateCombat(deck, StarterContent.Burr(), 1, 80, 80);
+            state.Enemies[0].AddStatus(StatusType.Thorns, 3);
+            int playerHp = state.Player.Hp;
+            var engine = new CombatEngine(state, new EffectDispatcher());
+            engine.Advance(); engine.Advance();
+            engine.PlayCard(0);   // 강타 공격 → 적 가시 3 반사
+            Assert.AreEqual(playerHp - 3, state.Player.Hp, "적 가시에 플레이어 3 반사");
+        }
     }
 }

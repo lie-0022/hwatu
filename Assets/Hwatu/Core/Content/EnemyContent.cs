@@ -50,7 +50,7 @@ namespace Hwatu.Core.Content
                          : el == 1 ? StarterContent.CyclopsOni()
                          : StarterContent.Serpent();
                 default:
-                    int i = rng.NextInt(8);
+                    int i = rng.NextInt(9);
                     return i == 0 ? StarterContent.DokkaebiMinion()
                          : i == 1 ? StarterContent.Crows()
                          : i == 2 ? StarterContent.Scarecrow()
@@ -58,7 +58,8 @@ namespace Hwatu.Core.Content
                          : i == 4 ? StarterContent.Jangseung()
                          : i == 5 ? StarterContent.Geuseundae()
                          : i == 6 ? StarterContent.Boar()
-                         : StarterContent.Toad();
+                         : i == 7 ? StarterContent.Toad()
+                         : StarterContent.Burr();
             }
         }
     }

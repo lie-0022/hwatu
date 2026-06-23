@@ -80,6 +80,19 @@ namespace Hwatu.Core.Content
             EnemyAiKind.Sequence,
             new[] { "crouch", "venomspit", "venomspit" });
 
+        // 일반: 밤송이도깨비 — 가시 두르기(자기 Thorns 3)→찌르기(공6). 플레이어가 공격하면 가시 3 반사당함(가시 양방향)
+        public static EnemyData Burr() => new EnemyData(
+            "burr", "밤송이도깨비", 24, 30,
+            new[]
+            {
+                new EnemyMoveData("bristle", IntentType.Buff, 0,
+                    new[] { new EffectData(EffectOp.ApplyStatus, amount: 3, target: TargetType.Self, status: StatusType.Thorns) }),
+                new EnemyMoveData("prick", IntentType.Attack, 6,
+                    new[] { new EffectData(EffectOp.DealDamage, amount: 6, target: TargetType.Enemy) }),
+            },
+            EnemyAiKind.Sequence,
+            new[] { "bristle", "prick", "prick" });
+
         // 보스: 달그림자 도깨비 — 1페이즈 [강타13/광폭9/방벽12], HP 50%↓ 2페이즈 광폭화 [월식18/강타13/광폭9]
         public static EnemyData DokkaebiBoss() => new EnemyData(
             "dokkaebi_boss", "달그림자 도깨비", 95, 115,
