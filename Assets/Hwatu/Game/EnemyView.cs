@@ -19,6 +19,7 @@ namespace Hwatu.Game
         private TextMeshProUGUI _nameText;
         private HpBar _hpBar;
         private Image _intentBg;
+        private Image _intentIcon;
         private TextMeshProUGUI _intentText;
         private TextMeshProUGUI _blockText;
         private RectTransform _enemyStatusArea;
@@ -68,6 +69,19 @@ namespace Hwatu.Game
             irt.sizeDelta = new Vector2(264f, 48f);
             _intentBg = intentGo.GetComponent<Image>();
             _intentBg.raycastTarget = false;
+
+            // 인텐트 아이콘(game-icons — 박스 왼쪽, IconSm 규격으로 크기 통일)
+            var iconGo = new GameObject("IntentIcon", typeof(RectTransform), typeof(Image));
+            iconGo.transform.SetParent(irt, false);
+            var iconRt = (RectTransform)iconGo.transform;
+            iconRt.anchorMin = new Vector2(0f, 0.5f);
+            iconRt.anchorMax = new Vector2(0f, 0.5f);
+            iconRt.pivot = new Vector2(0f, 0.5f);
+            iconRt.anchoredPosition = new Vector2(8f, 0f);
+            _intentIcon = iconGo.GetComponent<Image>();
+            _intentIcon.raycastTarget = false;
+            _intentIcon.enabled = false;
+
             _intentText = CreateText(irt, "IntentText", 24f, new Vector2(0.5f, 0.5f), new Vector2(256f, 44f));
             _intentText.enableAutoSizing = true;   // 긴 인텐트(연속 히트·Doom 타이머)는 자동 축소해 박스 안에 맞춘다
             _intentText.fontSizeMin = 13f;
@@ -114,10 +128,12 @@ namespace Hwatu.Game
                 string doomTag = (e.CurrentIntent.Intent == IntentType.Doom && e.DoomTimer > 0)
                     ? $"  <size=80%>({e.DoomTimer})</size>" : "";
                 _intentText.text = $"{IntentKor(e.CurrentIntent.Intent)}  <b><size=135%>{num}</size></b>{doomTag}";
+                IconLoader.Apply(this, _intentIcon, IconCatalog.ForIntent(it), Color.white, DesignTokens.IconSm);
             }
             else
             {
                 _intentBg.enabled = false;
+                _intentIcon.enabled = false;
                 _intentText.text = "?";
             }
             RebuildEnemyStatus(e);
