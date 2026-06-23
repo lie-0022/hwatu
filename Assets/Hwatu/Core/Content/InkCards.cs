@@ -135,14 +135,30 @@ namespace Hwatu.Core.Content
         public static CardData Stealth() => new CardData("ink_stealth", "잠행", CardType.Skill, 1, TargetType.Self, false,
             new[] { new EffectData(EffectOp.GainBlock, amount: 6, target: TargetType.Self) }, CardRarity.Uncommon, retain: true);
 
-        /// <summary>묵귀 보상 풀(21장: Common4/Uncommon10/Rare7).</summary>
+        // 고독술: 강한 디버프(중독4 + 약화2)
+        public static CardData GuMastery() => new CardData("ink_gumaster", "고독술", CardType.Skill, 1, TargetType.Enemy, false,
+            new[]
+            {
+                new EffectData(EffectOp.ApplyStatus, amount: 4, target: TargetType.Enemy, status: StatusType.Poison),
+                new EffectData(EffectOp.ApplyStatus, amount: 2, target: TargetType.Enemy, status: StatusType.Weak),
+            }, CardRarity.Uncommon);
+
+        // 암격: 피해10 + 약화1
+        public static CardData DarkStrike() => new CardData("ink_darkstrike", "암격", CardType.Attack, 2, TargetType.Enemy, false,
+            new[]
+            {
+                new EffectData(EffectOp.DealDamage, amount: 10, target: TargetType.Enemy),
+                new EffectData(EffectOp.ApplyStatus, amount: 1, target: TargetType.Enemy, status: StatusType.Weak),
+            }, CardRarity.Uncommon);
+
+        /// <summary>묵귀 보상 풀(23장: Common4/Uncommon12/Rare7).</summary>
         public static List<CardData> RewardPool()
         {
             return new List<CardData>
             {
                 InkStrike(), Soot(), DarkGuard(), Lacquer(),
                 Seep(), Miasma(), Veil(), Gu(), Lingering(), ToxicCloud(), Sting(),
-                Plague(), Decay(), BlackSpot(), Venom(), Corrode(), VenomShroud(), Assassinate(), Catalyst(), VenomFog(), Stealth(),
+                Plague(), Decay(), BlackSpot(), Venom(), Corrode(), VenomShroud(), Assassinate(), Catalyst(), VenomFog(), Stealth(), GuMastery(), DarkStrike(),
             };
         }
     }
