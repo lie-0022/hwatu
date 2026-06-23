@@ -3,6 +3,7 @@
     "rootNamespace": "Hwatu.Tests",
     "references": [
         "Hwatu.Core",
+        "Hwatu.Game",
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner"
     ],
