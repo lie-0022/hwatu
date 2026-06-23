@@ -12,5 +12,6 @@ namespace Hwatu.Core.Effects
         public const string GainResource = "gain_resource";
         public const string ClearStatus = "clear_status";
         public const string ConsumeRadiance = "consume_radiance";   // 광 전부 소비 → (소비한 광 × amount) 데미지 (STS2 Stars식)
+        public const string MultiplyPoison = "multiply_poison";     // 대상 중독을 amount배로 증폭 (STS Catalyst식)
     }
 }

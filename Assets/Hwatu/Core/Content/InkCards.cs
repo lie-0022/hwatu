@@ -125,14 +125,18 @@ namespace Hwatu.Core.Content
         public static CardData Assassinate() => new CardData("ink_assassin", "암살", CardType.Attack, 2, TargetType.Enemy, true,
             new[] { new EffectData(EffectOp.DealDamage, amount: 16, target: TargetType.Enemy) }, CardRarity.Rare);
 
-        /// <summary>묵귀 보상 풀(18장: Common4/Uncommon8/Rare6).</summary>
+        // 독 촉매(STS Catalyst식): 적의 중독을 2배로 증폭
+        public static CardData Catalyst() => new CardData("ink_catalyst", "촉매", CardType.Skill, 1, TargetType.Enemy, true,
+            new[] { new EffectData(EffectOp.MultiplyPoison, amount: 2, target: TargetType.Enemy) }, CardRarity.Rare);
+
+        /// <summary>묵귀 보상 풀(19장: Common4/Uncommon8/Rare7).</summary>
         public static List<CardData> RewardPool()
         {
             return new List<CardData>
             {
                 InkStrike(), Soot(), DarkGuard(), Lacquer(),
                 Seep(), Miasma(), Veil(), Gu(), Lingering(), ToxicCloud(), Sting(),
-                Plague(), Decay(), BlackSpot(), Venom(), Corrode(), VenomShroud(), Assassinate(),
+                Plague(), Decay(), BlackSpot(), Venom(), Corrode(), VenomShroud(), Assassinate(), Catalyst(),
             };
         }
     }

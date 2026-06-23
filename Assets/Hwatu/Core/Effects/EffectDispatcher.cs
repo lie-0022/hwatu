@@ -21,6 +21,7 @@ namespace Hwatu.Core.Effects
                 case EffectOp.GainResource: GainResource(e, ctx); break;
                 case EffectOp.ClearStatus: ClearStatus(e, ctx); break;
                 case EffectOp.ConsumeRadiance: ConsumeRadiance(e, ctx); break;
+                case EffectOp.MultiplyPoison: MultiplyPoison(e, ctx); break;
                 default: throw new NotSupportedException("Unknown effect op: " + e.Op);
             }
         }
@@ -97,6 +98,14 @@ namespace Hwatu.Core.Effects
             if (dmg <= block) { ctx.Target.SetBlock(block - dmg); return; }
             ctx.Target.SetBlock(0);
             ctx.Target.SetHp(ctx.Target.Hp - (dmg - block));
+        }
+
+        // 대상의 중독(Poison)을 amount배로 증폭(STS Catalyst식). amount 2면 독 2배.
+        private static void MultiplyPoison(EffectData e, IEffectContext ctx)
+        {
+            int p = ctx.Target.GetStatus(StatusType.Poison);
+            if (p <= 0) { return; }
+            ctx.Target.AddStatus(StatusType.Poison, p * (e.Amount - 1));   // p → p × amount
         }
 
         // Self면 Source(시전자), 그 외면 컨텍스트가 정한 Target.
