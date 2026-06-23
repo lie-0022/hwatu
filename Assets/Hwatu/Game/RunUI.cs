@@ -98,6 +98,8 @@ namespace Hwatu.Game
                 .gameObject.AddComponent<TooltipTrigger>().Set(GameInfo.CharacterDesc(CharacterData.Luminary()));
             CreateButton(_charPanel, "묵귀 (墨鬼) — 독/약화", new Vector2(0, -40), () => _flow.StartNewRun(CharacterData.InkSpirit()))
                 .gameObject.AddComponent<TooltipTrigger>().Set(GameInfo.CharacterDesc(CharacterData.InkSpirit()));
+            CreateButton(_charPanel, "백호 산군 (白虎 山君) — 위엄/성장", new Vector2(0, -120), () => _flow.StartNewRun(CharacterData.Beast()))
+                .gameObject.AddComponent<TooltipTrigger>().Set(GameInfo.CharacterDesc(CharacterData.Beast()));
 
             // 맵
             _mapPanel = CreatePanel(root, "MapPanel", new Color(0.06f, 0.07f, 0.10f, 1f));
