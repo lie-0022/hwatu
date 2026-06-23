@@ -83,9 +83,17 @@ namespace Hwatu.Tests.Run
         }
 
         [Test]
-        public void AllRelics_AreTwelve()
+        public void RegenCharm_GivesRegenOnCombatStart()
         {
-            Assert.AreEqual(12, RelicContent.AllRelics().Count);
+            var p = new PlayerState(80);
+            RelicContent.RegenCharm().ApplyCombatStart(p);
+            Assert.AreEqual(3, p.GetStatus(StatusType.Regen));
+        }
+
+        [Test]
+        public void AllRelics_AreThirteen()
+        {
+            Assert.AreEqual(13, RelicContent.AllRelics().Count);
         }
     }
 }
