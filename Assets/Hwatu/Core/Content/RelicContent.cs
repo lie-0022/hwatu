@@ -55,13 +55,17 @@ namespace Hwatu.Core.Content
         public static RelicData Abacus() => new RelicData("relic_abacus", "주판", "카드를 1장 낼 때마다 방어 +1.",
             null, null, p => p.SetBlock(p.Block + 1));
 
+        // HP 임계 트리거(연구 §3.2): 턴 시작 시 HP 절반 이하면 방어 강화 — 위기 반응형(조건부 발동, 유물 다양성)
+        public static RelicData LastStand() => new RelicData("relic_laststand", "배수진", "턴 시작 시 HP가 절반 이하면 방어 +8.",
+            null, p => { if (p.Hp * 2 <= p.MaxHp) { p.SetBlock(p.Block + 8); } });
+
         /// <summary>전체 유물 풀(보물/엘리트/보스 보상 추첨용).</summary>
         public static List<RelicData> AllRelics()
         {
             return new List<RelicData>
             {
                 Cushion(), Blanket(), Lantern(), CoinPouch(), Whetstone(),
-                Charm(), RuneStone(), SteelScale(), RiceCake(), Gourd(), InkStone(), Herb(), RegenCharm(), ThornMail(), EchoHide(), Abacus(),
+                Charm(), RuneStone(), SteelScale(), RiceCake(), Gourd(), InkStone(), Herb(), RegenCharm(), ThornMail(), EchoHide(), Abacus(), LastStand(),
             };
         }
     }

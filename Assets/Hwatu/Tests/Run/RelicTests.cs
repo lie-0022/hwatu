@@ -122,9 +122,21 @@ namespace Hwatu.Tests.Run
         }
 
         [Test]
-        public void AllRelics_AreSixteen()
+        public void LastStand_AddsBlock_OnlyWhenHpLow()
         {
-            Assert.AreEqual(16, RelicContent.AllRelics().Count);
+            // 배수진: HP 임계 트리거 — 절반 초과엔 무효, 절반 이하 턴 시작에 방어 +8
+            var p = new PlayerState(80);
+            RelicContent.LastStand().ApplyTurnStart(p);
+            Assert.AreEqual(0, p.Block, "HP 절반 초과면 무효");
+            p.SetHp(40);
+            RelicContent.LastStand().ApplyTurnStart(p);
+            Assert.AreEqual(8, p.Block, "HP 절반 이하면 방어 +8");
+        }
+
+        [Test]
+        public void AllRelics_AreSeventeen()
+        {
+            Assert.AreEqual(17, RelicContent.AllRelics().Count);
         }
     }
 }
