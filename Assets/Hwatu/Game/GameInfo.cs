@@ -22,6 +22,9 @@ namespace Hwatu.Game
                 case StatusType.Vulnerable: return "취약";
                 case StatusType.Poison:     return "중독";
                 case StatusType.Dexterity:  return "민첩";
+                case StatusType.Majesty:    return "위엄";
+                case StatusType.Regen:      return "재생";
+                case StatusType.Thorns:     return "가시";
                 default:                    return s.ToString();
             }
         }
@@ -36,6 +39,9 @@ namespace Hwatu.Game
                 case StatusType.Vulnerable: return $"<b>취약 {amount}</b>\n받는 공격 피해 50% 증가 ({amount}턴)";
                 case StatusType.Poison:     return $"<b>중독 {amount}</b>\n턴 시작 시 {amount} 피해, 이후 1 감소";
                 case StatusType.Dexterity:  return $"<b>민첩 {amount}</b>\n방어 획득량 +{amount}";
+                case StatusType.Majesty:    return $"<b>위엄 {amount}</b>\n공격 피해 +{amount} (백호 고유, 전투 내내 유지)";
+                case StatusType.Regen:      return $"<b>재생 {amount}</b>\n턴 시작 시 {amount} 회복, 이후 1 감소";
+                case StatusType.Thorns:     return $"<b>가시 {amount}</b>\n피격 시 공격자에게 {amount} 반사(영구)";
                 default:                    return $"{s} {amount}";
             }
         }
@@ -96,6 +102,8 @@ namespace Hwatu.Game
                 return $"{tgt}{StatusName(e.Status)} {e.Amount} — {StatusShort(e.Status)}";
             }
             if (e.Op == EffectOp.ClearStatus)  { return $"{StatusName(e.Status)} 제거"; }
+            if (e.Op == EffectOp.ConsumeRadiance) { return $"광을 모두 소비해 광×{e.Amount} 피해"; }
+            if (e.Op == EffectOp.MultiplyPoison)  { return $"적 중독을 {e.Amount}배로 증폭"; }
             return e.Op;
         }
 
@@ -108,6 +116,9 @@ namespace Hwatu.Game
                 case StatusType.Vulnerable: return "받는 피해 증가";
                 case StatusType.Poison:     return "매 턴 피해";
                 case StatusType.Dexterity:  return "방어 증가";
+                case StatusType.Majesty:    return "공격 피해 증가";
+                case StatusType.Regen:      return "매 턴 회복";
+                case StatusType.Thorns:     return "피격 시 반사";
                 default:                    return "";
             }
         }

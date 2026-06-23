@@ -23,7 +23,7 @@ namespace Hwatu.Game
         private TextMeshProUGUI _intentText;
         private TextMeshProUGUI _blockText;
         private RectTransform _enemyStatusArea;
-        private static readonly StatusType[] s_statusOrder = { StatusType.Weak, StatusType.Vulnerable, StatusType.Poison, StatusType.Radiance, StatusType.Dexterity };
+        private static readonly StatusType[] s_statusOrder = { StatusType.Weak, StatusType.Vulnerable, StatusType.Poison, StatusType.Radiance, StatusType.Majesty, StatusType.Dexterity, StatusType.Regen, StatusType.Thorns };
 
         /// <summary>적 배열에서의 인덱스(PlayCard 타깃 지정용).</summary>
         public int Index { get; private set; }

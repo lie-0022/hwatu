@@ -40,7 +40,7 @@ namespace Hwatu.Game
         private readonly Dictionary<int, CardView> _cardViews = new Dictionary<int, CardView>();
         private RectTransform _handArea;
         private RectTransform _playerStatusArea;
-        private static readonly StatusType[] s_statusOrder = { StatusType.Radiance, StatusType.Dexterity, StatusType.Weak, StatusType.Vulnerable, StatusType.Poison };
+        private static readonly StatusType[] s_statusOrder = { StatusType.Radiance, StatusType.Majesty, StatusType.Dexterity, StatusType.Regen, StatusType.Thorns, StatusType.Weak, StatusType.Vulnerable, StatusType.Poison };
         private GameObject _pilePanel;
         private TextMeshProUGUI _pileText;
         private RectTransform _pileGridArea;
