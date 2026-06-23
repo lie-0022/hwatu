@@ -74,7 +74,11 @@ namespace Hwatu.Core.Combat
             var state = new CombatState(player, enemies, streams.ForStream("combatShuffle"));
             if (relics != null)
             {
-                for (int i = 0; i < relics.Count; i++) { state.OnTurnStartHooks.Add(relics[i].ApplyTurnStart); }
+                for (int i = 0; i < relics.Count; i++)
+                {
+                    state.OnTurnStartHooks.Add(relics[i].ApplyTurnStart);
+                    state.OnCardPlayHooks.Add(relics[i].ApplyCardPlay);
+                }
             }
 
             int instanceId = 0;

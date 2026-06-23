@@ -99,6 +99,7 @@ namespace Hwatu.Core.Combat
 
             State.Player.Energy -= card.Data.Cost;
             State.Log.Add($"플레이어: {card.Data.Name}");
+            for (int hi = 0; hi < State.OnCardPlayHooks.Count; hi++) { State.OnCardPlayHooks[hi](State.Player); }  // 카드 플레이시 유물(연구 §3.2)
 
             var effects = card.Data.Effects;
             if (targetType == TargetType.AllEnemies)

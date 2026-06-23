@@ -110,9 +110,21 @@ namespace Hwatu.Tests.Run
         }
 
         [Test]
-        public void AllRelics_AreFifteen()
+        public void Abacus_AddsBlock_OnCardPlayOnly()
         {
-            Assert.AreEqual(15, RelicContent.AllRelics().Count);
+            // 주판: 트리거 확장 — 전투시작/턴시작엔 무효, 카드 플레이마다 방어 +1
+            var p = new PlayerState(80);
+            RelicContent.Abacus().ApplyCombatStart(p);
+            RelicContent.Abacus().ApplyTurnStart(p);
+            Assert.AreEqual(0, p.Block, "전투시작·턴시작엔 효과 없음");
+            RelicContent.Abacus().ApplyCardPlay(p);
+            Assert.AreEqual(1, p.Block, "카드 플레이에 방어 +1");
+        }
+
+        [Test]
+        public void AllRelics_AreSixteen()
+        {
+            Assert.AreEqual(16, RelicContent.AllRelics().Count);
         }
     }
 }

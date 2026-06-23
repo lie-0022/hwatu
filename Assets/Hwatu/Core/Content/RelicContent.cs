@@ -51,13 +51,17 @@ namespace Hwatu.Core.Content
         public static RelicData EchoHide() => new RelicData("relic_echohide", "산울림 가죽", "매 턴 시작 시 방어 +4.",
             null, p => p.SetBlock(p.Block + 4));
 
+        // 트리거 다양성(연구 §3.2): '카드를 낼 때마다' 발동하는 유물
+        public static RelicData Abacus() => new RelicData("relic_abacus", "주판", "카드를 1장 낼 때마다 방어 +1.",
+            null, null, p => p.SetBlock(p.Block + 1));
+
         /// <summary>전체 유물 풀(보물/엘리트/보스 보상 추첨용).</summary>
         public static List<RelicData> AllRelics()
         {
             return new List<RelicData>
             {
                 Cushion(), Blanket(), Lantern(), CoinPouch(), Whetstone(),
-                Charm(), RuneStone(), SteelScale(), RiceCake(), Gourd(), InkStone(), Herb(), RegenCharm(), ThornMail(), EchoHide(),
+                Charm(), RuneStone(), SteelScale(), RiceCake(), Gourd(), InkStone(), Herb(), RegenCharm(), ThornMail(), EchoHide(), Abacus(),
             };
         }
     }

@@ -31,6 +31,9 @@ namespace Hwatu.Core.Combat
         /// <summary>매 플레이어 턴 시작 시 실행할 유물 효과(RelicData 직접 참조는 Run→Combat 순환이라 Action으로 주입).</summary>
         public List<System.Action<PlayerState>> OnTurnStartHooks { get; } = new List<System.Action<PlayerState>>();
 
+        /// <summary>카드 1장 플레이마다 실행할 유물 효과(Action 주입으로 순환 회피).</summary>
+        public List<System.Action<PlayerState>> OnCardPlayHooks { get; } = new List<System.Action<PlayerState>>();
+
         /// <summary>전투 이벤트 로그(턴/카드/적 행동/결과). UI·디버그용.</summary>
         public List<string> Log { get; } = new List<string>();
 

@@ -15,15 +15,18 @@ namespace Hwatu.Core.Run
 
         private readonly Action<PlayerState> _onCombatStart;
         private readonly Action<PlayerState> _onTurnStart;
+        private readonly Action<PlayerState> _onCardPlay;
 
         public RelicData(string id, string name, string description,
-            Action<PlayerState> onCombatStart = null, Action<PlayerState> onTurnStart = null)
+            Action<PlayerState> onCombatStart = null, Action<PlayerState> onTurnStart = null,
+            Action<PlayerState> onCardPlay = null)
         {
             Id = id;
             Name = name;
             Description = description;
             _onCombatStart = onCombatStart;
             _onTurnStart = onTurnStart;
+            _onCardPlay = onCardPlay;
         }
 
         /// <summary>전투 시작 시 플레이어에 효과 적용(없으면 무동작).</summary>
@@ -36,6 +39,12 @@ namespace Hwatu.Core.Run
         public void ApplyTurnStart(PlayerState player)
         {
             _onTurnStart?.Invoke(player);
+        }
+
+        /// <summary>카드 1장 플레이할 때마다 효과 적용(없으면 무동작). 트리거 다양성(연구 §3.2).</summary>
+        public void ApplyCardPlay(PlayerState player)
+        {
+            _onCardPlay?.Invoke(player);
         }
     }
 }
