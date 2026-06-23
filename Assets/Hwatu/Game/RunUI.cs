@@ -606,6 +606,17 @@ namespace Hwatu.Game
                 var pos = new Vector2(-840f, 380f - i * 90f);
                 var pbtn = CreateButton(_potionBarGo, potion.Name, pos, () => UsePotionInCombat(potion));
                 pbtn.gameObject.AddComponent<TooltipTrigger>().Set(GameInfo.PotionDesc(potion));
+                // 포션 아이콘(game-icons — 버튼 좌측, IconMd 규격)
+                var pico = new GameObject("Icon", typeof(RectTransform), typeof(Image));
+                pico.transform.SetParent(pbtn.transform, false);
+                var picoRt = (RectTransform)pico.transform;
+                picoRt.anchorMin = new Vector2(0f, 0.5f);
+                picoRt.anchorMax = new Vector2(0f, 0.5f);
+                picoRt.pivot = new Vector2(0f, 0.5f);
+                picoRt.anchoredPosition = new Vector2(8f, 0f);
+                var picoImg = pico.GetComponent<Image>();
+                picoImg.raycastTarget = false;
+                IconLoader.Apply(this, picoImg, IconCatalog.Potion, DesignTokens.Heal, DesignTokens.IconMd);
             }
         }
 

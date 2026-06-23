@@ -48,5 +48,6 @@ namespace Hwatu.Game
         public const string Hp = "health-normal";
         public const string Gold = "two-coins";
         public const string Energy = "lightning-arc";
+        public const string Potion = "potion-ball";
     }
 }
