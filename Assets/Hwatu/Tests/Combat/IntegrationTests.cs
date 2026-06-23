@@ -64,7 +64,7 @@ namespace Hwatu.Tests.Combat
                 poison = state.Player.GetStatus(StatusType.Poison);
                 if (poison > 0) break;
             }
-            Assert.AreEqual(3, poison);   // 도깨비불 scald가 플레이어에 중독 3
+            Assert.AreEqual(5, poison);   // 도깨비불 scald가 플레이어에 중독 5
         }
 
         [Test]

@@ -60,7 +60,7 @@ namespace Hwatu.Tests.Run
             Assert.IsNotNull(scald);
             Assert.AreEqual(EffectOp.ApplyStatus, scald.Effects[0].Op);
             Assert.AreEqual(StatusType.Poison, scald.Effects[0].Status);
-            Assert.AreEqual(3, scald.Effects[0].Amount);
+            Assert.AreEqual(5, scald.Effects[0].Amount);
         }
 
         [Test]

@@ -134,8 +134,8 @@ namespace Hwatu.Core.Content
             "scarecrow", "허수아비", 28, 34,
             new[]
             {
-                new EnemyMoveData("weaken", IntentType.Debuff, 2,
-                    new[] { new EffectData(EffectOp.ApplyStatus, amount: 2, target: TargetType.Enemy, status: StatusType.Weak) }),
+                new EnemyMoveData("weaken", IntentType.Debuff, 3,
+                    new[] { new EffectData(EffectOp.ApplyStatus, amount: 3, target: TargetType.Enemy, status: StatusType.Weak) }),
                 new EnemyMoveData("poke", IntentType.Attack, 5,
                     new[] { new EffectData(EffectOp.DealDamage, amount: 5, target: TargetType.Enemy) }),
             },
@@ -168,8 +168,8 @@ namespace Hwatu.Core.Content
                         new EffectData(EffectOp.DealDamage, amount: 3, target: TargetType.Enemy),
                         new EffectData(EffectOp.DealDamage, amount: 3, target: TargetType.Enemy),
                     }, hits: 2),
-                new EnemyMoveData("scald", IntentType.Debuff, 3,
-                    new[] { new EffectData(EffectOp.ApplyStatus, amount: 3, target: TargetType.Enemy, status: StatusType.Poison) }),
+                new EnemyMoveData("scald", IntentType.Debuff, 5,
+                    new[] { new EffectData(EffectOp.ApplyStatus, amount: 5, target: TargetType.Enemy, status: StatusType.Poison) }),
             },
             EnemyAiKind.Sequence,
             new[] { "ember", "scald", "ember" });
@@ -246,7 +246,11 @@ namespace Hwatu.Core.Content
                         new EffectData(EffectOp.DealDamage, amount: 3, target: TargetType.Enemy),
                     }, hits: 2),
                 new EnemyMoveData("curse", IntentType.Debuff, 2,
-                    new[] { new EffectData(EffectOp.ApplyStatus, amount: 2, target: TargetType.Enemy, status: StatusType.Weak) }),
+                    new[]
+                    {
+                        new EffectData(EffectOp.ApplyStatus, amount: 2, target: TargetType.Enemy, status: StatusType.Weak),
+                        new EffectData(EffectOp.ApplyStatus, amount: 1, target: TargetType.Enemy, status: StatusType.Vulnerable),
+                    }),
             },
             EnemyAiKind.WeightedRandom,
             new[] { "claw", "curse", "claw" });
