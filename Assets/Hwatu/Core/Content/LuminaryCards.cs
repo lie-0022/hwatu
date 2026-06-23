@@ -10,10 +10,10 @@ namespace Hwatu.Core.Content
     {
         // ── Common ──
         public static CardData HeavyStrike() => new CardData("lum_heavy", "강타", CardType.Attack, 2, TargetType.Enemy, false,
-            new[] { new EffectData(EffectOp.DealDamage, amount: 9, target: TargetType.Enemy) }, CardRarity.Common);
+            new[] { new EffectData(EffectOp.DealDamage, amount: 13, target: TargetType.Enemy) }, CardRarity.Common);
 
         public static CardData Guard() => new CardData("lum_guard", "수비", CardType.Skill, 2, TargetType.Self, false,
-            new[] { new EffectData(EffectOp.GainBlock, amount: 8, target: TargetType.Self) }, CardRarity.Common);
+            new[] { new EffectData(EffectOp.GainBlock, amount: 13, target: TargetType.Self) }, CardRarity.Common);
 
         public static CardData Whet() => new CardData("lum_whet", "연마", CardType.Skill, 1, TargetType.Self, false,
             new[] { new EffectData(EffectOp.Draw, amount: 2) }, CardRarity.Common);
@@ -52,7 +52,7 @@ namespace Hwatu.Core.Content
 
         // ── 다양성 추가 ──
         public static CardData Jab() => new CardData("lum_jab", "난타", CardType.Attack, 1, TargetType.Enemy, false,
-            new[] { new EffectData(EffectOp.DealDamage, amount: 4, target: TargetType.Enemy) }, CardRarity.Common);
+            new[] { new EffectData(EffectOp.DealDamage, amount: 6, target: TargetType.Enemy) }, CardRarity.Common);
 
         public static CardData LightRay() => new CardData("lum_ray", "광선", CardType.Attack, 1, TargetType.Enemy, false,
             new[]

@@ -25,7 +25,7 @@ namespace Hwatu.Tests.Combat
         [Test]
         public void PlayCard_TargetsChosenEnemyByIndex()
         {
-            // 강타(피해9)를 두 번째 적(index 1)에만 명중
+            // 강타(피해13)를 두 번째 적(index 1)에만 명중
             var deck = new List<CardData> { LuminaryCards.HeavyStrike() };
             var enemies = new[] { StarterContent.DokkaebiMinion(), StarterContent.DokkaebiMinion(), StarterContent.DokkaebiMinion() };
             CombatState state = CombatFactory.CreateCombat(deck, enemies, 1, 80, 80);
@@ -34,7 +34,7 @@ namespace Hwatu.Tests.Combat
             int e0 = state.Enemies[0].Hp, e1 = state.Enemies[1].Hp, e2 = state.Enemies[2].Hp;
             engine.PlayCard(0, 1);   // index 1 타겟
             Assert.AreEqual(e0, state.Enemies[0].Hp, "0번 적 무피해");
-            Assert.AreEqual(e1 - 9, state.Enemies[1].Hp, "1번 적 9 피해");
+            Assert.AreEqual(e1 - 13, state.Enemies[1].Hp, "1번 적 13 피해");
             Assert.AreEqual(e2, state.Enemies[2].Hp, "2번 적 무피해");
         }
     }
