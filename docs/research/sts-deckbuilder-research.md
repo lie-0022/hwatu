@@ -13,7 +13,7 @@
 | **4** | 적 AI / 의도(Intent) | 4.1 핵심 · 4.2 화투 적용(Sequence/Weighted) ✅ · 4.3 고도화(PeekNext+ConditionalAi, 외눈 적용) ✅ |
 | **5** | 몬스터(체력·수·패턴) | 5.1 Act1 기준 · 5.2 화투 기준 · 5.3 밸런스 시뮬(엘리트/보스) ✅ · 5.4 멀티+SimAi버그 ✅ |
 
-> ✅ = 화투에 구현/적용 완료. 미표시 = 리서치만(후속 가능 — 예: §3.2 피격시/HP임계 트리거, §4.3 보스 ConditionalAi).
+> ✅ = 화투에 구현/적용 완료. 미표시 = 리서치만(후속 가능 — 예: §3.2 피격시·처치시 트리거). HP임계 트리거·보스 ConditionalAi는 구현 완료.
 
 ---
 
@@ -112,7 +112,8 @@
 ### 3.3 화투 트리거 확장 구현 (2026-06)
 - **1차 구현**: `RelicData.onTurnStart` 훅 추가 → 전투시작 외 **'매 턴 시작'** 트리거 도입. `EchoHide`(산울림 가죽, 매턴 방어4)가 첫 적용.
 - **순환 의존 회피**: RelicData(Run)가 PlayerState(Combat)를 참조하므로 CombatState가 RelicData를 직접 들면 Run↔Combat 순환. → `CombatState.OnTurnStartHooks`(`List<Action<PlayerState>>`)로 우회. CombatFactory가 `relic.ApplyTurnStart` 메서드 그룹을 주입, CombatEngine.StartPlayerTurn에서 실행.
-- **후속 트리거 후보**: 피격 시(EffectDispatcher.DealDamage 훅)·카드 플레이 시(타입별)·HP 임계·처치 시. 같은 Action-주입 패턴으로 확장 가능.
+- **HP 임계 트리거 ✅ 구현(2026-06)**: '배수진'(turn-start에서 HP≤50%면 방어+8) — OnTurnStart 훅 안에서 HP 조건 분기. 첫 **조건부** 발동 유물(기존은 모두 무조건 → 다양성↑).
+- **남은 트리거 후보**: 피격 시(EffectDispatcher.DealDamage 훅)·카드 플레이 타입별·처치 시. 같은 Action-주입 패턴으로 확장 가능.
 
 ## 4. 적 AI / 의도(Intent) 패턴
 
