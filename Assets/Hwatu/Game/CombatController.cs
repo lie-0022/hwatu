@@ -47,6 +47,12 @@ namespace Hwatu.Game
             BeginWith(CombatFactory.CreateCombat(deck, enemyData, seed, maxHp, hp, relics));
         }
 
+        /// <summary>다중 몬스터 전투 시작(STS식 1~다수).</summary>
+        public void StartCombat(IReadOnlyList<CardData> deck, IReadOnlyList<EnemyData> enemies, ulong seed, int maxHp, int hp, IReadOnlyList<RelicData> relics = null)
+        {
+            BeginWith(CombatFactory.CreateCombat(deck, enemies, seed, maxHp, hp, relics));
+        }
+
         private void BeginWith(CombatState state)
         {
             _engine = new CombatEngine(state, new EffectDispatcher());

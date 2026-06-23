@@ -16,6 +16,25 @@ namespace Hwatu.Core.Content
             return act >= 2 ? picked.WithHpScale(1.0 + 0.25 * (act - 1)) : picked;
         }
 
+        /// <summary>STS식 다중 몬스터 선택. 보스/엘리트는 1마리(강적), 일반은 1~3마리.</summary>
+        public static System.Collections.Generic.List<EnemyData> PickEnemies(NodeType type, IRandom rng, int act)
+        {
+            var list = new System.Collections.Generic.List<EnemyData>();
+            if (type == NodeType.Boss || type == NodeType.Elite)
+            {
+                list.Add(PickEnemy(type, rng, act));   // 단일 강적
+                return list;
+            }
+            // 일반: 45% 1마리 / 40% 2마리 / 15% 3마리
+            int roll = rng.NextInt(100);
+            int count = roll < 45 ? 1 : roll < 85 ? 2 : 3;
+            for (int i = 0; i < count; i++)
+            {
+                list.Add(PickEnemy(type, rng, act));
+            }
+            return list;
+        }
+
         private static EnemyData PickBase(NodeType type, IRandom rng)
         {
             switch (type)

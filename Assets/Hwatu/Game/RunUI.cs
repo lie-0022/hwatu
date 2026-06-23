@@ -617,9 +617,9 @@ namespace Hwatu.Game
             MapNode node = _flow.Run.Map.GetNode(_flow.Run.CurrentNodeId);
             NodeType nodeType = node != null ? node.Type : NodeType.Combat;
             IRandom enemyRng = new RngStreams(_flow.Run.Seed).ForStream("enemy_" + _flow.Run.CurrentNodeId);
-            EnemyData enemy = EnemyContent.PickEnemy(nodeType, enemyRng, _flow.Run.Act);
+            var enemies = EnemyContent.PickEnemies(nodeType, enemyRng, _flow.Run.Act);
             ulong combatSeed = _flow.Run.Seed + (ulong)(_flow.Run.CurrentNodeId + 1);
-            _combatCtrl.StartCombat(_flow.Run.Deck, enemy, combatSeed, _flow.Run.MaxHp, _flow.Run.Hp, _flow.Run.Relics);
+            _combatCtrl.StartCombat(_flow.Run.Deck, enemies, combatSeed, _flow.Run.MaxHp, _flow.Run.Hp, _flow.Run.Relics);
             _combatView.SetVisible(true);
             _combatView.ResetForNewCombat();
             _combatView.Refresh();
