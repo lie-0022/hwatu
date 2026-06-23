@@ -52,6 +52,19 @@
 
 ## 3. 유물 (다양성·효과 트리거) — [리서치 예정]
 
-## 4. 적 AI / 의도(Intent) 패턴 — [리서치 예정]
+## 4. 적 AI / 의도(Intent) 패턴
+
+### 4.1 핵심 (STS1/2)
+- 적은 **스크립트(상태기계)**로 행동. 의도(Intent)를 머리 위에 미리 표시(완전정보).
+- Act1 단순(고정/교대), **Act2·3은 가중치 move 풀**(확률 선택) — "보통 한 행동을 선호하나 확정은 아님".
+- **연속 제한(repetition limit)**: 같은 move를 연속 N회 초과 금지(예: 공격 2연타 후 강제 전환). 예측 가능성↓·패턴화 방지.
+- 예: Cultist = 의식(버프) 1회 → 이후 공격 반복. Jaw Worm = 가중치(물기/방어버프/포효).
+
+### 4.2 화투 적용
+- 기존: `SequenceAi`(고정 순서 순환), `PhaseAi`(HP 임계 페이즈 전환).
+- 추가: **`WeightedAi`** — AiOrder를 가중치 풀(중복 ID = 높은 확률)로 보고, 시드 RNG로 선택 + **연속 제한(기본 2)**. Act2+ 일반 적에 적용해 예측성↓.
+- 의도 미리보기(`PeekNext`)는 한 번 정한 move를 **캐시**해 완전정보(미리보기=실제 실행) 유지. `Advance`에서 캐시 비우고 연속 카운트 갱신.
+
+> 출처: [Intent — STS Wiki](https://slaythespire.wiki.gg/wiki/Intent) · [Enemy Patterns & AI — A20 Mastery](https://oboe.com/learn/slay-the-spire-ascension-20-mastery-rgvy3n/enemy-patterns-and-ai-4) · [Intent — Fandom](https://slay-the-spire.fandom.com/wiki/Intent)
 
 ## 5. 몬스터 (체력·수·패턴·특징) — [리서치 예정]

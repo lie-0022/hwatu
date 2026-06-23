@@ -47,6 +47,7 @@ namespace Hwatu.Core.Combat
             }
 
             var hpStream = streams.ForStream("enemyHp");
+            var aiStream = streams.ForStream("enemyAi");
             var enemies = new List<EnemyState>();
             for (int i = 0; i < enemyDatas.Count; i++)
             {
@@ -54,9 +55,19 @@ namespace Hwatu.Core.Combat
                 int hpRange = ed.MaxHpMax - ed.MaxHpMin + 1;
                 int baseHp = ed.MaxHpMin + hpStream.NextInt(hpRange);
                 int enemyHp = baseHp * AscensionRules.EnemyHpPercent(ascension) / 100;
-                IEnemyAi ai = ed.AiKind == EnemyAiKind.Phase && ed.SecondPhaseOrder != null
-                    ? new PhaseAi(ed, ed.AiOrder, ed.SecondPhaseOrder)
-                    : (IEnemyAi)new SequenceAi(ed);
+                IEnemyAi ai;
+                if (ed.AiKind == EnemyAiKind.Phase && ed.SecondPhaseOrder != null)
+                {
+                    ai = new PhaseAi(ed, ed.AiOrder, ed.SecondPhaseOrder);
+                }
+                else if (ed.AiKind == EnemyAiKind.WeightedRandom)
+                {
+                    ai = new WeightedAi(ed, aiStream);   // 가중치+연속제한(연구 §4.2)
+                }
+                else
+                {
+                    ai = new SequenceAi(ed);
+                }
                 enemies.Add(new EnemyState(ed, enemyHp, ai));
             }
 
