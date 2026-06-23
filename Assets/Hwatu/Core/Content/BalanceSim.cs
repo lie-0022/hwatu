@@ -52,5 +52,28 @@ namespace Hwatu.Core.Content
                 AvgHpLeftOnWin = wins > 0 ? totalHpOnWin / wins : 0,
             };
         }
+
+        /// <summary>다중 적(약몹 무리/페어)을 trials회 자동 전투해 집계한다(몬스터 수 밸런스).</summary>
+        public static Matchup SimulateMulti(IReadOnlyList<CardData> deck, IReadOnlyList<EnemyData> enemies, int maxHp, int trials)
+        {
+            int wins = 0, totalTurns = 0, totalHpOnWin = 0;
+            for (int t = 0; t < trials; t++)
+            {
+                CombatState state = CombatFactory.CreateCombat(deck, enemies, (ulong)(t + 1), maxHp, maxHp);
+                var engine = new CombatEngine(state, new EffectDispatcher());
+                CombatResult result = SimAi.RunCombat(engine);
+                totalTurns += state.Turn;
+                if (result == CombatResult.Win) { wins++; totalHpOnWin += state.Player.Hp; }
+            }
+            return new Matchup
+            {
+                Enemy = enemies.Count + "-enemy",
+                Wins = wins,
+                Trials = trials,
+                WinRatePct = trials > 0 ? wins * 100 / trials : 0,
+                AvgTurns = trials > 0 ? totalTurns / trials : 0,
+                AvgHpLeftOnWin = wins > 0 ? totalHpOnWin / wins : 0,
+            };
+        }
     }
 }

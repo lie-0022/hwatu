@@ -37,7 +37,7 @@ namespace Hwatu.Core.Content
                 {
                     break;
                 }
-                engine.PlayCard(pick, 0);
+                engine.PlayCard(pick, FirstAliveEnemy(s));
             }
             if (s.Phase == CombatPhase.PlayerAction)
             {
@@ -66,6 +66,16 @@ namespace Hwatu.Core.Content
                 }
             }
             return fallback;
+        }
+
+        /// <summary>살아있는 첫 적 인덱스(다중 적 — 순차 처치로 적 수를 빠르게 줄인다). 없으면 0.</summary>
+        private static int FirstAliveEnemy(CombatState s)
+        {
+            for (int i = 0; i < s.Enemies.Count; i++)
+            {
+                if (!s.Enemies[i].IsDead) { return i; }
+            }
+            return 0;
         }
     }
 }
