@@ -274,7 +274,7 @@ namespace Hwatu.Core.Content
             EnemyAiKind.Sequence,
             new[] { "fang", "coil", "coil_strike" });
 
-        // 보스 장군: 강공형 — 내려베기(14) / 진군(자기 광+3) / 철벽(방14)
+        // 보스 장군: 조건 반응형 강공 — 호령(약화2+자기광2)/내려베기(18)/철벽(방14)/진군(자기광+3). Block↑면 호령으로 방패 무력화(연구 §4.3)
         public static EnemyData General() => new EnemyData(
             "general", "장군", 105, 125,
             new[]
@@ -285,8 +285,16 @@ namespace Hwatu.Core.Content
                     new[] { new EffectData(EffectOp.GainResource, amount: 3, target: TargetType.Self, resource: ResourceType.Radiance) }),
                 new EnemyMoveData("bastion", IntentType.Block, 14,
                     new[] { new EffectData(EffectOp.GainBlock, amount: 14, target: TargetType.Self) }),
+                // 호령: 플레이어가 방어를 굳히면(Block↑) 약화로 방패를 무력화 + 자기 광 강화 — 보스 조건 반응
+                new EnemyMoveData("command", IntentType.Debuff, 2,
+                    new[]
+                    {
+                        new EffectData(EffectOp.ApplyStatus, amount: 2, target: TargetType.Enemy, status: StatusType.Weak),
+                        new EffectData(EffectOp.GainResource, amount: 2, target: TargetType.Self, resource: ResourceType.Radiance),
+                    }),
             },
-            EnemyAiKind.Sequence,
-            new[] { "rally", "slash", "bastion", "slash" });
+            // Block↑면 호령(order[0]), 낮으면 내려베기/철벽/진군(order[1..]) 순환
+            EnemyAiKind.Conditional,
+            new[] { "command", "slash", "bastion", "rally" });
     }
 }

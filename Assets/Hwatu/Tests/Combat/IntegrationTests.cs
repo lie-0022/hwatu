@@ -130,17 +130,21 @@ namespace Hwatu.Tests.Combat
         }
 
         [Test]
-        public void General_Rally_GivesSelfRadiance()
+        public void General_Conditional_HighBlock_PicksCommand_Debuff()
         {
-            var deck = StarterContent.LuminaryStarterDeck();
-            CombatState state = CombatFactory.CreateCombat(deck, StarterContent.General(), 1, 80, 80);
-            var engine = new CombatEngine(state, new EffectDispatcher());
-            engine.Advance(); engine.Advance(); // PlayerAction
-            engine.EndTurn();
-            engine.Advance(); engine.Advance(); // EnemyTurn1(rally) → CheckDeath
+            EnemyData g = StarterContent.General();
+            // 조건 반응형 보스: 데이터 정의 검증 + AI가 Block↑일 때 호령(약화) 선택
+            Assert.AreEqual(EnemyAiKind.Conditional, g.AiKind);
+            EnemyMoveData cmd = g.FindMove("command");
+            Assert.IsNotNull(cmd, "장군 호령(command) move 존재");
+            Assert.AreEqual(StatusType.Weak, cmd.Effects[0].Status);
+            Assert.IsNotNull(g.FindMove("rally"), "진군(rally)도 풀에 유지(광 강화)");
 
-            // 장군 AiOrder [rally, ...] — 첫 적턴 rally가 자기 광 +3(이후 공격 강화)
-            Assert.AreEqual(3, state.Enemies[0].GetStatus(StatusType.Radiance));
+            var ai = new ConditionalAi(g);
+            var enemy = new EnemyState(g, 110, ai);
+            var player = new PlayerState(80);
+            player.SetBlock(12);   // Block ≥ 임계 → 호령
+            Assert.AreEqual("command", ai.PeekNext(enemy, player).Id, "Block↑면 호령으로 방패 무력화");
         }
 
         [Test]
