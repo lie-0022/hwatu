@@ -129,14 +129,20 @@ namespace Hwatu.Core.Content
         public static CardData Catalyst() => new CardData("ink_catalyst", "촉매", CardType.Skill, 1, TargetType.Enemy, true,
             new[] { new EffectData(EffectOp.MultiplyPoison, amount: 2, target: TargetType.Enemy) }, CardRarity.Rare);
 
-        /// <summary>묵귀 보상 풀(19장: Common4/Uncommon8/Rare7).</summary>
+        public static CardData VenomFog() => new CardData("ink_fog", "맹독무", CardType.Skill, 1, TargetType.Enemy, false,
+            new[] { new EffectData(EffectOp.ApplyStatus, amount: 5, target: TargetType.Enemy, status: StatusType.Poison) }, CardRarity.Uncommon);
+
+        public static CardData Stealth() => new CardData("ink_stealth", "잠행", CardType.Skill, 1, TargetType.Self, false,
+            new[] { new EffectData(EffectOp.GainBlock, amount: 6, target: TargetType.Self) }, CardRarity.Uncommon, retain: true);
+
+        /// <summary>묵귀 보상 풀(21장: Common4/Uncommon10/Rare7).</summary>
         public static List<CardData> RewardPool()
         {
             return new List<CardData>
             {
                 InkStrike(), Soot(), DarkGuard(), Lacquer(),
                 Seep(), Miasma(), Veil(), Gu(), Lingering(), ToxicCloud(), Sting(),
-                Plague(), Decay(), BlackSpot(), Venom(), Corrode(), VenomShroud(), Assassinate(), Catalyst(),
+                Plague(), Decay(), BlackSpot(), Venom(), Corrode(), VenomShroud(), Assassinate(), Catalyst(), VenomFog(), Stealth(),
             };
         }
     }
