@@ -86,9 +86,9 @@ namespace Hwatu.Core.Content
             new[]
             {
                 new EnemyMoveData("bristle", IntentType.Buff, 0,
-                    new[] { new EffectData(EffectOp.ApplyStatus, amount: 3, target: TargetType.Self, status: StatusType.Thorns) }),
-                new EnemyMoveData("prick", IntentType.Attack, 6,
-                    new[] { new EffectData(EffectOp.DealDamage, amount: 6, target: TargetType.Enemy) }),
+                    new[] { new EffectData(EffectOp.ApplyStatus, amount: 4, target: TargetType.Self, status: StatusType.Thorns) }),
+                new EnemyMoveData("prick", IntentType.Attack, 8,
+                    new[] { new EffectData(EffectOp.DealDamage, amount: 8, target: TargetType.Enemy) }),
             },
             EnemyAiKind.Sequence,
             new[] { "bristle", "prick", "prick" });
