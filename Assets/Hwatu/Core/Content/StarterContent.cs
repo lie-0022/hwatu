@@ -60,7 +60,7 @@ namespace Hwatu.Core.Content
                 new EnemyMoveData("snort", IntentType.Buff, 0,
                     new[] { new EffectData(EffectOp.ApplyStatus, amount: 2, target: TargetType.Self, status: StatusType.Radiance) }),
             },
-            EnemyAiKind.Sequence,
+            EnemyAiKind.WeightedRandom,
             new[] { "snort", "gore", "gore" });
 
         // 일반: 두꺼비 — 웅크리기(방어10)→독침(공5+중독2). 방어/독 지구전형
@@ -77,7 +77,7 @@ namespace Hwatu.Core.Content
                         new EffectData(EffectOp.ApplyStatus, amount: 2, target: TargetType.Enemy, status: StatusType.Poison),
                     }),
             },
-            EnemyAiKind.Sequence,
+            EnemyAiKind.WeightedRandom,
             new[] { "crouch", "venomspit", "venomspit" });
 
         // 일반: 밤송이도깨비 — 가시 두르기(자기 Thorns 3)→찌르기(공6). 플레이어가 공격하면 가시 3 반사당함(가시 양방향)
