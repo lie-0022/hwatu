@@ -35,6 +35,8 @@ namespace Hwatu.Game
         private GameObject _resultPanel;
         private TextMeshProUGUI _resultText;
         private TextMeshProUGUI _mapHud;
+        private TextMeshProUGUI _mapHpChip;
+        private TextMeshProUGUI _mapGoldChip;
         private GameObject _eventPanel;
         private TextMeshProUGUI _eventText;
         private RectTransform _eventChoiceArea;
@@ -100,11 +102,14 @@ namespace Hwatu.Game
             _mapPanel = CreatePanel(root, "MapPanel", new Color(0.06f, 0.07f, 0.10f, 1f));
             _mapView = _mapPanel.AddComponent<MapView>();
             _mapView.Init(_flow, _font, _mapPanel.GetComponent<RectTransform>());
-            _mapHud = CreateText(_mapPanel, "", 30f, new Vector2(0, 320));
+            // HP·골드 미니칩(아이콘+숫자) + 액트/유물/포션 텍스트
+            _mapHpChip = UiChips.MakeHudChip(this, _mapPanel.transform, _font, IconCatalog.Hp, DesignTokens.Danger, new Vector2(40f, -12f), 124f);
+            _mapGoldChip = UiChips.MakeHudChip(this, _mapPanel.transform, _font, IconCatalog.Gold, DesignTokens.Gold, new Vector2(180f, -12f), 110f);
+            _mapHud = CreateText(_mapPanel, "", 26f, new Vector2(0, 320));
             _mapHud.rectTransform.anchorMin = new Vector2(0.5f, 1f);
             _mapHud.rectTransform.anchorMax = new Vector2(0.5f, 1f);
-            _mapHud.rectTransform.anchoredPosition = new Vector2(0f, -28f);
-            _mapHud.rectTransform.sizeDelta = new Vector2(1100f, 48f);
+            _mapHud.rectTransform.anchoredPosition = new Vector2(150f, -28f);
+            _mapHud.rectTransform.sizeDelta = new Vector2(800f, 48f);
             CreateButton(_mapPanel, "덱 보기", new Vector2(720, 320), () => OpenDeckView());
 
             // 덱 보기 모달(맵 위 오버레이 — 버튼으로 열고 닫음)
@@ -273,7 +278,9 @@ namespace Hwatu.Game
             if (p == RunPhase.Map)
             {
                 _mapView.Build();
-                _mapHud.text = $"HP {_flow.Run.Hp}/{_flow.Run.MaxHp}    골드 {_flow.Run.Gold}    액트 {_flow.Run.Act}    유물 {_flow.Run.Relics.Count}    포션 {_flow.Run.Potions.Count}/{RunState.MaxPotions}";
+                _mapHpChip.text = $"{_flow.Run.Hp}/{_flow.Run.MaxHp}";
+                _mapGoldChip.text = _flow.Run.Gold.ToString();
+                _mapHud.text = $"액트 {_flow.Run.Act}    유물 {_flow.Run.Relics.Count}    포션 {_flow.Run.Potions.Count}/{RunState.MaxPotions}";
             }
             else if (p == RunPhase.Event)
             {
