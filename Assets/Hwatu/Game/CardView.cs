@@ -76,9 +76,9 @@ namespace Hwatu.Game
             Image art = CreateImage("Art", new Vector2(0.5f, 0.66f), new Vector2(0.5f, 0.66f), Vector2.zero, new Vector2(172, 120));
             art.color = new Color(0.16f, 0.16f, 0.19f);
 
-            // 좌상단 코스트 배지
+            // 좌상단 코스트 배지 — 에너지 아이콘(game-icons) + 숫자 오버레이(STS 에너지 구슬식)
             Image cost = CreateImage("CostBadge", new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(28, -28), new Vector2(46, 46));
-            cost.color = new Color(0.10f, 0.32f, 0.58f);
+            IconLoader.Apply(this, cost, IconCatalog.Energy, DesignTokens.Spirit, 46f);
             _costText = CreateText(cost.rectTransform, "CostText", Vector2.zero, Vector2.one, Vector2.zero, 26, TextAlignmentOptions.Center);
 
             // 우상단 타입 라벨
