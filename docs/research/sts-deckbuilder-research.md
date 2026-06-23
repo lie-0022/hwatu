@@ -48,9 +48,43 @@
 
 ---
 
-## 2. 카드 밸런싱 (코스트·효율) — [리서치 예정]
+## 2. 카드 밸런싱 (코스트·효율)
 
-## 3. 유물 (다양성·효과 트리거) — [리서치 예정]
+### 2.1 baseline (STS1)
+- **Strike**: 6 데미지 / 1에너지. **Defend**: 6 블록 / 1에너지. → 기본 = **6 데미지·6 블록 per 에너지**.
+- 효율 = 임팩트 / 자원. 예: 12뎀·2E(6/E) vs 8뎀·1E(8/E) → 후자가 효율↑.
+- Common 공격: ~8~9뎀·1E(baseline +α). Uncommon/Rare는 부가효과(상태이상·드로우)로 가치 보강.
+- **코스트 감소 강화가 매우 강력**(0코 Defend ≫ 1코 Defend). 데미지가 공격적으로 스케일 → 턴당 전체 에너지를 한 장에 몰지 않게 분산.
+
+### 2.2 화투 적용 기준
+| 분류 | 코스트 | 기준치 |
+|---|---|---|
+| 공격(단일) | 1코 | 6~9뎀(+자원) |
+| 공격(강타) | 2코 | 12~16뎀 |
+| 공격(피니셔/소멸) | 2~3코 | 20~25뎀 |
+| 방어 | 1코 | 5~8블록 |
+| 방어(대형) | 2코 | 14블록 |
+| 0코 카드 | 0코 | 효과 작게(드로우1·자원1·소형타격) |
+| 상태이상 | 1코 | 독 4·약화2 등(누적 가치라 보수적) |
+
+- 현재 카드 풀 점검: 백호 일섬(9뎀·1E)·연격(3×3·2E)·거수일격(10뎀+위엄2·2E)은 기준 부합. 광객/묵귀도 대체로 정합.
+
+> 출처: [Energy — Fandom](https://slay-the-spire.fandom.com/wiki/Energy) · [Card Rewards — Spire Builds](https://www.spirebuilds.com/guides/understanding-card-rewards)
+
+## 3. 유물 (다양성·효과 트리거)
+
+### 3.1 분류 (STS1/2)
+- 등급: **Common/Uncommon/Rare/Boss/Event/Shop** (+ Starter 시작 유물). STS2는 Ancient 추가(6등급).
+- 출처 제한: Boss=보스만, Event=이벤트만, Shop=상점만, Starter=캐릭터 기본.
+- 등급 확률 보통 **3:2:1**(Common50/Uncommon33/Rare17). 상자는 49/42/9.
+- 총량: STS1 100+, STS2 287개 → **다양성이 정체성**.
+
+### 3.2 효과 트리거 다양성 (현재 화투는 '전투 시작'만 — 핵심 개선점)
+- 트리거 종류: 전투시작 / **턴 시작·종료** / **공격 시·피격 시** / **카드 플레이 시**(타입별) / **HP 임계** / **처치 시** / 상점·맵·휴식 / 패시브 상시.
+- 화투 현재: `RelicData.ApplyCombatStart(PlayerState)`만 → **턴/피격/플레이 트리거 훅 확장 필요**(다양성 핵심).
+- **Boss 유물 = 강력+페널티**(예: 에너지+1 + 손해) — 트레이드오프 설계.
+
+> 출처: [Relics — Fandom](https://slay-the-spire.fandom.com/wiki/Relics) · [Relic Tier List — Unduel](https://unduel.com/slay-the-spire/tier-list/the-best-common-uncommon-and-rare-relics)
 
 ## 4. 적 AI / 의도(Intent) 패턴
 
@@ -67,4 +101,17 @@
 
 > 출처: [Intent — STS Wiki](https://slaythespire.wiki.gg/wiki/Intent) · [Enemy Patterns & AI — A20 Mastery](https://oboe.com/learn/slay-the-spire-ascension-20-mastery-rgvy3n/enemy-patterns-and-ai-4) · [Intent — Fandom](https://slay-the-spire.fandom.com/wiki/Intent)
 
-## 5. 몬스터 (체력·수·패턴·특징) — [리서치 예정]
+## 5. 몬스터 (체력·수·패턴·특징)
+
+### 5.1 Act1 기준 (STS1)
+- **일반 인카운터 구성**: ①단일 중강몹 / ②약몹 무리(다수) / ③2 중강몹 페어.
+- HP: 약몹 10~20, 중강 40~50대. 엘리트 ~90~110(Lagavulin 109~111). 보스 ~250.
+- **엘리트 풀(Act1)**: Gremlin Nob(스킬 쓰면 힘↑·취약), Lagavulin(3턴 수면→각성 강타), Tri-Sentries(다수+Dazed 덱오염).
+- 각 몬스터 **고유 기믹**: 수면/각성, 조건부 버프(스킬 트리거), 덱 오염, 다수 협공, 가시(피격 반사).
+
+### 5.2 화투 적용 기준
+- 인카운터: 일반 1~3마리(`PickEnemies` 구현됨). 약몹 무리 vs 단일 강몹 다양화.
+- HP 가이드(act1): 약몹 18~28 · 중강 38~50 · 엘리트 90~120 · 보스 100~125 (현재 밸런스와 정합 — `docs/systems/05-balance-sim.md`).
+- 몹별 고유 기믹: 현재 Doom(구미호)·PhaseAi(보스)·가중치 AI(멧돼지·두꺼비). 추가 — **가시 적(밤송이도깨비, 피격 반사)**, 수면/각성, 조건부 버프.
+
+> 출처: [Monsters — STS Wiki](https://slaythespire.wiki.gg/wiki/Monsters) · [Elites — STS Wiki](https://slaythespire.wiki.gg/wiki/Elites) · [Bosses — STS Wiki](https://slaythespire.wiki.gg/wiki/Bosses)
