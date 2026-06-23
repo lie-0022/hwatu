@@ -114,14 +114,25 @@ namespace Hwatu.Core.Content
             return deck;
         }
 
-        /// <summary>묵귀 보상 풀(16장: Common4/Uncommon7/Rare5).</summary>
+        // ── 방어형/피니셔 추가(묵귀에 부족한 축) ──
+        public static CardData VenomShroud() => new CardData("ink_shroud", "독막", CardType.Skill, 1, TargetType.Self, false,
+            new[]
+            {
+                new EffectData(EffectOp.GainBlock, amount: 8, target: TargetType.Self),
+                new EffectData(EffectOp.ApplyStatus, amount: 2, target: TargetType.Enemy, status: StatusType.Poison),
+            }, CardRarity.Uncommon);
+
+        public static CardData Assassinate() => new CardData("ink_assassin", "암살", CardType.Attack, 2, TargetType.Enemy, true,
+            new[] { new EffectData(EffectOp.DealDamage, amount: 16, target: TargetType.Enemy) }, CardRarity.Rare);
+
+        /// <summary>묵귀 보상 풀(18장: Common4/Uncommon8/Rare6).</summary>
         public static List<CardData> RewardPool()
         {
             return new List<CardData>
             {
                 InkStrike(), Soot(), DarkGuard(), Lacquer(),
                 Seep(), Miasma(), Veil(), Gu(), Lingering(), ToxicCloud(), Sting(),
-                Plague(), Decay(), BlackSpot(), Venom(), Corrode(),
+                Plague(), Decay(), BlackSpot(), Venom(), Corrode(), VenomShroud(), Assassinate(),
             };
         }
     }

@@ -28,9 +28,9 @@ namespace Hwatu.Tests.Run
         }
 
         [Test]
-        public void InkPool_HasSixteen()
+        public void InkPool_HasEighteen()
         {
-            Assert.AreEqual(16, InkCards.RewardPool().Count);
+            Assert.AreEqual(18, InkCards.RewardPool().Count);
         }
 
         [Test]
