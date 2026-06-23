@@ -16,6 +16,7 @@ namespace Hwatu.Game
         private GameObject _box;
         private TextMeshProUGUI _text;
         private RectTransform _boxRt;
+        private Canvas _canvas;
 
         /// <summary>툴팁 박스를 생성한다(폰트 주입). 씬당 1회.</summary>
         public void Build(TMP_FontAsset font)
@@ -24,9 +25,9 @@ namespace Hwatu.Game
 
             var canvasGo = new GameObject("TooltipCanvas", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
             canvasGo.transform.SetParent(transform, false);
-            var canvas = canvasGo.GetComponent<Canvas>();
-            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            canvas.sortingOrder = 200;   // 모든 UI 위
+            _canvas = canvasGo.GetComponent<Canvas>();
+            _canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            _canvas.sortingOrder = 200;   // 모든 UI 위
             var scaler = canvasGo.GetComponent<CanvasScaler>();
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
             scaler.referenceResolution = new Vector2(1920, 1080);
@@ -63,14 +64,23 @@ namespace Hwatu.Game
             {
                 return;
             }
+            Reposition();
+        }
+
+        // 마우스 옆에 띄우되 화면 밖으로 넘치지 않게 보정. CanvasScaler(ScaleWithScreenSize)에서
+        // sizeDelta는 1920 기준 로컬 단위라, 실제 픽셀과 비교하려면 scaleFactor를 곱해야 한다(넘침 보정 정확).
+        private void Reposition()
+        {
             Vector2 mp = Mouse.current != null ? Mouse.current.position.ReadValue() : Vector2.zero;
-            // 화면 우/하단 넘침 보정
-            float w = _boxRt.sizeDelta.x;
-            float h = _boxRt.sizeDelta.y;
+            float sf = _canvas != null ? _canvas.scaleFactor : 1f;
+            float w = _boxRt.sizeDelta.x * sf;
+            float h = _boxRt.sizeDelta.y * sf;
             float x = mp.x + 18f;
             float y = mp.y - 18f;
-            if (x + w > Screen.width) { x = mp.x - 18f - w; }
-            if (y - h < 0f) { y = h + 18f; }
+            if (x + w > Screen.width) { x = mp.x - 18f - w; }   // 우측 넘침 → 마우스 왼쪽으로
+            if (x < 4f) { x = 4f; }
+            if (y - h < 4f) { y = h + 4f; }                     // 하단 넘침 → 위로
+            if (y > Screen.height - 4f) { y = Screen.height - 4f; }
             _boxRt.position = new Vector2(x, y);
         }
 
@@ -88,6 +98,7 @@ namespace Hwatu.Game
             Instance._boxRt.sizeDelta = new Vector2(w, h);
             Instance._box.SetActive(true);
             Instance._box.transform.SetAsLastSibling();
+            Instance.Reposition();   // 첫 프레임부터 올바른 위치(깜빡임 방지)
         }
 
         /// <summary>툴팁을 숨긴다.</summary>
