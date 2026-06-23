@@ -135,13 +135,21 @@ namespace Hwatu.Core.Content
         public static CardData RadiantNova() => new CardData("lum_nova", "광폭발", CardType.Attack, 2, TargetType.Enemy, true,
             new[] { new EffectData(EffectOp.ConsumeRadiance, amount: 3, target: TargetType.Enemy) }, CardRarity.Rare);
 
-        /// <summary>보상 추첨에 쓰는 광객 카드 풀(26장: Common5/Uncommon12/Rare9).</summary>
+        // 공방 겸비: 피해 7 + 방어 4
+        public static CardData RadiantPulse() => new CardData("lum_pulse", "광휘파", CardType.Attack, 1, TargetType.Enemy, false,
+            new[]
+            {
+                new EffectData(EffectOp.DealDamage, amount: 7, target: TargetType.Enemy),
+                new EffectData(EffectOp.GainBlock, amount: 4, target: TargetType.Self),
+            }, CardRarity.Uncommon);
+
+        /// <summary>보상 추첨에 쓰는 광객 카드 풀(27장: Common5/Uncommon13/Rare9).</summary>
         public static List<CardData> RewardPool()
         {
             return new List<CardData>
             {
                 HeavyStrike(), Guard(), Whet(), Jab(), Check(),
-                Glow(), Daybreak(), Pierce(), LightRay(), Stockpile(), Purify(), Vigil(), Dawn(), Bulwark(), Volley(), LightVeil(), Glint(), RadiantNova(),
+                Glow(), Daybreak(), Pierce(), LightRay(), Stockpile(), Purify(), Vigil(), Dawn(), Bulwark(), Volley(), LightVeil(), Glint(), RadiantNova(), RadiantPulse(),
                 Burst(), GreatShield(), RadiantSurge(), Frenzy(), WhiteFlash(), Awaken(), Meteor(), LightWave(),
             };
         }
