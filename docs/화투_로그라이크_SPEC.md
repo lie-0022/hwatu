@@ -188,7 +188,7 @@ COMBAT_WIN → 보상(카드 3택1, 골드, [유물])
 | `gain_resource` | resource, n | 캐릭터 자원 누적(radiance/stakes/go/chaff) |
 | `add_card` | cardId, pile | 카드 생성(hand/draw/discard) |
 | `exhaust_card` | ref | 카드 소멸 |
-| `summon` | unitId, hp | 동료 소환/강화(§6 산군) |
+| `summon` | unitId, hp | 동료 소환/강화 (캐릭터 확장용) |
 | `mark_doom` | amount, target | 박(처형) 표식 부여(§5.3) |
 | `multiply_score` | factor | 판돈/점수 배율(§6 타짜) |
 
@@ -223,7 +223,7 @@ COMBAT_WIN → 보상(카드 3택1, 골드, [유물])
 |---|---|---|---|---|---|
 | `luminary` | 광객(光客) | 광 | `radiance` 스택 → 오광 폭발 | 아이언클래드+리젠트 | ★ 우선 |
 | `ribbon` | 단(丹)을 잇는 자 | 띠 | 홍·청·초단 세트 콤보 | 사일런트 | 후순위 |
-| `beast` | 산군(山君) | 열끗 | 동물 `summon`·동료 | 디펙트+네크로 | 후순위 |
+| `beast` | 산군(山君)=백호 | 열끗 | `majesty`(위엄) 스택 자가 성장·각성 변신 | 아이언클래드+변신 | 후순위 |
 | `husk` | 피바라기 | 피 | `chaff` 물량 스택·피박 | (신규) | 후순위 |
 | `gambler` | 타짜 | 고스톱 | `stakes`/`go` 판돈·박 처형 | 리젠트+네크로 | 후순위 |
 
