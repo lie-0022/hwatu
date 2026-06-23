@@ -8,9 +8,12 @@ namespace Hwatu.Core.Content
     {
         public static List<CardData> RewardPool(string characterId)
         {
-            return characterId == "ink_spirit"
-                ? InkCards.RewardPool()
-                : LuminaryCards.RewardPool();
+            switch (characterId)
+            {
+                case "ink_spirit": return InkCards.RewardPool();
+                case "beast": return BeastCards.RewardPool();
+                default: return LuminaryCards.RewardPool();
+            }
         }
     }
 }

@@ -50,5 +50,17 @@ namespace Hwatu.Tests.Combat
             Assert.AreEqual(10, beast.StartingDeck.Count);
             Assert.AreEqual("백호 산군", beast.Name);
         }
+
+        [Test]
+        public void BeastRewardPool_HasTen()
+        {
+            Assert.AreEqual(10, BeastCards.RewardPool().Count);
+        }
+
+        [Test]
+        public void CharacterPools_Beast_UsesBeastPool()
+        {
+            Assert.AreEqual(10, CharacterPools.RewardPool("beast").Count);
+        }
     }
 }
