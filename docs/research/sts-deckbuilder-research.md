@@ -139,6 +139,13 @@
   - STS 레퍼런스: Gremlin Nob(스킬 플레이 시 힘↑)·Lagavulin(수면→각성)·Cultist(의식 1회 후 공격 반복) 식 반응형.
 - **데이터 스키마**: EnemyData에 조건→move 매핑(예: `[{cond:"player_block>=10", move:"debuff"}, ...]`) 추가하거나, 적별 ConditionalAi 서브클래스로 구현.
 
+#### ✅ 구현·적용 결과 (2026-06)
+- **시그니처 확장 완료**: `PeekNext(EnemyState self, PlayerState player = null)` — IEnemyAi·Sequence·Weighted·Phase·Conditional + CombatEngine·RefreshIntent. 완전정보 유지(캐시).
+- **`ConditionalAi` 구현**: Block ≥ 임계(기본 8)면 `AiOrder[0]`(디버프), 낮으면 `AiOrder[1..]` 순환(매턴 같은 강타 반복 방지 — 초기 0% 버그 수정). 완전정보라 **한 턴 지연 반응**(플레이어가 Block 굳히면 다음 적턴 반응).
+- **적용 1 — 엘리트 외눈도깨비**: `[glare, oni_smash, enrage]`. 시뮬 **52~77%**(반응형이라 Sequence 85~97%보다 도전적).
+- **적용 2 — 보스 장군**: 호령(command: 약화2+자기광2) 추가, `[command, slash, bastion, rally]`. Block↑면 호령으로 방패 무력화. 시뮬 **63~78%**(보스 적정, 구미호 7%처럼 과하지 않게).
+- **남은 후속**: 자기 HP<50% 조건(Phase 결합)·다른 일반 적 반응형 확대.
+
 ## 5. 몬스터 (체력·수·패턴·특징)
 
 ### 5.1 Act1 기준 (STS1)
