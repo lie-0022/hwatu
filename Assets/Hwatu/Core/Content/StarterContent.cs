@@ -231,7 +231,7 @@ namespace Hwatu.Core.Content
                 new EnemyMoveData("ram", IntentType.Attack, 13,
                     new[] { new EffectData(EffectOp.DealDamage, amount: 13, target: TargetType.Enemy) }),
             },
-            EnemyAiKind.Sequence,
+            EnemyAiKind.WeightedRandom,
             new[] { "ward", "stare", "ram" });
 
         // 일반 그슨대: 어둠 정령 — 할퀴기(3×2) / 저주(약화2)
@@ -248,7 +248,7 @@ namespace Hwatu.Core.Content
                 new EnemyMoveData("curse", IntentType.Debuff, 2,
                     new[] { new EffectData(EffectOp.ApplyStatus, amount: 2, target: TargetType.Enemy, status: StatusType.Weak) }),
             },
-            EnemyAiKind.Sequence,
+            EnemyAiKind.WeightedRandom,
             new[] { "claw", "curse", "claw" });
 
         // 엘리트 구렁이: 독 특화 — 휘감기(12) / 독니(6+중독4) / 또아리(방10)
