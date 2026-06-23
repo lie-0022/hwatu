@@ -36,9 +36,9 @@ namespace Hwatu.Core.Combat
         public void AddStatus(StatusType status, int amount) => _statuses[status] = GetStatus(status) + amount;
 
         /// <summary>AI에서 다음 move를 계산해 intent로 노출한다(완전정보).</summary>
-        public void RefreshIntent()
+        public void RefreshIntent(PlayerState player = null)
         {
-            CurrentIntent = Ai.PeekNext(this);
+            CurrentIntent = Ai.PeekNext(this, player);
         }
     }
 }

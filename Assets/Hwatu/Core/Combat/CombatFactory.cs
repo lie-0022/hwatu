@@ -64,6 +64,10 @@ namespace Hwatu.Core.Combat
                 {
                     ai = new WeightedAi(ed, aiStream);   // 가중치+연속제한(연구 §4.2)
                 }
+                else if (ed.AiKind == EnemyAiKind.Conditional)
+                {
+                    ai = new ConditionalAi(ed);   // 플레이어 Block 반응형(연구 §4.3)
+                }
                 else
                 {
                     ai = new SequenceAi(ed);

@@ -185,7 +185,7 @@ namespace Hwatu.Core.Combat
             MoveInnateToTop();
             for (int i = 0; i < State.Enemies.Count; i++)
             {
-                State.Enemies[i].RefreshIntent();
+                State.Enemies[i].RefreshIntent(State.Player);
             }
         }
 
@@ -263,7 +263,7 @@ namespace Hwatu.Core.Combat
 
                 // 실행은 항상 현재 AI 상태(PeekNext)를 직접 사용한다.
                 // CurrentIntent는 UI 표시 전용 캐시이므로 실행 소스로 겸용하지 않는다(의도 변경 효과 대비).
-                EnemyMoveData move = enemy.Ai.PeekNext(enemy);
+                EnemyMoveData move = enemy.Ai.PeekNext(enemy, State.Player);
 
                 // Doom 카운트다운: DoomTurns>0이면 그만큼 예고 후 발동(예고 턴은 effects 보류 + AI 진행 보류).
                 if (move.Intent == IntentType.Doom && move.DoomTurns > 0)
@@ -276,7 +276,7 @@ namespace Hwatu.Core.Combat
                     {
                         enemy.SetDoomTimer(enemy.DoomTimer - 1);
                         State.Log.Add($"{enemy.Data.Name}: 파멸 예고({enemy.DoomTimer + 1})");
-                        enemy.RefreshIntent();
+                        enemy.RefreshIntent(State.Player);
                         continue;
                     }
                     enemy.SetDoomTimer(-1);   // 발동
@@ -291,7 +291,7 @@ namespace Hwatu.Core.Combat
                 }
 
                 enemy.Ai.Advance();
-                enemy.RefreshIntent(); // 다음 턴에 보여줄 의도 갱신
+                enemy.RefreshIntent(State.Player); // 다음 턴에 보여줄 의도 갱신
                 DecayDebuffs(enemy);    // 적 턴 종료 — 약화·취약 1 감소
             }
         }

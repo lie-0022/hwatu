@@ -27,7 +27,7 @@ namespace Hwatu.Core.Enemies
         /// <summary>광폭화(2페이즈) 진입 여부.</summary>
         public bool IsEnraged => _enraged;
 
-        public EnemyMoveData PeekNext(EnemyState self)
+        public EnemyMoveData PeekNext(EnemyState self, PlayerState player = null)
         {
             if (!_enraged && self != null && self.Hp * 100 <= self.MaxHp * _thresholdPercent)
             {

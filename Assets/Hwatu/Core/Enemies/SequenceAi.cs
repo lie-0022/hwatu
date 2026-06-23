@@ -13,7 +13,7 @@ namespace Hwatu.Core.Enemies
             _data = data;
         }
 
-        public EnemyMoveData PeekNext(EnemyState self)
+        public EnemyMoveData PeekNext(EnemyState self, PlayerState player = null)
         {
             string moveId = _data.AiOrder[_index % _data.AiOrder.Count];
             return _data.FindMove(moveId);

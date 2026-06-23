@@ -25,7 +25,7 @@ namespace Hwatu.Core.Enemies
             _repeatLimit = repeatLimit;
         }
 
-        public EnemyMoveData PeekNext(EnemyState self)
+        public EnemyMoveData PeekNext(EnemyState self, PlayerState player = null)
         {
             if (_cached == null)
             {

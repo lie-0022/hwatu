@@ -9,7 +9,7 @@ namespace Hwatu.Core.Enemies
     public interface IEnemyAi
     {
         /// <summary>다음에 실행할 move(self의 HP 등으로 페이즈 분기 가능). 같은 상태면 같은 값.</summary>
-        EnemyMoveData PeekNext(EnemyState self);
+        EnemyMoveData PeekNext(EnemyState self, PlayerState player = null);
 
         /// <summary>현재 move를 소비하고 다음으로 진행한다.</summary>
         void Advance();
