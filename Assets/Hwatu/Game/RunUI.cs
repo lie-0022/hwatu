@@ -35,6 +35,8 @@ namespace Hwatu.Game
         private GameObject _resultPanel;
         private TextMeshProUGUI _resultText;
         private TextMeshProUGUI _mapHud;
+        private TextMeshProUGUI _mapHpChip;
+        private TextMeshProUGUI _mapGoldChip;
         private GameObject _eventPanel;
         private TextMeshProUGUI _eventText;
         private RectTransform _eventChoiceArea;
@@ -42,6 +44,7 @@ namespace Hwatu.Game
         private GameObject _shopPanel;
         private RectTransform _shopItemsRoot;
         private TextMeshProUGUI _shopText;
+        private TextMeshProUGUI _shopGoldChip;
 
         private MapView _mapView;
         private GameObject _combatGo;
@@ -102,11 +105,14 @@ namespace Hwatu.Game
             _mapPanel = CreatePanel(root, "MapPanel", new Color(0.06f, 0.07f, 0.10f, 1f));
             _mapView = _mapPanel.AddComponent<MapView>();
             _mapView.Init(_flow, _font, _mapPanel.GetComponent<RectTransform>());
-            _mapHud = CreateText(_mapPanel, "", 30f, new Vector2(0, 320));
+            // HP·골드 미니칩(아이콘+숫자) + 액트/유물/포션 텍스트
+            _mapHpChip = UiChips.MakeHudChip(this, _mapPanel.transform, _font, IconCatalog.Hp, DesignTokens.Danger, new Vector2(40f, -12f), 124f);
+            _mapGoldChip = UiChips.MakeHudChip(this, _mapPanel.transform, _font, IconCatalog.Gold, DesignTokens.Gold, new Vector2(180f, -12f), 110f);
+            _mapHud = CreateText(_mapPanel, "", 26f, new Vector2(0, 320));
             _mapHud.rectTransform.anchorMin = new Vector2(0.5f, 1f);
             _mapHud.rectTransform.anchorMax = new Vector2(0.5f, 1f);
-            _mapHud.rectTransform.anchoredPosition = new Vector2(0f, -28f);
-            _mapHud.rectTransform.sizeDelta = new Vector2(1100f, 48f);
+            _mapHud.rectTransform.anchoredPosition = new Vector2(150f, -28f);
+            _mapHud.rectTransform.sizeDelta = new Vector2(800f, 48f);
             CreateButton(_mapPanel, "덱 보기", new Vector2(720, 320), () => OpenDeckView());
 
             // 덱 보기 모달(맵 위 오버레이 — 버튼으로 열고 닫음)
@@ -196,7 +202,8 @@ namespace Hwatu.Game
             // 상점(STS2식 다중 매물: 카드·유물·포션 동시 진열 + 개별 구매)
             _shopPanel = CreatePanel(root, "ShopPanel", new Color(0.10f, 0.08f, 0.04f, 0.97f));
             CreateText(_shopPanel, "상점", 50f, new Vector2(0, 440));
-            _shopText = CreateText(_shopPanel, "", 30f, new Vector2(0, 380));
+            _shopGoldChip = UiChips.MakeHudChip(this, _shopPanel.transform, _font, IconCatalog.Gold, DesignTokens.Gold, new Vector2(40f, -40f), 120f);
+            _shopText = CreateText(_shopPanel, "", 26f, new Vector2(0, 380));
             var itemsRootGo = new GameObject("ShopItems", typeof(RectTransform));
             itemsRootGo.transform.SetParent(_shopPanel.transform, false);
             _shopItemsRoot = (RectTransform)itemsRootGo.transform;
@@ -275,7 +282,9 @@ namespace Hwatu.Game
             if (p == RunPhase.Map)
             {
                 _mapView.Build();
-                _mapHud.text = $"HP {_flow.Run.Hp}/{_flow.Run.MaxHp}    골드 {_flow.Run.Gold}    액트 {_flow.Run.Act}    유물 {_flow.Run.Relics.Count}    포션 {_flow.Run.Potions.Count}/{RunState.MaxPotions}";
+                _mapHpChip.text = $"{_flow.Run.Hp}/{_flow.Run.MaxHp}";
+                _mapGoldChip.text = _flow.Run.Gold.ToString();
+                _mapHud.text = $"액트 {_flow.Run.Act}    유물 {_flow.Run.Relics.Count}    포션 {_flow.Run.Potions.Count}/{RunState.MaxPotions}";
             }
             else if (p == RunPhase.Event)
             {
@@ -327,7 +336,8 @@ namespace Hwatu.Game
         /// <summary>상점 화면을 현재 매물(카드·유물·포션)로 채운다 — 개별 구매 버튼 그리드.</summary>
         private void BuildShop()
         {
-            _shopText.text = $"골드 {_flow.Run.Gold}    <size=64%>(매물에 마우스를 올리면 효과)</size>";
+            _shopGoldChip.text = _flow.Run.Gold.ToString();
+            _shopText.text = "<size=70%>(매물에 마우스를 올리면 효과)</size>";
 
             var kill = new List<GameObject>();
             foreach (Transform c in _shopItemsRoot) { kill.Add(c.gameObject); }
@@ -598,6 +608,17 @@ namespace Hwatu.Game
                 var pos = new Vector2(-840f, 380f - i * 90f);
                 var pbtn = CreateButton(_potionBarGo, potion.Name, pos, () => UsePotionInCombat(potion));
                 pbtn.gameObject.AddComponent<TooltipTrigger>().Set(GameInfo.PotionDesc(potion));
+                // 포션 아이콘(game-icons — 버튼 좌측, IconMd 규격)
+                var pico = new GameObject("Icon", typeof(RectTransform), typeof(Image));
+                pico.transform.SetParent(pbtn.transform, false);
+                var picoRt = (RectTransform)pico.transform;
+                picoRt.anchorMin = new Vector2(0f, 0.5f);
+                picoRt.anchorMax = new Vector2(0f, 0.5f);
+                picoRt.pivot = new Vector2(0f, 0.5f);
+                picoRt.anchoredPosition = new Vector2(8f, 0f);
+                var picoImg = pico.GetComponent<Image>();
+                picoImg.raycastTarget = false;
+                IconLoader.Apply(this, picoImg, IconCatalog.Potion, DesignTokens.Heal, DesignTokens.IconMd);
             }
         }
 

@@ -19,6 +19,7 @@ namespace Hwatu.Game
         private TextMeshProUGUI _nameText;
         private HpBar _hpBar;
         private Image _intentBg;
+        private Image _intentIcon;
         private TextMeshProUGUI _intentText;
         private TextMeshProUGUI _blockText;
         private RectTransform _enemyStatusArea;
@@ -69,6 +70,18 @@ namespace Hwatu.Game
             _intentBg = intentGo.GetComponent<Image>();
             _intentBg.raycastTarget = false;
 
+            // 인텐트 아이콘(game-icons — 박스 왼쪽, IconSm 규격으로 크기 통일)
+            var iconGo = new GameObject("IntentIcon", typeof(RectTransform), typeof(Image));
+            iconGo.transform.SetParent(irt, false);
+            var iconRt = (RectTransform)iconGo.transform;
+            iconRt.anchorMin = new Vector2(0f, 0.5f);
+            iconRt.anchorMax = new Vector2(0f, 0.5f);
+            iconRt.pivot = new Vector2(0f, 0.5f);
+            iconRt.anchoredPosition = new Vector2(8f, 0f);
+            _intentIcon = iconGo.GetComponent<Image>();
+            _intentIcon.raycastTarget = false;
+            _intentIcon.enabled = false;
+
             _intentText = CreateText(irt, "IntentText", 24f, new Vector2(0.5f, 0.5f), new Vector2(256f, 44f));
             _intentText.enableAutoSizing = true;   // 긴 인텐트(연속 히트·Doom 타이머)는 자동 축소해 박스 안에 맞춘다
             _intentText.fontSizeMin = 13f;
@@ -115,10 +128,12 @@ namespace Hwatu.Game
                 string doomTag = (e.CurrentIntent.Intent == IntentType.Doom && e.DoomTimer > 0)
                     ? $"  <size=80%>({e.DoomTimer})</size>" : "";
                 _intentText.text = $"{IntentKor(e.CurrentIntent.Intent)}  <b><size=135%>{num}</size></b>{doomTag}";
+                IconLoader.Apply(this, _intentIcon, IconCatalog.ForIntent(it), Color.white, DesignTokens.IconSm);
             }
             else
             {
                 _intentBg.enabled = false;
+                _intentIcon.enabled = false;
                 _intentText.text = "?";
             }
             RebuildEnemyStatus(e);
@@ -141,16 +156,30 @@ namespace Hwatu.Game
                 crt.anchorMin = new Vector2(0f, 1f);
                 crt.anchorMax = new Vector2(0f, 1f);
                 crt.pivot = new Vector2(0f, 1f);
-                crt.anchoredPosition = new Vector2(idx * 96f, 0f);
-                crt.sizeDelta = new Vector2(90f, 34f);
+                crt.anchoredPosition = new Vector2(idx * 64f, 0f);
+                crt.sizeDelta = new Vector2(58f, 34f);   // 아이콘+수치(이름은 아이콘이 대신, hover로 설명)
                 var sc = DesignTokens.StatusColor(st);
-                chip.GetComponent<Image>().color = new Color(sc.r * 0.5f, sc.g * 0.5f, sc.b * 0.5f, 0.95f);   // 의미색을 어둡게 → 흰 글씨 대비 확보
+                chip.GetComponent<Image>().color = new Color(sc.r * 0.5f, sc.g * 0.5f, sc.b * 0.5f, 0.95f);   // 칩 배경을 어둡게 → 흰 아이콘·숫자 대비 확보
                 chip.GetComponent<TooltipTrigger>().Set(GameInfo.StatusDesc(st, amt));
-                var lbl = CreateText((RectTransform)chip.transform, "L", 19f, new Vector2(0.5f, 0.5f), new Vector2(86f, 32f));
-                lbl.enableAutoSizing = true;   // 큰 수치(취약 12 등)도 칩 안에 맞춤
+
+                // 칩 아이콘(game-icons — 칩 왼쪽, IconSm 규격)
+                var icoGo = new GameObject("Icon", typeof(RectTransform), typeof(Image));
+                icoGo.transform.SetParent(crt, false);
+                var icoRt = (RectTransform)icoGo.transform;
+                icoRt.anchorMin = new Vector2(0f, 0.5f);
+                icoRt.anchorMax = new Vector2(0f, 0.5f);
+                icoRt.pivot = new Vector2(0f, 0.5f);
+                icoRt.anchoredPosition = new Vector2(3f, 0f);
+                var ico = icoGo.GetComponent<Image>();
+                ico.raycastTarget = false;
+                IconLoader.Apply(this, ico, IconCatalog.ForStatus(st), Color.white, DesignTokens.IconSm);
+
+                var lbl = CreateText((RectTransform)chip.transform, "L", 19f, new Vector2(1f, 0.5f), new Vector2(28f, 32f));
+                lbl.rectTransform.anchoredPosition = new Vector2(-4f, 0f);
+                lbl.enableAutoSizing = true;
                 lbl.fontSizeMin = 12f;
                 lbl.fontSizeMax = 19f;
-                lbl.text = $"{GameInfo.StatusName(st)} {amt}";
+                lbl.text = amt.ToString();
                 idx++;
             }
         }

@@ -31,6 +31,8 @@ namespace Hwatu.Game
         /// <summary>적 박스 폭(400) + 여백(40) = 슬롯 간격.</summary>
         private const float EnemySpacing = 440f;
         private TextMeshProUGUI _playerText;
+        private TextMeshProUGUI _energyLabel;
+        private TextMeshProUGUI _blockLabel;
         private Outline _playerOutline;
         private HpBar _playerHpBar;
         private RectTransform _root;
@@ -122,9 +124,13 @@ namespace Hwatu.Game
             _playerHpBar = pbarGo.AddComponent<HpBar>();
             _playerHpBar.Build(_font, new Color(0.3f, 0.75f, 0.35f, 1f), 400f, 28f);
 
+            // 에너지·방어 미니칩(아이콘+숫자) — HP바 아래
+            _energyLabel = MakeHudChip(prt, IconCatalog.Energy, DesignTokens.Spirit, new Vector2(20f, -46f));
+            _blockLabel = MakeHudChip(prt, "round-shield", DesignTokens.Defense, new Vector2(124f, -46f));
+
             _playerText = CreateText(prt, "PlayerText", Vector2.zero, Vector2.one, Vector2.zero, 22, TextAlignmentOptions.Center);
             _playerText.rectTransform.offsetMin = new Vector2(16f, 12f);
-            _playerText.rectTransform.offsetMax = new Vector2(-16f, -52f);
+            _playerText.rectTransform.offsetMax = new Vector2(-16f, -86f);
 
             // 플레이어 status 칩 영역(PlayerView 위, hover 설명 — STS2식)
             var pstatGo = new GameObject("PlayerStatus", typeof(RectTransform));
@@ -277,9 +283,10 @@ namespace Hwatu.Game
 
             PlayerState p = s.Player;
             _playerHpBar.Set(p.Hp, p.MaxHp);
-            string blockStr = p.Block > 0 ? $"    <color=#5B9BD5><b>방어 {p.Block}</b></color>" : "";   // 방어>0만 표시(STS식), 청색 강조
+            _energyLabel.text = $"{p.Energy}/{p.BaseEnergy}";
+            _blockLabel.text = p.Block.ToString();
+            _blockLabel.transform.parent.gameObject.SetActive(p.Block > 0);   // 방어 0이면 칩 숨김(STS식)
             _playerText.text =
-                $"에너지 {p.Energy}/{p.BaseEnergy}{blockStr}\n" +
                 $"턴 {s.Turn}   덱 {s.DrawPile.Count}  버린 {s.DiscardPile.Count}  소멸 {s.ExhaustPile.Count}";
             RebuildStatus(p);
 
@@ -371,6 +378,36 @@ namespace Hwatu.Game
             }
         }
 
+        // HUD 미니칩(반투명 배경 + 아이콘 + 우측 숫자) 생성. 숫자 라벨 반환(갱신용).
+        private TextMeshProUGUI MakeHudChip(Transform parent, string iconName, Color color, Vector2 anchoredPos)
+        {
+            var go = new GameObject("HudChip", typeof(RectTransform), typeof(Image));
+            go.transform.SetParent(parent, false);
+            var rt = (RectTransform)go.transform;
+            rt.anchorMin = new Vector2(0f, 1f);
+            rt.anchorMax = new Vector2(0f, 1f);
+            rt.pivot = new Vector2(0f, 1f);
+            rt.anchoredPosition = anchoredPos;
+            rt.sizeDelta = new Vector2(92f, 34f);
+            go.GetComponent<Image>().color = new Color(color.r, color.g, color.b, 0.22f);
+
+            var icoGo = new GameObject("Icon", typeof(RectTransform), typeof(Image));
+            icoGo.transform.SetParent(rt, false);
+            var icoRt = (RectTransform)icoGo.transform;
+            icoRt.anchorMin = new Vector2(0f, 0.5f);
+            icoRt.anchorMax = new Vector2(0f, 0.5f);
+            icoRt.pivot = new Vector2(0f, 0.5f);
+            icoRt.anchoredPosition = new Vector2(5f, 0f);
+            var ico = icoGo.GetComponent<Image>();
+            ico.raycastTarget = false;
+            IconLoader.Apply(this, ico, iconName, color, DesignTokens.IconSm);
+
+            var lbl = CreateText(rt, "L", Vector2.zero, Vector2.one, Vector2.zero, 20f, TextAlignmentOptions.Right);
+            lbl.margin = new Vector4(0f, 0f, 8f, 0f);
+            lbl.raycastTarget = false;
+            return lbl;
+        }
+
         // 손패를 InstanceId로 재사용해 갱신한다(유지 카드는 위치만 트윈, 빠진 카드만 제거, 새 카드만 생성).
         /// <summary>플레이어 status를 칩으로 다시 그린다(active만, hover 설명 — STS2식).</summary>
         private void RebuildStatus(PlayerState p)
@@ -389,17 +426,31 @@ namespace Hwatu.Game
                 crt.anchorMin = new Vector2(0f, 0.5f);
                 crt.anchorMax = new Vector2(0f, 0.5f);
                 crt.pivot = new Vector2(0f, 0.5f);
-                crt.anchoredPosition = new Vector2(idx * 96f, 0f);
-                crt.sizeDelta = new Vector2(90f, 40f);
+                crt.anchoredPosition = new Vector2(idx * 64f, 0f);
+                crt.sizeDelta = new Vector2(58f, 40f);   // 아이콘+수치(이름은 아이콘이 대신, hover 설명)
                 var sc = DesignTokens.StatusColor(st);
-                chip.GetComponent<Image>().color = new Color(sc.r * 0.5f, sc.g * 0.5f, sc.b * 0.5f, 0.95f);   // 의미색을 어둡게 → 흰 글씨 대비 확보
+                chip.GetComponent<Image>().color = new Color(sc.r * 0.5f, sc.g * 0.5f, sc.b * 0.5f, 0.95f);   // 칩 배경을 어둡게 → 흰 아이콘·숫자 대비 확보
                 chip.GetComponent<TooltipTrigger>().Set(GameInfo.StatusDesc(st, amt));
-                var lbl = CreateText(crt, "L", Vector2.zero, Vector2.one, Vector2.zero, 20f, TextAlignmentOptions.Center);
-                lbl.enableAutoSizing = true;   // 큰 수치(취약 12 등)도 칩 안에 맞춤
+
+                // 칩 아이콘(game-icons — 칩 왼쪽, IconSm 규격)
+                var icoGo = new GameObject("Icon", typeof(RectTransform), typeof(Image));
+                icoGo.transform.SetParent(crt, false);
+                var icoRt = (RectTransform)icoGo.transform;
+                icoRt.anchorMin = new Vector2(0f, 0.5f);
+                icoRt.anchorMax = new Vector2(0f, 0.5f);
+                icoRt.pivot = new Vector2(0f, 0.5f);
+                icoRt.anchoredPosition = new Vector2(4f, 0f);
+                var ico = icoGo.GetComponent<Image>();
+                ico.raycastTarget = false;
+                IconLoader.Apply(this, ico, IconCatalog.ForStatus(st), Color.white, DesignTokens.IconSm);
+
+                var lbl = CreateText(crt, "L", Vector2.zero, Vector2.one, Vector2.zero, 20f, TextAlignmentOptions.Right);
+                lbl.enableAutoSizing = true;
                 lbl.fontSizeMin = 12f;
                 lbl.fontSizeMax = 20f;
-                lbl.text = $"{GameInfo.StatusName(st)} {amt}";
+                lbl.text = amt.ToString();
                 lbl.raycastTarget = false;
+                lbl.margin = new Vector4(0f, 0f, 6f, 0f);   // 수치 우측 패딩(아이콘과 분리)
                 idx++;
             }
         }
