@@ -55,6 +55,18 @@ namespace Hwatu.Game
             trt.anchorMax = Vector2.one;
             trt.offsetMin = Vector2.zero;
             trt.offsetMax = Vector2.zero;
+
+            // HP 아이콘(game-icons — 바 왼쪽 바깥, 바 색과 동일 틴트)
+            var icoGo = new GameObject("HpIcon", typeof(RectTransform), typeof(Image));
+            icoGo.transform.SetParent(transform, false);
+            var icoRt = (RectTransform)icoGo.transform;
+            icoRt.anchorMin = new Vector2(0f, 0.5f);
+            icoRt.anchorMax = new Vector2(0f, 0.5f);
+            icoRt.pivot = new Vector2(1f, 0.5f);
+            icoRt.anchoredPosition = new Vector2(-6f, 0f);
+            var ico = icoGo.GetComponent<Image>();
+            ico.raycastTarget = false;
+            IconLoader.Apply(this, ico, IconCatalog.Hp, fillColor, height + 6f);
         }
 
         /// <summary>현재/최대 체력을 반영한다(숫자는 즉시, 바는 Update에서 부드럽게).</summary>
