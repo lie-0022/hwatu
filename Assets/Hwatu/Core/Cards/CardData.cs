@@ -39,17 +39,58 @@ namespace Hwatu.Core.Cards
             Ethereal = ethereal;
         }
 
-        /// <summary>업그레이드 버전(MVP: DealDamage/GainBlock 수치 +3, 이름·Id에 + 표시). 카드별 세부는 후속.</summary>
+        /// <summary>
+        /// 업그레이드(STS 카드별 맞춤을 op별 규칙으로 근사 — docs/research/sts-deckbuilder-research.md §1.3).
+        /// 공격 단일 +3 / 다회 타격당 +1 / 방어 +3 / 독 +3 / 약화·취약 +1 / 광·민첩·가시·재생 +2 / 드로우·자원·배수 +1.
+        /// </summary>
         public CardData Upgrade()
         {
+            int damageHits = 0;
+            for (int i = 0; i < Effects.Count; i++)
+            {
+                if (Effects[i].Op == EffectOp.DealDamage) { damageHits++; }
+            }
+            bool multiHit = damageHits >= 2;   // 다회 공격은 타격당 +1로 억제(과강화 방지)
+
             var up = new System.Collections.Generic.List<EffectData>(Effects.Count);
             for (int i = 0; i < Effects.Count; i++)
             {
                 EffectData e = Effects[i];
-                int amt = (e.Op == EffectOp.DealDamage || e.Op == EffectOp.GainBlock) ? e.Amount + 3 : e.Amount;
-                up.Add(new EffectData(e.Op, amt, e.Target, e.Status, e.Resource));
+                up.Add(new EffectData(e.Op, e.Amount + UpgradeBonus(e, multiHit), e.Target, e.Status, e.Resource));
             }
             return new CardData(Id + "+", Name + "+", Type, Cost, Target, Exhaust, up, Rarity, Retain, Innate, Ethereal);
+        }
+
+        // op별 강화량(연구 문서 §1.3). 다회 공격이면 DealDamage는 타격당 +1.
+        private static int UpgradeBonus(EffectData e, bool multiHit)
+        {
+            switch (e.Op)
+            {
+                case EffectOp.DealDamage: return multiHit ? 1 : 3;
+                case EffectOp.GainBlock: return 3;
+                case EffectOp.Draw: return 1;
+                case EffectOp.GainResource: return 1;
+                case EffectOp.ConsumeRadiance: return 1;   // 광 소비 배수 +1
+                case EffectOp.MultiplyPoison: return 1;    // 독 증폭 배수 +1
+                case EffectOp.ApplyStatus: return StatusUpgradeBonus(e.Status);
+                default: return 0;                         // ClearStatus 등은 수치 무의미
+            }
+        }
+
+        // 상태이상 강화량: 독 +3(큼), 약화·취약 +1(보수적), 스케일 자원(광·민첩·가시·재생) +2.
+        private static int StatusUpgradeBonus(StatusType s)
+        {
+            switch (s)
+            {
+                case StatusType.Poison: return 3;
+                case StatusType.Weak:
+                case StatusType.Vulnerable: return 1;
+                case StatusType.Radiance:
+                case StatusType.Dexterity:
+                case StatusType.Thorns:
+                case StatusType.Regen: return 2;
+                default: return 1;
+            }
         }
 
         /// <summary>인챈트를 영구 적용한 복제본(STS2 Enchantments식). sharp=공격/방어 +2, brittle=소멸 부여.</summary>
