@@ -22,6 +22,9 @@ namespace Hwatu.Core.Cards
         public bool Innate { get; }   // 전투 첫 손패에 보장 투입
         public bool Ethereal { get; } // 턴 종료 시 미사용이면 소멸(휘발)
 
+        /// <summary>이미 강화된 카드인가(Id 끝 '+'). 카드당 강화는 1회만 가능.</summary>
+        public bool IsUpgraded => Id.EndsWith("+");
+
         public CardData(string id, string name, CardType type, int cost,
             TargetType target, bool exhaust, IReadOnlyList<EffectData> effects,
             CardRarity rarity = CardRarity.Common, bool retain = false, bool innate = false, bool ethereal = false)
@@ -45,6 +48,7 @@ namespace Hwatu.Core.Cards
         /// </summary>
         public CardData Upgrade()
         {
+            if (IsUpgraded) { return this; }   // 카드당 1회만 — 이미 강화된 카드는 그대로 반환
             int damageHits = 0;
             for (int i = 0; i < Effects.Count; i++)
             {

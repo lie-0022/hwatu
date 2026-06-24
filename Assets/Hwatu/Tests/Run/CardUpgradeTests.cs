@@ -63,5 +63,16 @@ namespace Hwatu.Tests.Run
             CardData up = BeastCards.InfuseSpirit().Upgrade();
             Assert.AreEqual(3, up.Effects[0].Amount);
         }
+
+        [Test]
+        public void Upgrade_OncePerCard_SecondIsNoop()
+        {
+            // 카드당 강화 1회: 이미 강화된 카드를 또 강화하면 변화 없이 그대로(this 반환)
+            CardData up1 = StarterContent.LightStrike().Upgrade();
+            Assert.IsTrue(up1.IsUpgraded, "강화 후 IsUpgraded");
+            CardData up2 = up1.Upgrade();
+            Assert.AreSame(up1, up2, "재강화는 같은 인스턴스 반환(무효)");
+            Assert.AreEqual(up1.Effects[0].Amount, up2.Effects[0].Amount, "수치 추가 증가 없음");
+        }
     }
 }

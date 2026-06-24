@@ -163,7 +163,6 @@ namespace Hwatu.Game
             CreateText(_restPanel, "휴식처", 50f, new Vector2(0, 160));
             CreateButton(_restPanel, "회복 (HP 30%)", new Vector2(0, 20), () => _flow.OnRest(0));
             CreateButton(_restPanel, "강화 (카드 선택)", new Vector2(0, -60), () => OpenUpgradeView(false));
-            CreateButton(_restPanel, "벼리기 (예리 인챈트)", new Vector2(0, -140), () => OpenUpgradeView(true));
 
             // 강화 카드 선택 모달(휴식 위 오버레이)
             _upgradePanel = CreatePanel(root, "UpgradePanel", new Color(0.06f, 0.05f, 0.09f, 0.98f));
@@ -415,7 +414,7 @@ namespace Hwatu.Game
         }
 
         /// <summary>부모에 덱 카드들을 CardView로 그리드 배치한다(축소 스케일, 클릭·hover 옵션). 카드에 이름·효과가 그려진다.</summary>
-        private void PopulateCardGrid(RectTransform parent, List<CardData> cards, Action<int> onClick, Func<CardData, string> hover)
+        private void PopulateCardGrid(RectTransform parent, List<CardData> cards, Action<int> onClick, Func<CardData, string> hover, Func<CardData, bool> canSelect = null)
         {
             var kill = new List<GameObject>();
             foreach (Transform c in parent) { kill.Add(c.gameObject); }
@@ -436,7 +435,8 @@ namespace Hwatu.Game
                 go.transform.SetParent(parent, false);
                 var cv = go.AddComponent<CardView>();
                 cv.Build(_font);
-                cv.Bind(new CardInstance(cards[i], i), true);
+                bool selectable = canSelect == null || canSelect(cards[i]);
+                cv.Bind(new CardInstance(cards[i], i), selectable);   // 선택 불가(이미 강화 등)면 어둡게
                 cv.enabled = false;   // 손패 트윈 Update 비활성 — 모달은 정적 배치(안 끄면 전부 중앙으로 모이고 스케일이 덮어써짐)
                 var rt = (RectTransform)go.transform;
                 rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
@@ -447,7 +447,7 @@ namespace Hwatu.Game
                 {
                     go.AddComponent<TooltipTrigger>().Set(hover(cards[idx]));
                 }
-                if (onClick != null)
+                if (onClick != null && selectable)
                 {
                     var btn = go.AddComponent<Button>();
                     btn.onClick.AddListener(() => onClick(idx));
@@ -500,7 +500,7 @@ namespace Hwatu.Game
             {
                 return;
             }
-            PopulateCardGrid((RectTransform)_upgradeCardArea.transform, _flow.Run.Deck, idx => UpgradeAndClose(idx), EnchantPreviewDesc);
+            PopulateCardGrid((RectTransform)_upgradeCardArea.transform, _flow.Run.Deck, idx => UpgradeAndClose(idx), EnchantPreviewDesc, c => !c.IsUpgraded);
             _upgradePanel.SetActive(true);
             _upgradePanel.transform.SetAsLastSibling();
         }
@@ -508,9 +508,9 @@ namespace Hwatu.Game
         /// <summary>강화/벼리기 시 카드가 어떻게 바뀌는지 — 지금 효과와 강화 후 효과를 함께 보여준다.</summary>
         private string EnchantPreviewDesc(CardData card)
         {
-            CardData after = _isEnchant ? card.WithEnchant("sharp") : card.Upgrade();
-            string label = _isEnchant ? "벼린 후 (예리)" : "강화 후";
-            return $"<b>지금</b>\n{GameInfo.CardDesc(card)}\n\n<b>→ {label}</b>\n{GameInfo.CardDesc(after)}";
+            if (card.IsUpgraded) { return $"{GameInfo.CardDesc(card)}\n\n<color=#999999>이미 강화됨 — 카드당 1회만 강화할 수 있습니다.</color>"; }
+            CardData after = card.Upgrade();
+            return $"<b>지금</b>\n{GameInfo.CardDesc(card)}\n\n<b>→ 강화 후</b>\n{GameInfo.CardDesc(after)}";
         }
 
         /// <summary>선택 카드를 강화하고 모달을 닫는다(휴식 종료 → 맵).</summary>

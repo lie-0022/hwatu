@@ -1,7 +1,9 @@
 using System.Collections.Generic;
 using Hwatu.Core.Cards;
 using Hwatu.Core.Combat;
+using Hwatu.Core.Content;
 using Hwatu.Core.Effects;
+using Hwatu.Core.Enemies;
 using Hwatu.Core.Run;
 
 namespace Hwatu.Game
@@ -148,6 +150,38 @@ namespace Hwatu.Game
                 case NodeType.Boss:     return "<b>보스</b>\n액트 최종 적. 처치 시 다음 액트로.";
                 default:                return t.ToString();
             }
+        }
+
+        /// <summary>노드 호버 설명 — 타입 + (전투/정예/보스면) 맵에 확정된 적 조합.</summary>
+        public static string NodeDesc(MapNode n)
+        {
+            string desc = NodeDesc(n.Type);
+            bool fight = n.Type == NodeType.Combat || n.Type == NodeType.Elite || n.Type == NodeType.Boss;
+            if (fight && n.EncounterId >= 0)
+            {
+                List<EnemyData> enc = EnemyContent.BuildEncounter(n.Type, n.EncounterId, 1);
+                desc += "\n<size=80%><color=#E8A0A0>적: " + FormatFoes(enc) + "</color></size>";
+            }
+            return desc;
+        }
+
+        // 같은 적은 '이름×N'으로 묶어 표시(예: 도깨비불×2, 그슨대).
+        private static string FormatFoes(List<EnemyData> enc)
+        {
+            var order = new List<string>();
+            var count = new Dictionary<string, int>();
+            for (int i = 0; i < enc.Count; i++)
+            {
+                string nm = enc[i].Name;
+                if (!count.ContainsKey(nm)) { count[nm] = 0; order.Add(nm); }
+                count[nm]++;
+            }
+            var parts = new List<string>();
+            for (int i = 0; i < order.Count; i++)
+            {
+                parts.Add(count[order[i]] > 1 ? order[i] + "×" + count[order[i]] : order[i]);
+            }
+            return string.Join(", ", parts);
         }
 
         /// <summary>캐릭터 설명(선택 화면 hover).</summary>
