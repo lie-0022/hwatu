@@ -88,10 +88,10 @@ namespace Hwatu.Game
                 var enemyGo = new GameObject($"EnemyView_{i}", typeof(RectTransform));
                 enemyGo.transform.SetParent(root, false);
                 var ert = (RectTransform)enemyGo.transform;
-                ert.anchorMin = new Vector2(0.5f, 1f);
-                ert.anchorMax = new Vector2(0.5f, 1f);
-                ert.pivot = new Vector2(0.5f, 1f);
-                ert.anchoredPosition = new Vector2(0f, -70f);
+                ert.anchorMin = new Vector2(1f, 0.5f);
+                ert.anchorMax = new Vector2(1f, 0.5f);
+                ert.pivot = new Vector2(0.5f, 0.5f);
+                ert.anchoredPosition = new Vector2(-540f, 40f);   // 우측 중앙(STS식 대치). 실제 위치/스케일은 Refresh에서 적 수에 따라
                 var ev = enemyGo.AddComponent<EnemyView>();
                 ev.Build(_font, i);
                 enemyGo.SetActive(false);
@@ -102,11 +102,11 @@ namespace Hwatu.Game
             var playerGo = new GameObject("PlayerView", typeof(RectTransform), typeof(Image));
             playerGo.transform.SetParent(root, false);
             var prt = (RectTransform)playerGo.transform;
-            prt.anchorMin = Vector2.zero;
-            prt.anchorMax = Vector2.zero;
-            prt.pivot = Vector2.zero;
-            prt.anchoredPosition = new Vector2(24f, 24f);
-            prt.sizeDelta = new Vector2(440f, 150f);
+            prt.anchorMin = new Vector2(0f, 0.5f);
+            prt.anchorMax = new Vector2(0f, 0.5f);
+            prt.pivot = new Vector2(0f, 0.5f);
+            prt.anchoredPosition = new Vector2(60f, 20f);   // 좌측 중앙(STS식 대치 — 캐릭터 자리)
+            prt.sizeDelta = new Vector2(460f, 220f);
             playerGo.GetComponent<Image>().color = new Color(0.12f, 0.14f, 0.20f, 0.85f);
             _playerOutline = playerGo.AddComponent<Outline>();
             _playerOutline.effectColor = new Color(0.4f, 0.8f, 1f, 1f);
@@ -130,11 +130,11 @@ namespace Hwatu.Game
             var pstatGo = new GameObject("PlayerStatus", typeof(RectTransform));
             pstatGo.transform.SetParent(root, false);
             _playerStatusArea = (RectTransform)pstatGo.transform;
-            _playerStatusArea.anchorMin = Vector2.zero;
-            _playerStatusArea.anchorMax = Vector2.zero;
-            _playerStatusArea.pivot = Vector2.zero;
-            _playerStatusArea.anchoredPosition = new Vector2(24f, 184f);
-            _playerStatusArea.sizeDelta = new Vector2(440f, 44f);
+            _playerStatusArea.anchorMin = new Vector2(0f, 0.5f);
+            _playerStatusArea.anchorMax = new Vector2(0f, 0.5f);
+            _playerStatusArea.pivot = new Vector2(0f, 0f);
+            _playerStatusArea.anchoredPosition = new Vector2(60f, 138f);   // 좌측 플레이어 박스 위
+            _playerStatusArea.sizeDelta = new Vector2(460f, 40f);
 
             // 손패(하단 중앙, 가로 배치)
             var handGo = new GameObject("HandArea", typeof(RectTransform));
@@ -244,10 +244,13 @@ namespace Hwatu.Game
 
                 if (alive)
                 {
-                    // 가운데 정렬: slotIdx 번째 표시 칸의 x = (slotIdx - (activeCount-1)/2f) * spacing
-                    float x = (slotIdx - (activeCount - 1) / 2f) * EnemySpacing;
+                    // STS식 우측 대치: 적은 화면 오른쪽에 가로 나열. 많을수록 박스 축소(scale)+간격 좁힘.
+                    float escale = activeCount <= 1 ? 1f : activeCount == 2 ? 0.82f : 0.66f;
+                    float espacing = (activeCount == 2 ? 430f : 360f) * escale;
+                    float x = -540f + (slotIdx - (activeCount - 1) / 2f) * espacing;
                     var ert = (RectTransform)_enemyViews[i].transform;
-                    ert.anchoredPosition = new Vector2(x, -70f);
+                    ert.localScale = new Vector3(escale, escale, 1f);
+                    ert.anchoredPosition = new Vector2(x, 40f);
 
                     _enemyViews[i].Bind(s.Enemies[i], s.Player);
 
