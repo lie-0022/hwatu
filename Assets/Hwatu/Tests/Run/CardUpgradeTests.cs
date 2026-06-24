@@ -55,5 +55,13 @@ namespace Hwatu.Tests.Run
             CardData up = InkCards.Veil().Upgrade();
             Assert.AreEqual(3, up.Effects[0].Amount);
         }
+
+        [Test]
+        public void MajestyCard_Upgrade_MajestyPlusTwo()
+        {
+            // 정기 주입(위엄1) 강화 → 위엄3. 위엄은 광/민첩과 같은 +2 그룹(G3 버그 수정 회귀)
+            CardData up = BeastCards.InfuseSpirit().Upgrade();
+            Assert.AreEqual(3, up.Effects[0].Amount);
+        }
     }
 }

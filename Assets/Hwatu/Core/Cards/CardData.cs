@@ -86,6 +86,7 @@ namespace Hwatu.Core.Cards
                 case StatusType.Weak:
                 case StatusType.Vulnerable: return 1;
                 case StatusType.Radiance:
+                case StatusType.Majesty:
                 case StatusType.Dexterity:
                 case StatusType.Thorns:
                 case StatusType.Regen: return 2;
