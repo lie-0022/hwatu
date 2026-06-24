@@ -26,7 +26,7 @@ namespace Hwatu.Core.Content
                 return list;
             }
             // 일반: 정의된 인카운터 중 하나를 통째로(랜덤 섞기가 아니라 '상정된 조합'). 멀티는 약체로만 묶어 여럿이어도 과하지 않게.
-            System.Func<EnemyData>[] encounter = s_normalEncounters[rng.NextInt(s_normalEncounters.Length)];
+            System.Func<EnemyData>[] encounter = NormalEncounters[rng.NextInt(NormalEncounters.Length)];
             foreach (System.Func<EnemyData> builder in encounter)
             {
                 EnemyData ed = builder();
@@ -35,9 +35,9 @@ namespace Hwatu.Core.Content
             return list;
         }
 
-        // STS식 일반 인카운터 풀: 단일(중체 1) + 멀티(약체 2~3 고정 조합).
+        // STS식 일반 인카운터 풀(맵 생성 시 노드에 인덱스 배정). 단일(중체 1) + 멀티(약체 2~3 고정 조합).
         // 멀티 몹은 HP 낮은 약체(까마귀22·도깨비불20·밤송이24·그슨대26)라 여럿이어도 적당. 단일은 HP 높은 중체.
-        private static readonly System.Func<EnemyData>[][] s_normalEncounters = new System.Func<EnemyData>[][]
+        public static readonly System.Func<EnemyData>[][] NormalEncounters = new System.Func<EnemyData>[][]
         {
             new System.Func<EnemyData>[] { StarterContent.Boar },                                    // 단일: 멧돼지
             new System.Func<EnemyData>[] { StarterContent.Toad },                                    // 단일: 두꺼비
@@ -50,6 +50,28 @@ namespace Hwatu.Core.Content
             new System.Func<EnemyData>[] { StarterContent.WillOWisp, StarterContent.Crows, StarterContent.Geuseundae }, // 3: 약체 셋
             new System.Func<EnemyData>[] { StarterContent.Crows, StarterContent.Burr, StarterContent.WillOWisp },       // 3: 약체 셋
         };
+
+        /// <summary>엘리트 3종을 인덱스로(0 광귀·1 외눈·2 구렁이).</summary>
+        public static EnemyData EliteByIndex(int i)
+            => i == 1 ? StarterContent.CyclopsOni() : i == 2 ? StarterContent.Serpent() : StarterContent.GwangGwiElite();
+
+        /// <summary>보스 3종을 인덱스로(0 달그림자·1 구미호·2 장군).</summary>
+        public static EnemyData BossByIndex(int i)
+            => i == 1 ? StarterContent.Gumiho() : i == 2 ? StarterContent.General() : StarterContent.DokkaebiBoss();
+
+        /// <summary>맵에 확정된 인카운터 인덱스로 적 목록을 만든다(전투=조합·엘리트/보스=단일). act HP 스케일 적용. 진입 때 랜덤 재계산 없음.</summary>
+        public static System.Collections.Generic.List<EnemyData> BuildEncounter(NodeType type, int encounterId, int act)
+        {
+            var list = new System.Collections.Generic.List<EnemyData>();
+            if (type == NodeType.Boss) { list.Add(Scale(BossByIndex(encounterId), act)); return list; }
+            if (type == NodeType.Elite) { list.Add(Scale(EliteByIndex(encounterId), act)); return list; }
+            int id = (encounterId >= 0 && encounterId < NormalEncounters.Length) ? encounterId : 0;
+            foreach (System.Func<EnemyData> b in NormalEncounters[id]) { list.Add(Scale(b(), act)); }
+            return list;
+        }
+
+        private static EnemyData Scale(EnemyData ed, int act)
+            => act >= 2 ? ed.WithHpScale(1.0 + 0.25 * (act - 1)) : ed;
 
         private static EnemyData PickBase(NodeType type, IRandom rng)
         {

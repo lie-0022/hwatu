@@ -80,5 +80,36 @@ namespace Hwatu.Tests.Run
             Assert.AreEqual(IntentType.Doom, doom.Intent);
             Assert.AreEqual(28, doom.Value);
         }
+
+        [Test]
+        public void MapGenerator_AssignsEncounterId_ToCombatNodes()
+        {
+            // 스테이지 고정: 맵 생성 시 모든 전투 노드에 인카운터 인덱스가 박힌다(-1 아님)
+            var graph = new MapGenerator().Generate(new SplitMix64Random(42), 1);
+            bool anyCombat = false;
+            for (int id = 0; id < 256; id++)
+            {
+                MapNode n = graph.GetNode(id);
+                if (n != null && n.Type == NodeType.Combat && n.OnPath)
+                {
+                    Assert.GreaterOrEqual(n.EncounterId, 0, $"전투 노드 {id}는 인카운터가 확정돼야 한다");
+                    anyCombat = true;
+                }
+            }
+            Assert.IsTrue(anyCombat, "맵에 전투 노드가 존재해야 한다");
+        }
+
+        [Test]
+        public void BuildEncounter_IsDeterministic()
+        {
+            // 같은 인카운터 인덱스 → 같은 적 조합(스펙·패턴 고정). 진입마다 달라지지 않는다.
+            var a = EnemyContent.BuildEncounter(NodeType.Combat, 4, 1);
+            var b = EnemyContent.BuildEncounter(NodeType.Combat, 4, 1);
+            Assert.AreEqual(a.Count, b.Count);
+            for (int i = 0; i < a.Count; i++)
+            {
+                Assert.AreEqual(a[i].Name, b[i].Name);
+            }
+        }
     }
 }

@@ -11,6 +11,9 @@ namespace Hwatu.Core.Run
         public int Col { get; }
         public NodeType Type { get; internal set; }
 
+        /// <summary>맵 생성 시 확정되는 인카운터 인덱스(전투=조합 풀 인덱스, 엘리트/보스=종류 인덱스). -1=미배정. 진입 때 재계산하지 않는다(스테이지 고정).</summary>
+        public int EncounterId { get; internal set; } = -1;
+
         /// <summary>위(다음 층)로 연결된 노드 id.</summary>
         public List<int> NextIds { get; } = new List<int>();
         /// <summary>아래(부모)로 연결된 노드 id.</summary>

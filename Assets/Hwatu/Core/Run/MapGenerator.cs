@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Hwatu.Core.Content;
 using Hwatu.Core.Rng;
 
 namespace Hwatu.Core.Run
@@ -79,6 +80,7 @@ namespace Hwatu.Core.Run
                 }
             }
 
+            AssignEncounters(nodes, boss, rng);   // 맵 생성 시 각 전투/엘리트/보스 노드의 인카운터 확정(런 동안 고정)
             var graph = new MapGraph(Width, Height, act, nodes) { Boss = boss };
             return graph;
         }
@@ -234,6 +236,20 @@ namespace Hwatu.Core.Run
         private static int Round(float x)
         {
             return (int)(x + 0.5f);
+        }
+
+        // 맵 생성 시 전투/엘리트/보스 노드에 인카운터 인덱스를 확정한다(STS식 — 스테이지가 미리 정해짐, 진입 때 재계산 X).
+        private void AssignEncounters(List<MapNode> nodes, MapNode boss, IRandom rng)
+        {
+            int normalCount = EnemyContent.NormalEncounters.Length;
+            for (int i = 0; i < nodes.Count; i++)
+            {
+                MapNode n = nodes[i];
+                if (!n.OnPath) { continue; }
+                if (n.Type == NodeType.Combat) { n.EncounterId = rng.NextInt(normalCount); }
+                else if (n.Type == NodeType.Elite) { n.EncounterId = rng.NextInt(3); }
+            }
+            boss.EncounterId = rng.NextInt(3);
         }
     }
 }

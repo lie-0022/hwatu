@@ -618,8 +618,10 @@ namespace Hwatu.Game
             yield return null;
             MapNode node = _flow.Run.Map.GetNode(_flow.Run.CurrentNodeId);
             NodeType nodeType = node != null ? node.Type : NodeType.Combat;
-            IRandom enemyRng = new RngStreams(_flow.Run.Seed).ForStream("enemy_" + _flow.Run.CurrentNodeId);
-            var enemies = EnemyContent.PickEnemies(nodeType, enemyRng, _flow.Run.Act);
+            // 맵 생성 시 노드에 확정된 인카운터를 그대로 사용(스테이지 고정 — 진입 때 랜덤 재계산 X). 미배정(-1)이면 시드 fallback.
+            var enemies = (node != null && node.EncounterId >= 0)
+                ? EnemyContent.BuildEncounter(nodeType, node.EncounterId, _flow.Run.Act)
+                : EnemyContent.PickEnemies(nodeType, new RngStreams(_flow.Run.Seed).ForStream("enemy_" + _flow.Run.CurrentNodeId), _flow.Run.Act);
             ulong combatSeed = _flow.Run.Seed + (ulong)(_flow.Run.CurrentNodeId + 1);
             _combatCtrl.StartCombat(_flow.Run.Deck, enemies, combatSeed, _flow.Run.MaxHp, _flow.Run.Hp, _flow.Run.Relics);
             _combatView.SetVisible(true);
