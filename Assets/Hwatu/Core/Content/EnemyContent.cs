@@ -16,7 +16,7 @@ namespace Hwatu.Core.Content
             return act >= 2 ? picked.WithHpScale(1.0 + 0.25 * (act - 1)) : picked;
         }
 
-        /// <summary>STS식 다중 몬스터 선택. 보스/엘리트는 1마리(강적), 일반은 1~3마리.</summary>
+        /// <summary>STS식 인카운터 — 보스/엘리트는 단일 강적, 일반은 미리 정의된 고정 조합(단일=중체, 멀티=약체 다수).</summary>
         public static System.Collections.Generic.List<EnemyData> PickEnemies(NodeType type, IRandom rng, int act)
         {
             var list = new System.Collections.Generic.List<EnemyData>();
@@ -25,15 +25,31 @@ namespace Hwatu.Core.Content
                 list.Add(PickEnemy(type, rng, act));   // 단일 강적
                 return list;
             }
-            // 일반: 45% 1마리 / 40% 2마리 / 15% 3마리
-            int roll = rng.NextInt(100);
-            int count = roll < 45 ? 1 : roll < 85 ? 2 : 3;
-            for (int i = 0; i < count; i++)
+            // 일반: 정의된 인카운터 중 하나를 통째로(랜덤 섞기가 아니라 '상정된 조합'). 멀티는 약체로만 묶어 여럿이어도 과하지 않게.
+            System.Func<EnemyData>[] encounter = s_normalEncounters[rng.NextInt(s_normalEncounters.Length)];
+            foreach (System.Func<EnemyData> builder in encounter)
             {
-                list.Add(PickEnemy(type, rng, act));
+                EnemyData ed = builder();
+                list.Add(act >= 2 ? ed.WithHpScale(1.0 + 0.25 * (act - 1)) : ed);
             }
             return list;
         }
+
+        // STS식 일반 인카운터 풀: 단일(중체 1) + 멀티(약체 2~3 고정 조합).
+        // 멀티 몹은 HP 낮은 약체(까마귀22·도깨비불20·밤송이24·그슨대26)라 여럿이어도 적당. 단일은 HP 높은 중체.
+        private static readonly System.Func<EnemyData>[][] s_normalEncounters = new System.Func<EnemyData>[][]
+        {
+            new System.Func<EnemyData>[] { StarterContent.Boar },                                    // 단일: 멧돼지
+            new System.Func<EnemyData>[] { StarterContent.Toad },                                    // 단일: 두꺼비
+            new System.Func<EnemyData>[] { StarterContent.Jangseung },                               // 단일: 장승
+            new System.Func<EnemyData>[] { StarterContent.DokkaebiMinion },                          // 단일: 잡도깨비
+            new System.Func<EnemyData>[] { StarterContent.Crows, StarterContent.Crows },             // 2: 까마귀떼 둘
+            new System.Func<EnemyData>[] { StarterContent.WillOWisp, StarterContent.WillOWisp },     // 2: 도깨비불 짝
+            new System.Func<EnemyData>[] { StarterContent.Burr, StarterContent.Geuseundae },         // 2: 밤송이+그슨대
+            new System.Func<EnemyData>[] { StarterContent.Scarecrow, StarterContent.Crows },         // 2: 허수아비+까마귀
+            new System.Func<EnemyData>[] { StarterContent.WillOWisp, StarterContent.Crows, StarterContent.Geuseundae }, // 3: 약체 셋
+            new System.Func<EnemyData>[] { StarterContent.Crows, StarterContent.Burr, StarterContent.WillOWisp },       // 3: 약체 셋
+        };
 
         private static EnemyData PickBase(NodeType type, IRandom rng)
         {

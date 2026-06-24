@@ -134,8 +134,8 @@ namespace Hwatu.Core.Content
             "scarecrow", "허수아비", 28, 34,
             new[]
             {
-                new EnemyMoveData("weaken", IntentType.Debuff, 2,
-                    new[] { new EffectData(EffectOp.ApplyStatus, amount: 2, target: TargetType.Enemy, status: StatusType.Weak) }),
+                new EnemyMoveData("weaken", IntentType.Debuff, 1,
+                    new[] { new EffectData(EffectOp.ApplyStatus, amount: 1, target: TargetType.Enemy, status: StatusType.Weak) }),
                 new EnemyMoveData("poke", IntentType.Attack, 5,
                     new[] { new EffectData(EffectOp.DealDamage, amount: 5, target: TargetType.Enemy) }),
             },
@@ -179,8 +179,8 @@ namespace Hwatu.Core.Content
             "cyclops_oni", "외눈도깨비", 95, 110,
             new[]
             {
-                new EnemyMoveData("glare", IntentType.Debuff, 2,
-                    new[] { new EffectData(EffectOp.ApplyStatus, amount: 2, target: TargetType.Enemy, status: StatusType.Weak) }),
+                new EnemyMoveData("glare", IntentType.Debuff, 1,
+                    new[] { new EffectData(EffectOp.ApplyStatus, amount: 1, target: TargetType.Enemy, status: StatusType.Weak) }),
                 new EnemyMoveData("oni_smash", IntentType.Attack, 18,
                     new[] { new EffectData(EffectOp.DealDamage, amount: 18, target: TargetType.Enemy) }),
                 new EnemyMoveData("enrage", IntentType.Buff, 3,
@@ -194,8 +194,8 @@ namespace Hwatu.Core.Content
             "gumiho", "구미호", 100, 120,
             new[]
             {
-                new EnemyMoveData("charm", IntentType.Debuff, 2,
-                    new[] { new EffectData(EffectOp.ApplyStatus, amount: 2, target: TargetType.Enemy, status: StatusType.Weak) }),
+                new EnemyMoveData("charm", IntentType.Debuff, 1,
+                    new[] { new EffectData(EffectOp.ApplyStatus, amount: 1, target: TargetType.Enemy, status: StatusType.Weak) }),
                 new EnemyMoveData("tail", IntentType.AttackMulti, 4,
                     new[]
                     {
@@ -245,8 +245,8 @@ namespace Hwatu.Core.Content
                         new EffectData(EffectOp.DealDamage, amount: 3, target: TargetType.Enemy),
                         new EffectData(EffectOp.DealDamage, amount: 3, target: TargetType.Enemy),
                     }, hits: 2),
-                new EnemyMoveData("curse", IntentType.Debuff, 2,
-                    new[] { new EffectData(EffectOp.ApplyStatus, amount: 2, target: TargetType.Enemy, status: StatusType.Weak) }),
+                new EnemyMoveData("curse", IntentType.Debuff, 1,
+                    new[] { new EffectData(EffectOp.ApplyStatus, amount: 1, target: TargetType.Enemy, status: StatusType.Weak) }),
             },
             EnemyAiKind.WeightedRandom,
             new[] { "claw", "curse", "claw" });
@@ -285,7 +285,7 @@ namespace Hwatu.Core.Content
                 new EnemyMoveData("command", IntentType.Debuff, 2,
                     new[]
                     {
-                        new EffectData(EffectOp.ApplyStatus, amount: 2, target: TargetType.Enemy, status: StatusType.Weak),
+                        new EffectData(EffectOp.ApplyStatus, amount: 1, target: TargetType.Enemy, status: StatusType.Weak),
                         new EffectData(EffectOp.GainResource, amount: 2, target: TargetType.Self, resource: ResourceType.Radiance),
                     }),
             },
