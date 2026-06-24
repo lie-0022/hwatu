@@ -171,12 +171,12 @@ namespace Hwatu.Game
                 () => { _controller.NewCombat(); Refresh(); });
             _resultPanel.SetActive(false);
 
-            // 더미 보기 버튼(우하단 세로) — STS2식 draw/discard/exhaust
-            CreateButton(root, "뽑을 카드", new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-130f, 486f), new Vector2(170f, 52f),
+            // 더미 보기 버튼 — 좌하단 모서리 세로(STS식: 뽑을/버린/소멸). 적(우측)·손패(중앙)와 안 겹침.
+            CreateButton(root, "뽑을 카드", new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(112f, 190f), new Vector2(156f, 50f),
                 () => ShowPile(_controller.State.DrawPile, "뽑을 카드 (남은 덱)"));
-            CreateButton(root, "버린 카드", new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-130f, 428f), new Vector2(170f, 52f),
+            CreateButton(root, "버린 카드", new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(112f, 132f), new Vector2(156f, 50f),
                 () => ShowPile(_controller.State.DiscardPile, "버린 카드"));
-            CreateButton(root, "소멸 카드", new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-130f, 370f), new Vector2(170f, 52f),
+            CreateButton(root, "소멸 카드", new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(112f, 74f), new Vector2(156f, 50f),
                 () => ShowPile(_controller.State.ExhaustPile, "소멸한 카드"));
 
             // 더미 내용 모달
@@ -280,10 +280,10 @@ namespace Hwatu.Game
 
             PlayerState p = s.Player;
             _playerHpBar.Set(p.Hp, p.MaxHp);
-            string blockStr = p.Block > 0 ? $"    <color=#5B9BD5><b>방어 {p.Block}</b></color>" : "";   // 방어>0만 표시(STS식), 청색 강조
+            string blockStr = p.Block > 0 ? $"      <color=#5B9BD5><b>방어 {p.Block}</b></color>" : "";   // 방어>0만 표시(STS식), 청색
             _playerText.text =
-                $"에너지 {p.Energy}/{p.BaseEnergy}{blockStr}\n" +
-                $"턴 {s.Turn}   덱 {s.DrawPile.Count}  버린 {s.DiscardPile.Count}  소멸 {s.ExhaustPile.Count}";
+                $"<size=150%><color=#9FD8F0><b>에너지 {p.Energy}/{p.BaseEnergy}</b></color></size>{blockStr}\n" +
+                $"<size=78%>턴 {s.Turn}   ·   덱 {s.DrawPile.Count} / 버린 {s.DiscardPile.Count} / 소멸 {s.ExhaustPile.Count}</size>";
             RebuildStatus(p);
 
             RebuildHand(s);
