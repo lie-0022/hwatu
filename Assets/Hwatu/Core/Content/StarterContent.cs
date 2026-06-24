@@ -42,8 +42,8 @@ namespace Hwatu.Core.Content
             "dokkaebi_minion", "잡도깨비", 28, 34,
             new[]
             {
-                new EnemyMoveData("swipe", IntentType.Attack, 9,
-                    new[] { new EffectData(EffectOp.DealDamage, amount: 9, target: TargetType.Enemy) }),
+                new EnemyMoveData("swipe", IntentType.Attack, 7,
+                    new[] { new EffectData(EffectOp.DealDamage, amount: 7, target: TargetType.Enemy) }),
                 new EnemyMoveData("guard", IntentType.Block, 6,
                     new[] { new EffectData(EffectOp.GainBlock, amount: 6, target: TargetType.Self) }),
             },
@@ -55,8 +55,8 @@ namespace Hwatu.Core.Content
             "boar", "멧돼지", 38, 46,
             new[]
             {
-                new EnemyMoveData("gore", IntentType.Attack, 12,
-                    new[] { new EffectData(EffectOp.DealDamage, amount: 12, target: TargetType.Enemy) }),
+                new EnemyMoveData("gore", IntentType.Attack, 10,
+                    new[] { new EffectData(EffectOp.DealDamage, amount: 10, target: TargetType.Enemy) }),
                 new EnemyMoveData("snort", IntentType.Buff, 0,
                     new[] { new EffectData(EffectOp.ApplyStatus, amount: 2, target: TargetType.Self, status: StatusType.Radiance) }),
             },
@@ -87,8 +87,8 @@ namespace Hwatu.Core.Content
             {
                 new EnemyMoveData("bristle", IntentType.Buff, 0,
                     new[] { new EffectData(EffectOp.ApplyStatus, amount: 4, target: TargetType.Self, status: StatusType.Thorns) }),
-                new EnemyMoveData("prick", IntentType.Attack, 8,
-                    new[] { new EffectData(EffectOp.DealDamage, amount: 8, target: TargetType.Enemy) }),
+                new EnemyMoveData("prick", IntentType.Attack, 6,
+                    new[] { new EffectData(EffectOp.DealDamage, amount: 6, target: TargetType.Enemy) }),
             },
             EnemyAiKind.Sequence,
             new[] { "bristle", "prick", "prick" });
@@ -116,12 +116,12 @@ namespace Hwatu.Core.Content
             "crows", "까마귀떼", 22, 28,
             new[]
             {
-                new EnemyMoveData("peck", IntentType.AttackMulti, 3,
+                new EnemyMoveData("peck", IntentType.AttackMulti, 2,
                     new[]
                     {
-                        new EffectData(EffectOp.DealDamage, amount: 3, target: TargetType.Enemy),
-                        new EffectData(EffectOp.DealDamage, amount: 3, target: TargetType.Enemy),
-                        new EffectData(EffectOp.DealDamage, amount: 3, target: TargetType.Enemy),
+                        new EffectData(EffectOp.DealDamage, amount: 2, target: TargetType.Enemy),
+                        new EffectData(EffectOp.DealDamage, amount: 2, target: TargetType.Enemy),
+                        new EffectData(EffectOp.DealDamage, amount: 2, target: TargetType.Enemy),
                     }, hits: 3),
                 new EnemyMoveData("flock", IntentType.Block, 4,
                     new[] { new EffectData(EffectOp.GainBlock, amount: 4, target: TargetType.Self) }),
@@ -134,8 +134,8 @@ namespace Hwatu.Core.Content
             "scarecrow", "허수아비", 28, 34,
             new[]
             {
-                new EnemyMoveData("weaken", IntentType.Debuff, 3,
-                    new[] { new EffectData(EffectOp.ApplyStatus, amount: 3, target: TargetType.Enemy, status: StatusType.Weak) }),
+                new EnemyMoveData("weaken", IntentType.Debuff, 2,
+                    new[] { new EffectData(EffectOp.ApplyStatus, amount: 2, target: TargetType.Enemy, status: StatusType.Weak) }),
                 new EnemyMoveData("poke", IntentType.Attack, 5,
                     new[] { new EffectData(EffectOp.DealDamage, amount: 5, target: TargetType.Enemy) }),
             },
@@ -147,8 +147,8 @@ namespace Hwatu.Core.Content
             "gwanggwi_elite", "광귀", 90, 104,
             new[]
             {
-                new EnemyMoveData("smash", IntentType.Attack, 15,
-                    new[] { new EffectData(EffectOp.DealDamage, amount: 15, target: TargetType.Enemy) }),
+                new EnemyMoveData("smash", IntentType.Attack, 13,
+                    new[] { new EffectData(EffectOp.DealDamage, amount: 13, target: TargetType.Enemy) }),
                 new EnemyMoveData("expose", IntentType.Debuff, 2,
                     new[] { new EffectData(EffectOp.ApplyStatus, amount: 2, target: TargetType.Enemy, status: StatusType.Vulnerable) }),
                 new EnemyMoveData("wall", IntentType.Block, 10,
@@ -181,8 +181,8 @@ namespace Hwatu.Core.Content
             {
                 new EnemyMoveData("glare", IntentType.Debuff, 2,
                     new[] { new EffectData(EffectOp.ApplyStatus, amount: 2, target: TargetType.Enemy, status: StatusType.Weak) }),
-                new EnemyMoveData("oni_smash", IntentType.Attack, 21,
-                    new[] { new EffectData(EffectOp.DealDamage, amount: 21, target: TargetType.Enemy) }),
+                new EnemyMoveData("oni_smash", IntentType.Attack, 18,
+                    new[] { new EffectData(EffectOp.DealDamage, amount: 18, target: TargetType.Enemy) }),
                 new EnemyMoveData("enrage", IntentType.Buff, 3,
                     new[] { new EffectData(EffectOp.GainResource, amount: 3, target: TargetType.Self, resource: ResourceType.Radiance) }),
             },
@@ -194,8 +194,8 @@ namespace Hwatu.Core.Content
             "gumiho", "구미호", 100, 120,
             new[]
             {
-                new EnemyMoveData("charm", IntentType.Debuff, 3,
-                    new[] { new EffectData(EffectOp.ApplyStatus, amount: 3, target: TargetType.Enemy, status: StatusType.Weak) }),
+                new EnemyMoveData("charm", IntentType.Debuff, 2,
+                    new[] { new EffectData(EffectOp.ApplyStatus, amount: 2, target: TargetType.Enemy, status: StatusType.Weak) }),
                 new EnemyMoveData("tail", IntentType.AttackMulti, 4,
                     new[]
                     {
@@ -226,10 +226,10 @@ namespace Hwatu.Core.Content
             {
                 new EnemyMoveData("ward", IntentType.Block, 10,
                     new[] { new EffectData(EffectOp.GainBlock, amount: 10, target: TargetType.Self) }),
-                new EnemyMoveData("stare", IntentType.Debuff, 2,
-                    new[] { new EffectData(EffectOp.ApplyStatus, amount: 2, target: TargetType.Enemy, status: StatusType.Weak) }),
-                new EnemyMoveData("ram", IntentType.Attack, 13,
-                    new[] { new EffectData(EffectOp.DealDamage, amount: 13, target: TargetType.Enemy) }),
+                new EnemyMoveData("stare", IntentType.Debuff, 1,
+                    new[] { new EffectData(EffectOp.ApplyStatus, amount: 1, target: TargetType.Enemy, status: StatusType.Weak) }),
+                new EnemyMoveData("ram", IntentType.Attack, 11,
+                    new[] { new EffectData(EffectOp.DealDamage, amount: 11, target: TargetType.Enemy) }),
             },
             EnemyAiKind.WeightedRandom,
             new[] { "ward", "stare", "ram" });
@@ -246,11 +246,7 @@ namespace Hwatu.Core.Content
                         new EffectData(EffectOp.DealDamage, amount: 3, target: TargetType.Enemy),
                     }, hits: 2),
                 new EnemyMoveData("curse", IntentType.Debuff, 2,
-                    new[]
-                    {
-                        new EffectData(EffectOp.ApplyStatus, amount: 2, target: TargetType.Enemy, status: StatusType.Weak),
-                        new EffectData(EffectOp.ApplyStatus, amount: 1, target: TargetType.Enemy, status: StatusType.Vulnerable),
-                    }),
+                    new[] { new EffectData(EffectOp.ApplyStatus, amount: 2, target: TargetType.Enemy, status: StatusType.Weak) }),
             },
             EnemyAiKind.WeightedRandom,
             new[] { "claw", "curse", "claw" });
@@ -260,8 +256,8 @@ namespace Hwatu.Core.Content
             "serpent", "구렁이", 92, 106,
             new[]
             {
-                new EnemyMoveData("coil_strike", IntentType.Attack, 16,
-                    new[] { new EffectData(EffectOp.DealDamage, amount: 16, target: TargetType.Enemy) }),
+                new EnemyMoveData("coil_strike", IntentType.Attack, 14,
+                    new[] { new EffectData(EffectOp.DealDamage, amount: 14, target: TargetType.Enemy) }),
                 new EnemyMoveData("fang", IntentType.Attack, 6,
                     new[]
                     {
