@@ -465,7 +465,9 @@ namespace Hwatu.Game
                     card.SetCombat(this);
                     _cardViews[c.InstanceId] = card;
                 }
-                card.Bind(c, playable);
+                int atkBonus = s.Player.GetStatus(StatusType.Majesty) + s.Player.GetStatus(StatusType.Radiance);
+                bool weak = s.Player.GetStatus(StatusType.Weak) > 0;
+                card.Bind(c, playable, atkBonus, weak);
                 ordered.Add(card);
             }
 

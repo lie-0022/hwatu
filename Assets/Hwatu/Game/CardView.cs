@@ -102,7 +102,7 @@ namespace Hwatu.Game
         }
 
         /// <summary>카드 데이터를 비주얼에 반영한다. playable=false면 어둡게 표시.</summary>
-        public void Bind(CardInstance card, bool playable)
+        public void Bind(CardInstance card, bool playable, int atkBonus = 0, bool weak = false)
         {
             Card = card;
             CardData d = card.Data;
@@ -112,7 +112,7 @@ namespace Hwatu.Game
             _costText.text = d.Cost.ToString();
             _typeText.text = TypeKor(d.Type);
             _nameText.text = d.Name;
-            _descText.text = Describe(d);
+            _descText.text = Describe(d, atkBonus, weak);
             // 카드 자체에 이름·효과가 적혀 있어 hover 툴팁은 두지 않는다(손패에서 카드를 가리는 문제 회피).
 
             float a = playable ? 1f : 0.6f;
@@ -409,14 +409,22 @@ namespace Hwatu.Game
             }
         }
 
-        private static string Describe(CardData d)
+        private static string Describe(CardData d, int atkBonus, bool weak)
         {
             var parts = new System.Collections.Generic.List<string>();
             foreach (EffectData e in d.Effects)
             {
                 switch (e.Op)
                 {
-                    case EffectOp.DealDamage:   parts.Add($"{e.Amount} 피해"); break;
+                    case EffectOp.DealDamage:
+                    {
+                        // STS식 동적 표시: 위엄·광은 모든 공격에 가산되고 약화면 ×3/4 → 실제 들어갈 피해로 보여준다(늘면 초록).
+                        int shown = e.Amount + atkBonus;
+                        if (weak) { shown = shown * 3 / 4; }
+                        if (shown < 0) { shown = 0; }
+                        parts.Add(shown != e.Amount ? $"<color=#9FE38A>{shown}</color> 피해" : $"{shown} 피해");
+                        break;
+                    }
                     case EffectOp.GainBlock:    parts.Add($"{e.Amount} 방어"); break;
                     case EffectOp.GainResource: parts.Add($"광 +{e.Amount}"); break;
                     case EffectOp.Draw:         parts.Add($"{e.Amount}장 뽑기"); break;
@@ -448,6 +456,9 @@ namespace Hwatu.Game
                 case StatusType.Weak:       return "약화";
                 case StatusType.Vulnerable: return "취약";
                 case StatusType.Radiance:   return "광";
+                case StatusType.Majesty:    return "위엄";
+                case StatusType.Regen:      return "재생";
+                case StatusType.Thorns:     return "가시";
                 case StatusType.Dexterity:  return "민첩";
                 default:                    return s.ToString();
             }
