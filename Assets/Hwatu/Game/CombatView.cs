@@ -245,12 +245,12 @@ namespace Hwatu.Game
                 if (alive)
                 {
                     // STS식 우측 대치: 적은 화면 오른쪽에 가로 나열. 많을수록 박스 축소(scale)+간격 좁힘.
-                    float escale = activeCount <= 1 ? 1f : activeCount == 2 ? 0.82f : 0.66f;
-                    float espacing = (activeCount == 2 ? 430f : 360f) * escale;
-                    float x = -540f + (slotIdx - (activeCount - 1) / 2f) * espacing;
+                    float escale = activeCount <= 1 ? 0.92f : activeCount == 2 ? 0.84f : 0.74f;
+                    float espacing = 400f * escale + 64f;   // 박스폭(400)×scale + 여백64 → 인접 박스가 절대 안 겹침
+                    float x = -560f + (slotIdx - (activeCount - 1) / 2f) * espacing;
                     var ert = (RectTransform)_enemyViews[i].transform;
                     ert.localScale = new Vector3(escale, escale, 1f);
-                    ert.anchoredPosition = new Vector2(x, 40f);
+                    ert.anchoredPosition = new Vector2(x, 20f);
 
                     _enemyViews[i].Bind(s.Enemies[i], s.Player);
 
