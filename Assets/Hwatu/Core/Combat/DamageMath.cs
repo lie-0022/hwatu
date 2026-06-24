@@ -10,6 +10,10 @@ namespace Hwatu.Core.Combat
         public static int RawDamage(ICombatant source, ICombatant target, int baseAmount)
         {
             int dmg = baseAmount + source.GetStatus(StatusType.Radiance) + source.GetStatus(StatusType.Majesty);
+            if (source.GetStatus(StatusType.Majesty) >= 10)
+            {
+                dmg = dmg * 5 / 4;   // 각성 3단계(위엄 10+): 공격 피해 +25%
+            }
             if (source.GetStatus(StatusType.Weak) > 0)
             {
                 dmg = dmg * 3 / 4;
@@ -17,6 +21,10 @@ namespace Hwatu.Core.Combat
             if (target.GetStatus(StatusType.Vulnerable) > 0)
             {
                 dmg = dmg * 3 / 2;
+            }
+            if (target.GetStatus(StatusType.Majesty) >= 15)
+            {
+                dmg = dmg * 3 / 4;   // 각성 4단계(위엄 15+): 받는 피해 -25%
             }
             return dmg < 0 ? 0 : dmg;
         }

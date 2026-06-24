@@ -216,6 +216,11 @@ namespace Hwatu.Core.Combat
                 return;
             }
             TickRegen(State.Player);   // 독 정산 후 회복(MaxHp 캡)
+            // 각성 2단계(위엄 5+): 매 턴 시작 위엄 +1 — 산군 자가 성장(캐릭터 문서 §2.4)
+            if (Awakening.Tier(State.Player.GetStatus(StatusType.Majesty)) >= 2)
+            {
+                State.Player.AddStatus(StatusType.Majesty, 1);
+            }
             for (int i = 0; i < State.OnTurnStartHooks.Count; i++) { State.OnTurnStartHooks[i](State.Player); }  // 턴시작 유물(연구 §3.2)
             State.Player.Energy = State.Player.BaseEnergy;
             PileSystem.Draw(State.Hand, State.DrawPile, State.DiscardPile, State.ShuffleRng, State.Player.HandSize);

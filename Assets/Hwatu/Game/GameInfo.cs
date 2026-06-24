@@ -41,7 +41,12 @@ namespace Hwatu.Game
                 case StatusType.Vulnerable: return $"<b>취약 {amount}</b>\n받는 공격 피해 50% 증가 ({amount}턴)";
                 case StatusType.Poison:     return $"<b>중독 {amount}</b>\n턴 시작 시 {amount} 피해, 이후 1 감소";
                 case StatusType.Dexterity:  return $"<b>민첩 {amount}</b>\n방어 획득량 +{amount}";
-                case StatusType.Majesty:    return $"<b>위엄 {amount}</b>\n공격 피해 +{amount} (백호 고유, 전투 내내 유지)";
+                case StatusType.Majesty:
+                {
+                    int mt = Hwatu.Core.Combat.Awakening.Tier(amount);
+                    string mp = mt >= 4 ? "받는 피해 -25%" : mt >= 3 ? "공격 피해 +25%" : mt >= 2 ? "매 턴 위엄 +1" : "기본";
+                    return $"<b>위엄 {amount}</b>\n공격 피해 +{amount} (백호 고유, 전투 내내 유지)\n<color=#E0B84A>각성 {mt}단계 · {Hwatu.Core.Combat.Awakening.TierName(mt)}</color> — {mp}";
+                }
                 case StatusType.Regen:      return $"<b>재생 {amount}</b>\n턴 시작 시 {amount} 회복, 이후 1 감소";
                 case StatusType.Thorns:     return $"<b>가시 {amount}</b>\n피격 시 공격자에게 {amount} 반사(영구)";
                 default:                    return $"{s} {amount}";

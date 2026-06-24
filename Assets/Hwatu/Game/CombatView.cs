@@ -281,9 +281,11 @@ namespace Hwatu.Game
             PlayerState p = s.Player;
             _playerHpBar.Set(p.Hp, p.MaxHp);
             string blockStr = p.Block > 0 ? $"      <color=#5B9BD5><b>방어 {p.Block}</b></color>" : "";   // 방어>0만 표시(STS식), 청색
+            int maj = p.GetStatus(StatusType.Majesty);
+            string awaken = maj > 0 ? $"\n<size=82%><color=#E0B84A>각성 {Awakening.Tier(maj)}단계 · {Awakening.TierName(Awakening.Tier(maj))}</color></size>" : "";   // 백호 각성 단계
             _playerText.text =
                 $"<size=150%><color=#9FD8F0><b>에너지 {p.Energy}/{p.BaseEnergy}</b></color></size>{blockStr}\n" +
-                $"<size=78%>턴 {s.Turn}   ·   덱 {s.DrawPile.Count} / 버린 {s.DiscardPile.Count} / 소멸 {s.ExhaustPile.Count}</size>";
+                $"<size=78%>턴 {s.Turn}   ·   덱 {s.DrawPile.Count} / 버린 {s.DiscardPile.Count} / 소멸 {s.ExhaustPile.Count}</size>{awaken}";
             RebuildStatus(p);
 
             RebuildHand(s);
