@@ -150,5 +150,11 @@ namespace Hwatu.Core.Jokbo
         {
             Phase = JokboRunPhase.Map;
         }
+
+        /// <summary>이벤트 넘기기(이벤트 콘텐츠는 후속 — 현재는 맵 복귀).</summary>
+        public void ResolveEventSkip()
+        {
+            Phase = JokboRunPhase.Map;
+        }
     }
 }
