@@ -48,6 +48,12 @@ namespace Hwatu.Game
             BeginWith(JokboCombatFactory.Create(deck, enemies, seed, maxHp, hp, relics));
         }
 
+        /// <summary>외부(런 흐름 JokboRunFlow.Combat)에서 만든 전투 엔진을 주입해 이 컨트롤러로 구동한다(런 통합용).</summary>
+        public void SetEngine(JokboCombatEngine engine)
+        {
+            BeginWith(engine);
+        }
+
         private void BeginWith(JokboCombatEngine engine)
         {
             _engine = engine;
