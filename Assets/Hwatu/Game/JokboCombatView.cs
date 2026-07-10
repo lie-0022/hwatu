@@ -338,6 +338,7 @@ namespace Hwatu.Game
             go.GetComponent<Image>().color = new Color(0.20f, 0.22f, 0.30f, 0.95f);
             go.GetComponent<Button>().onClick.AddListener(onClick);
             labelText = MakeText(rt, "L", new Vector2(0.5f, 0.5f), 24f, size);
+            labelText.text = label;
             return go.GetComponent<Button>();
         }
 
