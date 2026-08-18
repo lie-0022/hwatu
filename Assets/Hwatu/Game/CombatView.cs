@@ -55,10 +55,10 @@ namespace Hwatu.Game
 
         public static TMP_FontAsset LoadKoreanFont()
         {
-            Font f = Resources.Load<Font>("Fonts/malgun");
+            Font f = Resources.Load<Font>("Fonts/Pretendard-Regular");
             if (f == null)
             {
-                f = Font.CreateDynamicFontFromOSFont(new[] { "Malgun Gothic", "맑은 고딕", "Gulim", "Apple SD Gothic Neo", "AppleGothic", "NanumGothic", "Arial" }, 24);
+                f = Font.CreateDynamicFontFromOSFont(new[] { "Pretendard", "Apple SD Gothic Neo", "AppleGothic", "NanumGothic", "Malgun Gothic", "맑은 고딕", "Arial" }, 24);
             }
             return TMP_FontAsset.CreateFontAsset(f);
         }
