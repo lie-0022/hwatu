@@ -1,0 +1,82 @@
+# ===================================================================
+# 줄바꿈 정규화 — 윈도우/맥 혼용 대비 (2026-08-19)
+# 저장소에는 항상 LF로 저장하고, 체크아웃도 LF로 통일한다.
+# ===================================================================
+* text=auto eol=lf
+
+# 소스/설정 — 명시적으로 텍스트
+*.cs        text diff=csharp
+*.md        text
+*.json      text
+*.txt       text
+*.xml       text
+*.yml       text
+*.yaml      text
+*.asmdef    text
+*.asmref    text
+*.shader    text
+*.hlsl      text
+*.cginc     text
+*.uss       text
+*.uxml      text
+*.sh        text eol=lf
+*.bat       text eol=crlf
+
+# ===================================================================
+# Unity YAML — Smart Merge (UnityYAMLMerge) 대상
+# 사용하려면 로컬에 merge 드라이버 등록 필요 (README 참조)
+# ===================================================================
+*.unity           merge=unityyamlmerge eol=lf
+*.prefab          merge=unityyamlmerge eol=lf
+*.asset           merge=unityyamlmerge eol=lf
+*.mat             merge=unityyamlmerge eol=lf
+*.anim            merge=unityyamlmerge eol=lf
+*.controller      merge=unityyamlmerge eol=lf
+*.overrideController merge=unityyamlmerge eol=lf
+*.physicMaterial  merge=unityyamlmerge eol=lf
+*.physicsMaterial2D merge=unityyamlmerge eol=lf
+*.playable        merge=unityyamlmerge eol=lf
+*.mask            merge=unityyamlmerge eol=lf
+*.brush           merge=unityyamlmerge eol=lf
+*.flare           merge=unityyamlmerge eol=lf
+*.fontsettings    merge=unityyamlmerge eol=lf
+*.guiskin         merge=unityyamlmerge eol=lf
+*.giparams        merge=unityyamlmerge eol=lf
+*.renderTexture   merge=unityyamlmerge eol=lf
+*.spriteatlas     merge=unityyamlmerge eol=lf
+*.terrainlayer    merge=unityyamlmerge eol=lf
+*.mixer           merge=unityyamlmerge eol=lf
+*.shadervariants  merge=unityyamlmerge eol=lf
+*.preset          merge=unityyamlmerge eol=lf
+*.meta            text eol=lf
+
+# ===================================================================
+# 바이너리 — 절대 줄바꿈 변환 금지
+# ===================================================================
+*.ttf   binary
+*.otf   binary
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.psd   binary
+*.tga   binary
+*.tif   binary
+*.exr   binary
+*.aseprite binary
+*.ase   binary
+*.wav   binary
+*.mp3   binary
+*.ogg   binary
+*.aif   binary
+*.fbx   binary
+*.blend binary
+*.obj   binary
+*.dll   binary
+*.so    binary
+*.dylib binary
+*.bundle binary
+*.a     binary
+*.pdf   binary
+*.zip   binary
+*.unitypackage binary

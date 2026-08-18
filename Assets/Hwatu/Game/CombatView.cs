@@ -58,7 +58,7 @@ namespace Hwatu.Game
             Font f = Resources.Load<Font>("Fonts/malgun");
             if (f == null)
             {
-                f = Font.CreateDynamicFontFromOSFont(new[] { "Malgun Gothic", "맑은 고딕", "Gulim", "Arial" }, 24);
+                f = Font.CreateDynamicFontFromOSFont(new[] { "Malgun Gothic", "맑은 고딕", "Gulim", "Apple SD Gothic Neo", "AppleGothic", "NanumGothic", "Arial" }, 24);
             }
             return TMP_FontAsset.CreateFontAsset(f);
         }
